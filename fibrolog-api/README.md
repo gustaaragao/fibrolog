@@ -15,10 +15,16 @@ API para gerenciamento de dados de pacientes com fibromialgia.
 poetry install
 ```
 
-2. Configure as variáveis de ambiente criando um arquivo `.env`:
+2. Configure as variáveis de ambiente:
 ```bash
-DATABASE_URL="sqlite:///database.db"
+cp .env.example .env
 ```
+
+3. Edite o arquivo `.env` e configure as seguintes variáveis:
+   - `DATABASE_URL`: URL de conexão com o banco de dados
+   - `SECRET_KEY`: Chave secreta para JWT (gere uma segura com `openssl rand -hex 32`)
+   - `ALGORITHM`: Algoritmo de criptografia (padrão: HS256)
+   - `ACCESS_TOKEN_EXPIRE_MINUTES`: Tempo de expiração do token (padrão: 30 minutos)
 
 ## Gerenciamento do Banco de Dados
 

@@ -11,7 +11,7 @@ from fibrolog_api.models import Paciente
 from fibrolog_api.schemas import Token
 from fibrolog_api.security import create_access_token, verify_password
 
-router = APIRouter(prefix='/auth', tags=['auth'])
+router = APIRouter(prefix='/auth', tags=['Autenticação'])
 
 
 @router.post('/token', response_model=Token)
