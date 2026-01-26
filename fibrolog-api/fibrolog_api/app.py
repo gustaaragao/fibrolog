@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
+from fibrolog_api.routers import pacientes
+
 app = FastAPI()
 
-
-@app.get('/')
-def read_root():
-    return {'message': 'Hello World!'}
+app.include_router(pacientes.router)
