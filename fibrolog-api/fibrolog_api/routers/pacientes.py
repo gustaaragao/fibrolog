@@ -19,14 +19,14 @@ from fibrolog_api.security import get_current_paciente, get_password_hash
 
 router = APIRouter(prefix='/pacientes', tags=['Pacientes'])
 
-SessionDep = Annotated[AsyncSession, Depends(get_session)]
-CurrentPaciente = Annotated[Paciente, Depends(get_current_paciente)]
+Session = Annotated[AsyncSession, Depends(get_session)]
+DBPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 
 @router.post(
     '/', status_code=HTTPStatus.CREATED, response_model=PacientePublic
 )
-async def create_paciente(paciente: PacienteSchema, session: SessionDep):
+async def create_paciente(paciente: PacienteSchema, session: Session):
     # Verificar se o email já existe
     result = await session.execute(
         select(Paciente).where(Paciente.email == paciente.email)
@@ -50,7 +50,7 @@ async def create_paciente(paciente: PacienteSchema, session: SessionDep):
 
 @router.get('/', response_model=PacienteList)
 async def get_pacientes(
-    session: SessionDep, filter_page: Annotated[FilterPage, Query()]
+    session: Session, filter_page: Annotated[FilterPage, Query()]
 ):
     result = await session.scalars(
         select(Paciente).offset(filter_page.offset).limit(filter_page.limit)
@@ -60,7 +60,7 @@ async def get_pacientes(
 
 
 @router.get('/{paciente_id}', response_model=PacientePublic)
-async def get_paciente(paciente_id: int, session: SessionDep):
+async def get_paciente(paciente_id: int, session: Session):
     result = await session.execute(
         select(Paciente).where(Paciente.id == paciente_id)
     )
@@ -78,8 +78,8 @@ async def get_paciente(paciente_id: int, session: SessionDep):
 async def update_paciente(
     paciente_id: int,
     paciente: PacienteSchema,
-    session: SessionDep,
-    current_paciente: CurrentPaciente,
+    session: Session,
+    current_paciente: DBPaciente,
 ):
     if current_paciente.id != paciente_id:
         raise HTTPException(
@@ -105,8 +105,8 @@ async def update_paciente(
 @router.delete('/{paciente_id}', response_model=Message)
 async def delete_paciente(
     paciente_id: int,
-    session: SessionDep,
-    current_paciente: CurrentPaciente,
+    session: Session,
+    current_paciente: DBPaciente,
 ):
     if current_paciente.id != paciente_id:
         raise HTTPException(
