@@ -36,7 +36,7 @@ class Paciente:
         back_populates='paciente', init=False
     )
     registros: Mapped[List['Registro']] = relationship(
-        back_populates='paciente', init=False
+        back_populates='paciente', cascade='all, delete-orphan', init=False
     )
 
     created_at: Mapped[datetime] = mapped_column(
