@@ -55,7 +55,7 @@ async def client(session):
 
 @pytest_asyncio.fixture
 async def paciente(session):
-    password_plain = 'senha123'
+    password_plain = 'Senha@123'
     paciente = Paciente(
         nome='Gustavo',
         email='gustavo@example.com',
@@ -75,7 +75,7 @@ async def other_paciente(session):
     paciente = Paciente(
         nome='João',
         email='joao@example.com',
-        password=get_password_hash('senha456'),
+        password=get_password_hash('Senha@456'),
     )
     session.add(paciente)
     await session.commit()

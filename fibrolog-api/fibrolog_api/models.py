@@ -24,6 +24,9 @@ class Paciente:
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str]
     data_nascimento: Mapped[Optional[datetime]] = mapped_column(default=None)
+    sexo: Mapped[Optional[str]] = mapped_column(String(50), default=None)
+    data_diagnostico: Mapped[Optional[datetime]] = mapped_column(default=None)
+    medicacoes: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     # Relacionamentos
     contatos: Mapped[List['ContatoApoio']] = relationship(

@@ -10,7 +10,7 @@ async def test_create_paciente(client):
         json={
             'nome': 'Gustavo',
             'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
 
@@ -32,7 +32,7 @@ async def test_create_paciente_duplicate_email(client):
         json={
             'nome': 'Gustavo',
             'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
 
@@ -42,12 +42,25 @@ async def test_create_paciente_duplicate_email(client):
         json={
             'nome': 'João',
             'email': 'gustavo@example.com',
-            'password': 'outrasenha',
+            'password': 'Outra@123',
         },
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json()['detail'] == 'Email already registered'
+
+
+@pytest.mark.asyncio
+async def test_create_paciente_invalid_password(client):
+    response = await client.post(
+        '/pacientes/',
+        json={
+            'nome': 'Gustavo',
+            'email': 'gustavo.invalid@example.com',
+            'password': 'weak',
+        },
+    )
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
@@ -68,7 +81,7 @@ async def test_get_pacientes(client):
         json={
             'nome': 'Gustavo',
             'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
     await client.post(
@@ -76,7 +89,7 @@ async def test_get_pacientes(client):
         json={
             'nome': 'João',
             'email': 'joao@example.com',
-            'password': 'senha456',
+            'password': 'Senha@456',
         },
     )
 
@@ -98,7 +111,7 @@ async def test_get_pacientes_with_pagination(client):
             json={
                 'nome': f'Paciente {i}',
                 'email': f'paciente{i}@example.com',
-                'password': 'senha123',
+                'password': 'Senha@123',
             },
         )
 
@@ -120,7 +133,7 @@ async def test_get_paciente_by_id(client):
         json={
             'nome': 'Gustavo',
             'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
     paciente_id = create_response.json()['id']
@@ -152,7 +165,7 @@ async def test_update_paciente(client, paciente, token):
         json={
             'nome': 'Gustavo Atualizado',
             'email': 'gustavo.novo@example.com',
-            'password': 'novasenha123',
+            'password': 'Nova@123',
         },
     )
 
@@ -171,7 +184,7 @@ async def test_update_paciente_wrong_user(client, other_paciente, token):
         json={
             'nome': 'Tentando Atualizar',
             'email': 'tentando@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
 
@@ -190,7 +203,7 @@ async def test_update_paciente_duplicate_email(
         json={
             'nome': 'Gustavo',
             'email': other_paciente.email,
-            'password': 'senha123',
+            'password': 'Senha@123',
         },
     )
 
