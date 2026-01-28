@@ -47,7 +47,7 @@ async def test_create_paciente_duplicate_email(client):
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json()['detail'] == 'Email already registered'
+    assert response.json()['detail'] == 'Email já cadastrado'
 
 
 @pytest.mark.asyncio
@@ -153,7 +153,7 @@ async def test_get_paciente_not_found(client):
     response = await client.get('/pacientes/999')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json()['detail'] == 'Paciente not found'
+    assert response.json()['detail'] == 'Paciente não encontrado'
 
 
 @pytest.mark.asyncio
@@ -189,7 +189,7 @@ async def test_update_paciente_wrong_user(client, other_paciente, token):
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json()['detail'] == 'Not enough permissions'
+    assert response.json()['detail'] == 'Permissões insuficientes'
 
 
 @pytest.mark.asyncio
@@ -208,7 +208,7 @@ async def test_update_paciente_duplicate_email(
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json()['detail'] == 'Email already exists'
+    assert response.json()['detail'] == 'Email já existe'
 
 
 @pytest.mark.asyncio
@@ -220,7 +220,7 @@ async def test_delete_paciente(client, paciente, token):
     )
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json()['message'] == 'Paciente deleted'
+    assert response.json()['message'] == 'Paciente excluído'
 
     # Verificar que foi deletado
     get_response = await client.get(f'/pacientes/{paciente.id}')
@@ -236,4 +236,4 @@ async def test_delete_paciente_wrong_user(client, other_paciente, token):
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json()['detail'] == 'Not enough permissions'
+    assert response.json()['detail'] == 'Permissões insuficientes'

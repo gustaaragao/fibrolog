@@ -34,7 +34,7 @@ async def create_paciente(paciente: PacienteSchema, session: Session):
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Email already registered',
+            detail='Email já cadastrado',
         )
 
     db_paciente = Paciente(
@@ -72,7 +72,7 @@ async def get_paciente(paciente_id: int, session: Session):
 
     if not paciente:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='Paciente not found'
+            status_code=HTTPStatus.NOT_FOUND, detail='Paciente não encontrado'
         )
 
     return paciente
@@ -87,7 +87,7 @@ async def update_paciente(
 ):
     if current_paciente.id != paciente_id:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+            status_code=HTTPStatus.FORBIDDEN, detail='Permissões insuficientes'
         )
 
     try:
@@ -106,7 +106,7 @@ async def update_paciente(
     except IntegrityError:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Email already exists',
+            detail='Email já existe',
         )
 
 
@@ -118,10 +118,10 @@ async def delete_paciente(
 ):
     if current_paciente.id != paciente_id:
         raise HTTPException(
-            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+            status_code=HTTPStatus.FORBIDDEN, detail='Permissões insuficientes'
         )
 
     await session.delete(current_paciente)
     await session.commit()
 
-    return {'message': 'Paciente deleted'}
+    return {'message': 'Paciente excluído'}
