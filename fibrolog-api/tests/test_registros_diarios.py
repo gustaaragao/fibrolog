@@ -166,6 +166,46 @@ async def test_update_registro_diario_not_found(
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
+async def test_patch_registro_diario(
+    client: AsyncClient, token: str, registro_diario_data: dict
+):
+    # Cria o registro
+    create_response = await client.post(
+        '/registros-diarios/',
+        headers={'Authorization': f'Bearer {token}'},
+        json=registro_diario_data,
+    )
+    registro_id = create_response.json()['id']
+
+    # Atualiza parcialmente
+    patch_data = {
+        'nivel_fadiga': 8,
+        'localizacao_dor': 'Costas e pescoço',
+    }
+    response = await client.patch(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json=patch_data,
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    data = response.json()
+    assert data['nivel_fadiga'] == patch_data['nivel_fadiga']
+    assert data['localizacao_dor'] == patch_data['localizacao_dor']
+    assert data['intensidade_dor'] == registro_diario_data['intensidade_dor']
+
+
+async def test_patch_registro_diario_not_found(
+    client: AsyncClient, token: str
+):
+    response = await client.patch(
+        '/registros-diarios/999',
+        headers={'Authorization': f'Bearer {token}'},
+        json={'nivel_fadiga': 10},
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
 async def test_delete_registro_diario(
     client: AsyncClient, token: str, registro_diario_data: dict
 ):

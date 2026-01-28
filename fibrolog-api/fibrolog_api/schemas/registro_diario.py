@@ -20,6 +20,16 @@ class RegistroDiarioSchema(BaseModel):
     localizacao_dor: Optional[str] = None
 
 
+class RegistroDiarioUpdate(BaseModel):
+    """Schema para atualização parcial de um registro diário."""
+
+    intensidade_dor: Optional[int] = Field(None, ge=0, le=10)
+    qualidade_sono: Optional[int] = Field(None, ge=0, le=10)
+    nivel_fadiga: Optional[int] = Field(None, ge=0, le=10)
+    estado_emocional: Optional[EstadoEmocional] = None
+    localizacao_dor: Optional[str] = None
+
+
 class RegistroDiarioPublic(RegistroDiarioSchema):
     """Schema para retorno público de um registro diário."""
 

@@ -14,6 +14,7 @@ from fibrolog_api.schemas import (
     PacienteList,
     PacientePublic,
     PacienteSchema,
+    PacienteUpdate,
 )
 from fibrolog_api.security import get_current_paciente, get_password_hash
 
@@ -120,6 +121,42 @@ async def update_paciente(
             status_code=HTTPStatus.CONFLICT,
             detail='Email já existe',
         )
+
+
+@router.patch(
+    '/{paciente_id}',
+    response_model=PacientePublic,
+    summary='Atualizar parcialmente paciente',
+    description='Atualiza parcialmente os dados do paciente autenticado',
+)
+async def patch_paciente(
+    paciente_id: int,
+    paciente: PacienteUpdate,
+    session: Session,
+    current_paciente: DBPaciente,
+):
+    if current_paciente.id != paciente_id:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Permissões insuficientes'
+        )
+
+    paciente_data = paciente.model_dump(exclude_unset=True)
+
+    for key, value in paciente_data.items():
+        if key == 'password':
+            setattr(current_paciente, key, get_password_hash(value))
+        else:
+            setattr(current_paciente, key, value)
+    try:
+        await session.commit()
+        await session.refresh(current_paciente)
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=HTTPStatus.CONFLICT,
+            detail='Email já cadastrado',
+        )
+    return current_paciente
 
 
 @router.delete(

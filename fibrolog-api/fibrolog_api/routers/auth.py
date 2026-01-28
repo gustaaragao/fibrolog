@@ -28,7 +28,10 @@ async def login(
         select(Paciente).where(Paciente.email == form_data.username)
     )
 
-    if not paciente or not verify_password(form_data.password, paciente.password):
+    credentials_ok = paciente and verify_password(
+        form_data.password, paciente.password
+    )
+    if not credentials_ok:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Email ou senha incorretos',

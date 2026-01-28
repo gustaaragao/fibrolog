@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 
 import pytest
 import pytest_asyncio
@@ -55,8 +56,6 @@ async def client(session):
 
 @pytest_asyncio.fixture
 async def paciente(session):
-    from datetime import datetime
-    
     password_plain = 'Senha@123'
     paciente = Paciente(
         nome='Gustavo Silva',
@@ -78,8 +77,6 @@ async def paciente(session):
 
 @pytest_asyncio.fixture
 async def other_paciente(session):
-    from datetime import datetime
-    
     password_plain = 'Senha@456'
     paciente = Paciente(
         nome='Maria Santos',
@@ -93,7 +90,7 @@ async def other_paciente(session):
     session.add(paciente)
     await session.commit()
     await session.refresh(paciente)
-    
+
     paciente.password_plain = password_plain
     return paciente
 

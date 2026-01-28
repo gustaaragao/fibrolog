@@ -40,6 +40,41 @@ class PacienteSchema(BaseModel):
         return v
 
 
+class PacienteUpdate(BaseModel):
+    nome: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    data_nascimento: Optional[datetime] = None
+    sexo: Optional[str] = None
+    data_diagnostico: Optional[datetime] = None
+    medicacoes: Optional[str] = None
+
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        if len(v) < MIN_PASSWORD_LENGTH:
+            raise ValueError(
+                f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
+            )
+        if not re.search(r'[A-Z]', v):
+            raise ValueError(
+                'A senha deve conter pelo menos uma letra maiúscula'
+            )
+        if not re.search(r'[a-z]', v):
+            raise ValueError(
+                'A senha deve conter pelo menos uma letra minúscula'
+            )
+        if not re.search(r'\d', v):
+            raise ValueError('A senha deve conter pelo menos um número')
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
+            raise ValueError(
+                'A senha deve conter pelo menos um caractere especial'
+            )
+        return v
+
+
 class PacientePublic(BaseModel):
     id: int
     nome: str

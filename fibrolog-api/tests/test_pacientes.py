@@ -128,10 +128,10 @@ async def test_get_pacientes_with_pagination(client):
         await client.post(
             '/pacientes/',
             json={
-                'nome': f'Paciente {i+1}',
+                'nome': f'Paciente {i + 1}',
                 'email': f'paciente{i}@example.com',
                 'password': 'Senha@123',
-                'data_nascimento': f'198{i}-0{i+1}-15T00:00:00',
+                'data_nascimento': f'198{i}-0{i + 1}-15T00:00:00',
                 'sexo': sexos[i],
             },
         )
@@ -242,6 +242,35 @@ async def test_update_paciente_duplicate_email(
 
     assert response.status_code == HTTPStatus.CONFLICT
     assert response.json()['detail'] == 'Email já existe'
+
+
+@pytest.mark.asyncio
+async def test_patch_paciente(client, paciente, token):
+    response = await client.patch(
+        f'/pacientes/{paciente.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'nome': 'Gustavo S. Pereira',
+            'medicacoes': 'Nenhuma medicação no momento',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    data = response.json()
+    assert data['nome'] == 'Gustavo S. Pereira'
+    assert data['medicacoes'] == 'Nenhuma medicação no momento'
+    assert data['email'] == paciente.email  # Verificar que não mudou
+
+
+@pytest.mark.asyncio
+async def test_patch_paciente_wrong_user(client, other_paciente, token):
+    response = await client.patch(
+        f'/pacientes/{other_paciente.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={'nome': 'Nome Invasor'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()['detail'] == 'Permissões insuficientes'
 
 
 @pytest.mark.asyncio

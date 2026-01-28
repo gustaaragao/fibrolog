@@ -4,7 +4,18 @@ para facilitar a importação em outros módulos.
 """
 
 from .base import FilterPage, Message
-from .paciente import PacienteList, PacientePublic, PacienteSchema
+from .paciente import (
+    PacienteList,
+    PacientePublic,
+    PacienteSchema,
+    PacienteUpdate,
+)
+from .registro_diario import (
+    RegistroDiarioList,
+    RegistroDiarioPublic,
+    RegistroDiarioSchema,
+    RegistroDiarioUpdate,
+)
 from .token import Token, TokenData
 
 __all__ = [
@@ -13,6 +24,11 @@ __all__ = [
     'PacienteList',
     'PacientePublic',
     'PacienteSchema',
+    'PacienteUpdate',
+    'RegistroDiarioList',
+    'RegistroDiarioPublic',
+    'RegistroDiarioSchema',
+    'RegistroDiarioUpdate',
     'Token',
     'TokenData',
 ]

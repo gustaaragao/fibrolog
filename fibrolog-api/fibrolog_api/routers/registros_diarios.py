@@ -17,6 +17,7 @@ from fibrolog_api.schemas.registro_diario import (
     RegistroDiarioList,
     RegistroDiarioPublic,
     RegistroDiarioSchema,
+    RegistroDiarioUpdate,
 )
 from fibrolog_api.security import get_current_paciente
 
@@ -60,7 +61,6 @@ async def create_registro_diario(
         await session.refresh(db_registro)
         return db_registro
 
-    
     db_registro = RegistroDiario(
         **registro_schema.model_dump(),
         paciente_id=paciente.id,
@@ -133,6 +133,40 @@ async def update_registro_diario(
         )
 
     for key, value in registro_schema.model_dump().items():
+        setattr(registro, key, value)
+
+    await session.commit()
+    await session.refresh(registro)
+    return registro
+
+
+@router.patch(
+    '/{registro_id}',
+    response_model=RegistroDiarioPublic,
+    summary='Atualizar parcialmente registro diário',
+    description='Atualiza parcialmente um registro diário existente',
+)
+async def patch_registro_diario(
+    registro_id: int,
+    registro_schema: RegistroDiarioUpdate,
+    session: Session,
+    paciente: CurrentPaciente,
+):
+    registro = await session.scalar(
+        select(RegistroDiario).where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
+    )
+    if not registro:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Registro diário não encontrado.',
+        )
+
+    update_data = registro_schema.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
         setattr(registro, key, value)
 
     await session.commit()
