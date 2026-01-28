@@ -21,22 +21,21 @@ class PacienteSchema(BaseModel):
     def validate_password(cls, v: str) -> str:
         if len(v) < MIN_PASSWORD_LENGTH:
             raise ValueError(
-                f'Password must be at least {MIN_PASSWORD_LENGTH} '
-                'characters long'
+                f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
             )
         if not re.search(r'[A-Z]', v):
             raise ValueError(
-                'Password must contain at least one uppercase letter'
+                'A senha deve conter pelo menos uma letra maiúscula'
             )
         if not re.search(r'[a-z]', v):
             raise ValueError(
-                'Password must contain at least one lowercase letter'
+                'A senha deve conter pelo menos uma letra minúscula'
             )
         if not re.search(r'\d', v):
-            raise ValueError('Password must contain at least one number')
+            raise ValueError('A senha deve conter pelo menos um número')
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
             raise ValueError(
-                'Password must contain at least one special character'
+                'A senha deve conter pelo menos um caractere especial'
             )
         return v
 

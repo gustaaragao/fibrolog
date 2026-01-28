@@ -24,14 +24,17 @@ DBPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 
 @router.post(
-    '/', status_code=HTTPStatus.CREATED, response_model=PacientePublic
+    '/',
+    status_code=HTTPStatus.CREATED,
+    response_model=PacientePublic,
+    summary='Criar paciente',
+    description='Cria um novo paciente no sistema',
 )
 async def create_paciente(paciente: PacienteSchema, session: Session):
-    # Verificar se o email já existe
-    result = await session.execute(
+    existing = await session.scalar(
         select(Paciente).where(Paciente.email == paciente.email)
     )
-    if result.scalar_one_or_none():
+    if existing:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
             detail='Email já cadastrado',
@@ -52,33 +55,44 @@ async def create_paciente(paciente: PacienteSchema, session: Session):
     return db_paciente
 
 
-@router.get('/', response_model=PacienteList)
+@router.get(
+    '/',
+    response_model=PacienteList,
+    summary='Listar pacientes',
+    description='Retorna lista paginada de pacientes',
+)
 async def get_pacientes(
     session: Session, filter_page: Annotated[FilterPage, Query()]
 ):
-    result = await session.scalars(
+    pacientes = await session.scalars(
         select(Paciente).offset(filter_page.offset).limit(filter_page.limit)
     )
-    pacientes = result.all()
-    return {'pacientes': pacientes}
+    return {'pacientes': pacientes.all()}
 
 
-@router.get('/{paciente_id}', response_model=PacientePublic)
+@router.get(
+    '/{paciente_id}',
+    response_model=PacientePublic,
+    summary='Buscar paciente',
+    description='Retorna os dados de um paciente específico',
+)
 async def get_paciente(paciente_id: int, session: Session):
-    result = await session.execute(
+    paciente = await session.scalar(
         select(Paciente).where(Paciente.id == paciente_id)
     )
-    paciente = result.scalar_one_or_none()
-
     if not paciente:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND, detail='Paciente não encontrado'
         )
-
     return paciente
 
 
-@router.put('/{paciente_id}', response_model=PacientePublic)
+@router.put(
+    '/{paciente_id}',
+    response_model=PacientePublic,
+    summary='Atualizar paciente',
+    description='Atualiza os dados do paciente autenticado',
+)
 async def update_paciente(
     paciente_id: int,
     paciente: PacienteSchema,
@@ -100,9 +114,7 @@ async def update_paciente(
         current_paciente.medicacoes = paciente.medicacoes
         await session.commit()
         await session.refresh(current_paciente)
-
         return current_paciente
-
     except IntegrityError:
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
@@ -110,7 +122,12 @@ async def update_paciente(
         )
 
 
-@router.delete('/{paciente_id}', response_model=Message)
+@router.delete(
+    '/{paciente_id}',
+    response_model=Message,
+    summary='Excluir paciente',
+    description='Exclui o paciente autenticado do sistema',
+)
 async def delete_paciente(
     paciente_id: int,
     session: Session,

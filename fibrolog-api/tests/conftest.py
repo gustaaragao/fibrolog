@@ -55,11 +55,17 @@ async def client(session):
 
 @pytest_asyncio.fixture
 async def paciente(session):
+    from datetime import datetime
+    
     password_plain = 'Senha@123'
     paciente = Paciente(
-        nome='Gustavo',
+        nome='Gustavo Silva',
         email='gustavo@example.com',
         password=get_password_hash(password_plain),
+        data_nascimento=datetime(1990, 5, 15),
+        sexo='M',
+        data_diagnostico=datetime(2020, 3, 10),
+        medicacoes='Pregabalina 75mg (2x/dia), Duloxetina 60mg (1x/dia)',
     )
     session.add(paciente)
     await session.commit()
@@ -72,14 +78,23 @@ async def paciente(session):
 
 @pytest_asyncio.fixture
 async def other_paciente(session):
+    from datetime import datetime
+    
+    password_plain = 'Senha@456'
     paciente = Paciente(
-        nome='João',
-        email='joao@example.com',
-        password=get_password_hash('Senha@456'),
+        nome='Maria Santos',
+        email='maria@example.com',
+        password=get_password_hash(password_plain),
+        data_nascimento=datetime(1985, 8, 22),
+        sexo='F',
+        data_diagnostico=datetime(2018, 11, 5),
+        medicacoes='Gabapentina 300mg (3x/dia), Amitriptilina 25mg (1x/dia)',
     )
     session.add(paciente)
     await session.commit()
     await session.refresh(paciente)
+    
+    paciente.password_plain = password_plain
     return paciente
 
 

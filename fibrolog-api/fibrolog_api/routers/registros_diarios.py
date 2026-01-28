@@ -28,8 +28,10 @@ CurrentPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 @router.post(
     '/',
-    status_code=HTTPStatus.OK,
+    status_code=HTTPStatus.CREATED,
     response_model=RegistroDiarioPublic,
+    summary='Criar registro diário',
+    description='Cria ou atualiza o registro diário do dia atual',
 )
 async def create_registro_diario(
     registro_schema: RegistroDiarioSchema,
@@ -37,10 +39,6 @@ async def create_registro_diario(
     paciente: CurrentPaciente,
     response: Response,
 ):
-    """
-    Cria um novo registro diário para o paciente logado.
-    Se já existir um registro para o dia, ele será sobrescrito.
-    """
     today = datetime.now(zoneinfo.ZoneInfo('America/Sao_Paulo')).date()
 
     statement = (
@@ -52,19 +50,17 @@ async def create_registro_diario(
     db_registro = result.scalar_one_or_none()
 
     if db_registro:
-        # Atualiza o registro existente
+        response.status_code = HTTPStatus.OK
         for key, value in registro_schema.model_dump().items():
             setattr(db_registro, key, value)
         db_registro.data_hora = datetime.now(
             zoneinfo.ZoneInfo('America/Sao_Paulo')
         )
-        session.add(db_registro)
         await session.commit()
         await session.refresh(db_registro)
         return db_registro
 
-    # Cria um novo registro
-    response.status_code = HTTPStatus.CREATED
+    
     db_registro = RegistroDiario(
         **registro_schema.model_dump(),
         paciente_id=paciente.id,
@@ -76,78 +72,94 @@ async def create_registro_diario(
     return db_registro
 
 
-@router.get('/', response_model=RegistroDiarioList)
+@router.get(
+    '/',
+    response_model=RegistroDiarioList,
+    summary='Listar registros diários',
+    description='Retorna todos os registros diários do paciente autenticado',
+)
 async def get_registros_diarios(session: Session, paciente: CurrentPaciente):
-    """Retorna todos os registros diários do paciente logado."""
-    statement = select(RegistroDiario).where(
-        RegistroDiario.paciente_id == paciente.id
+    registros = await session.scalars(
+        select(RegistroDiario).where(RegistroDiario.paciente_id == paciente.id)
     )
-    result = await session.scalars(statement)
-    return {'registros': result.all()}
+    return {'registros': registros.all()}
 
 
-@router.get('/{registro_id}', response_model=RegistroDiarioPublic)
+@router.get(
+    '/{registro_id}',
+    response_model=RegistroDiarioPublic,
+    summary='Buscar registro diário',
+    description='Retorna um registro diário específico',
+)
 async def get_registro_diario(
     registro_id: int, session: Session, paciente: CurrentPaciente
 ):
-    """Retorna um registro diário específico pelo ID."""
-    statement = select(RegistroDiario).where(
-        RegistroDiario.id == registro_id,
-        RegistroDiario.paciente_id == paciente.id,
+    registro = await session.scalar(
+        select(RegistroDiario).where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
     )
-    result = await session.scalar(statement)
-    if not result:
+    if not registro:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Registro diário não encontrado.',
         )
-    return result
+    return registro
 
 
-@router.put('/{registro_id}', response_model=RegistroDiarioPublic)
+@router.put(
+    '/{registro_id}',
+    response_model=RegistroDiarioPublic,
+    summary='Atualizar registro diário',
+    description='Atualiza um registro diário existente',
+)
 async def update_registro_diario(
     registro_id: int,
     registro_schema: RegistroDiarioSchema,
     session: Session,
     paciente: CurrentPaciente,
 ):
-    """Atualiza um registro diário existente."""
-    statement = select(RegistroDiario).where(
-        RegistroDiario.id == registro_id,
-        RegistroDiario.paciente_id == paciente.id,
+    registro = await session.scalar(
+        select(RegistroDiario).where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
     )
-    result = await session.scalar(statement)
-    if not result:
+    if not registro:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Registro diário não encontrado.',
         )
 
     for key, value in registro_schema.model_dump().items():
-        setattr(result, key, value)
+        setattr(registro, key, value)
 
-    session.add(result)
     await session.commit()
-    await session.refresh(result)
+    await session.refresh(registro)
+    return registro
 
-    return result
 
-
-@router.delete('/{registro_id}', status_code=HTTPStatus.NO_CONTENT)
+@router.delete(
+    '/{registro_id}',
+    status_code=HTTPStatus.NO_CONTENT,
+    summary='Excluir registro diário',
+    description='Exclui um registro diário',
+)
 async def delete_registro_diario(
     registro_id: int, session: Session, paciente: CurrentPaciente
 ):
-    """Deleta um registro diário."""
-    statement = select(RegistroDiario).where(
-        RegistroDiario.id == registro_id,
-        RegistroDiario.paciente_id == paciente.id,
+    registro = await session.scalar(
+        select(RegistroDiario).where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
     )
-    result = await session.scalar(statement)
-    if not result:
+    if not registro:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
             detail='Registro diário não encontrado.',
         )
 
-    await session.delete(result)
+    await session.delete(registro)
     await session.commit()

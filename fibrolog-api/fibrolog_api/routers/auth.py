@@ -14,21 +14,21 @@ from fibrolog_api.security import create_access_token, verify_password
 router = APIRouter(prefix='/auth', tags=['Autenticação'])
 
 
-@router.post('/token', response_model=Token)
+@router.post(
+    '/token',
+    response_model=Token,
+    summary='Autenticar',
+    description='Realiza autenticação e retorna token de acesso',
+)
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
-    # OAuth2PasswordRequestForm usa 'username', mas usamos email
-    email = form_data.username
-    password = form_data.password
-
-    # Buscar paciente pelo email
     paciente = await session.scalar(
-        select(Paciente).where(Paciente.email == email)
+        select(Paciente).where(Paciente.email == form_data.username)
     )
 
-    if not paciente or not verify_password(password, paciente.password):
+    if not paciente or not verify_password(form_data.password, paciente.password):
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='Email ou senha incorretos',
