@@ -1,399 +1,193 @@
-# CONTEXTO MESTRE: FibroLog (P2527)
+# CONTEXTO DE DESENVOLVIMENTO: FibroLog API
 
-Diretrizes, tecnologias e convenções do sistema FibroLog.
-
----
-
-## 1. VISÃO GERAL
-
-**Produto:** Sistema Digital para Monitoramento da Fibromialgia  
-**Objetivo:** App mobile para registro de sintomas (dor, fadiga, sono, humor) e crises  
-**Diferencial:** Mapa corporal, áudio com transcrição IA, rede de apoio, relatórios PDF
-
-**Componentes:**
-- Backend (API): REST API Python/FastAPI
-- Frontend: App mobile
-- IA: Google Gemini/OpenAI para transcrição
+Este documento fornece as diretrizes, tecnologias e convenções para o desenvolvimento do backend (API) do sistema FibroLog.
 
 ---
 
-## 2. STACK TECNOLÓGICA
+## 1. VISÃO GERAL DO PROJETO
 
-**Core:** Python 3.12+, FastAPI 0.128.0+, Uvicorn  
-**Database:** SQLite (aiosqlite), SQLAlchemy 2.0.46+ (async), Alembic 1.18.1+  
-**Validação:** Pydantic 2.12.5+, Pydantic Settings 2.12.0+  
-**Segurança:** JWT (PyJWT 2.10.1+), Argon2 (pwdlib[argon2] 0.3.0+), OAuth2  
-**Dev/Qualidade:** Poetry, Ruff 0.14.14+, pytest 9.0.2+, pytest-asyncio, pytest-cov, taskipy  
-**Outros:** httpx, ZoneInfo
+- **Produto**: Sistema Digital para Monitoramento da Fibromialgia (FibroLog).
+- **Objetivo**: Desenvolver um aplicativo mobile que permita a pacientes com fibromialgia registrar sintomas (dor, fadiga, sono, humor), crises e outros dados relevantes para seu tratamento.
+- **Componentes Principais**:
+    - **Backend (API)**: API RESTful desenvolvida em Python com FastAPI.
+    - **Frontend**: Aplicativo mobile (detalhado no contexto `fibrolog-app`).
+    - **Inteligência Artificial**: Serviços de IA (Google Gemini/OpenAI) para transcrição de áudio.
+
+---
+
+## 2. ARQUITETURA E TECNOLOGIAS (BACKEND)
+
+### 2.1. Stack Tecnológica
+
+- **Core**: Python 3.12+, FastAPI, Uvicorn.
+- **Banco de Dados**: SQLite (desenvolvimento), PostgreSQL (produção), SQLAlchemy (ORM Async), Alembic (migrações).
+- **Validação de Dados**: Pydantic, Pydantic Settings.
+- **Segurança**: JWT, OAuth2, Hash de senhas com Argon2 (`pwdlib`).
+- **Testes e Qualidade**: Pytest, Pytest-asyncio, Pytest-cov, Ruff, Taskipy.
+- **Outros**: HTTPX (para requisições async).
+
+### 2.2. Estrutura de Diretórios
+
 ```
 fibrolog-api/
 ├── fibrolog_api/              # Código fonte principal
-│   ├── __init__.py
 │   ├── app.py                 # Aplicação FastAPI (entry point)
-│   ├── database.py            # Configuração AsyncEngine + SessionMaker
+│   ├── database.py            # Configuração do banco de dados (AsyncEngine, SessionMaker)
 │   ├── models.py              # Modelos SQLAlchemy (ORM)
-│   ├── schemas.py             # Schemas Pydantic (validação)
-│   ├── security.py            # JWT, password hashing, auth
-│   ├── settings.py            # Configurações (Pydantic Settings)
-│   ├── routers/               # Rotas da API (organizadas por domínio)
-│   │   ├── auth.py            # Autenticação (login, token)
-│   │   ├── pacientes.py       # CRUD de pacientes
-│   │   └── registros_diarios.py  # (futuro) CRUD de registros
-│   └── schemas/               # Schemas organizados por domínio
-│       ├── paciente.py
-│       └── token.py
+│   ├── schemas.py             # Schemas Pydantic (validação de dados)
+│   ├── security.py            # Funções de autenticação e segurança
+│   ├── settings.py            # Configurações da aplicação
+│   └── routers/               # Endpoints da API (organizados por recurso)
+│       ├── auth.py
+│       └── pacientes.py
 ├── migrations/                # Migrações Alembic
-│   ├── env.py
-│   └── versions/              # Arquivos de migração
 ├── tests/                     # Testes automatizados
-│   ├── conftest.py            # Fixtures pytest
-│   ├── test_auth.py
-│   └── test_pacientes.py
-├── htmlcov/                   # Relatórios de cobertura de testes
-├── alembic.ini                # Configuração Alembic
-├── pyproject.toml             # Dependências e configurações
-└── README.md                  # Documentação do projeto
+├── pyproject.toml             # Dependências e configurações do projeto
+└── README.md                  # Documentação
 ```
 
-### 3 Camadas da Arquitetura
-1. **Presentation Layer (Routers):** Endpoints FastAPI, validação de entrada
-2. **Application Layer (Schemas):** DTOs e validações Pydantic
-3. **Domain Layer (Models):** Lógica de negócio e entidades
-4. **Infrastructure Layer (Database/Security):** Persistência e serviços
+### 2.3. Camadas da Arquitetura
 
-### 4. Padrões de Design Utilizados
-- **Dependency Injection:** Uso de `Depends()` do FastAPI
-- **Repository Pattern:** Session as unit of work
-- **DTO Pattern:** Separação clara entre modelos ORM e schemas Pydantic
-- **Factory Pattern:** Fixtures no conftest.py para testes
+1.  **Camada de Apresentação (Routers)**: Define os endpoints da API, recebe as requisições HTTP e retorna as respostas. Responsável pela validação da entrada de dados usando os Schemas.
+2.  **Camada de Aplicação (Schemas)**: Utiliza Schemas Pydantic como DTOs (Data Transfer Objects) para validar, serializar e desserializar dados entre o cliente e o sistema.
+3.  **Camada de Domínio (Models)**: Contém as entidades do negócio (Modelos SQLAlchemy) e a lógica de negócio principal.
+4.  **Camada de Infraestrutura (Database, Security)**: Abstrai o acesso a serviços externos como banco de dados, sistemas de autenticação e outros.
 
-## 5. CONVENÇÕES DE CÓDIGO
+### 2.4. Padrões de Design
 
-### 5.1 Idioma e Tradução
-- **Idioma de Código:** Português (pt)
-- **Mensagens e Strings:** Sempre em português
-- **Comentários e Docstrings:** Sempre em português
-- **Documentação:** Seguir convenções do arquivo `llm-prompt.md`
-- **Termos Técnicos Preservados:** Alguns termos em inglês devem ser mantidos conforme glossário:
-  - `async context manager` → "gerenciador de contexto assíncrono"
+-   **Injeção de Dependência**: Utiliza o sistema de `Depends()` do FastAPI para gerenciar dependências como sessões de banco de dados e autenticação de usuários.
+-   **Padrão Repositório (implícito)**: A `AsyncSession` do SQLAlchemy atua como uma unidade de trabalho que gerencia a persistência dos modelos.
+-   **Padrão DTO**: Separação clara entre os modelos ORM (`models.py`) e os schemas de dados (`schemas.py`) para evitar acoplamento.
 
-### 5.2 Nomenclatura
-- **Variáveis e Funções:** `snake_case` (ex: `get_current_paciente`)
-- **Classes:** `PascalCase` (ex: `Paciente`, `RegistroDiario`)
-- **Constantes:** `UPPER_SNAKE_CASE` (ex: `DATABASE_URL`)
-- **Routers:** Prefixo descritivo (ex: `/pacientes`, `/auth`)
+---
 
-### 5.3 Camadas
-1. **Presentation (Routers):** Endpoints FastAPI
-2. **Application (Schemas):** DTOs Pydantic
-3. **Domain (Models):** Entidades e lógica
-4. **Infrastructure (Database/Security):** Persistência
+## 3. CONVENÇÕES DE CÓDIGO
 
-### 5.4 Padrões
-Dependency Injection, Repository Pattern, DTO Pattern, Factory Pattern (fixtures)
-- **Line Length:** 79 caracteres (PEP-8)
-- **Quotes:** Single quotes (`'`) para strings
-- **Indentação:** 4 espaços (sem tabs)
-- **Import Organization:** Automática via Ruff (I rule)
-- **Linting Rules:** `['I', 'F', 'E', 'W', 'PL', 'PT', 'FAST']`
+### 3.1. Idioma e Nomenclatura
 
-### 5.5 Anotações de Tipo (Type Hints)
-- **Obrigatório:** Todas as funções devem ter anotações de tipo completas
-- **SQLAlchemy:** Usar `Mapped[type]` para colunas
-- **FastAPI:** Usar `Annotated[Type, Depends()]` para injeção de dependências
-- **Retorno:** Sempre especificar tipo de retorno (incluindo `None` quando aplicável)
+-   **Idioma**: Todo o código, comentários, docstrings e mensagens de erro devem ser escritos em **Português (pt-BR)**.
+-   **Nomenclatura de Arquivos**: `snake_case.py` (ex: `registros_diarios.py`).
+-   **Variáveis e Funções**: `snake_case` (ex: `obter_paciente_por_id`).
+-   **Classes**: `PascalCase` (ex: `Paciente`, `RegistroDiario`).
+-   **Constantes**: `UPPER_SNAKE_CASE` (ex: `DATABASE_URL`).
+
+### 3.2. Estilo de Código e Qualidade
+
+-   **Formatação**: O código é formatado utilizando **Ruff**.
+-   **Linting**: **Ruff** é usado para garantir a qualidade e a consistência do código. Siga as regras definidas no `pyproject.toml`.
+-   **Organização de Imports**: As importações são organizadas automaticamente pelo Ruff.
+-   **Comprimento da Linha**: Máximo de 79 caracteres.
+-   **Aspas**: Use aspas simples (`'`) para strings, a menos que a string contenha uma aspa simples.
+
+### 3.3. Anotações de Tipo (Type Hints)
+
+-   **Obrigatoriedade**: Todas as funções, métodos e variáveis devem ter anotações de tipo completas.
+-   **FastAPI `Depends`**: Use `Annotated` para injeção de dependências (ex: `db: Annotated[AsyncSession, Depends(get_session)]`).
+-   **SQLAlchemy Models**: Use `Mapped` e `mapped_column` para definir os atributos dos modelos ORM.
+
+### 3.4. Padrões de Código Específicos
+
+-   **Async/Await**: Todas as operações de I/O (banco de dados, requisições HTTP) devem ser assíncronas. Use `async def` para funções e `await` para chamadas de I/O.
+-   **Tratamento de Erros**: Lance `HTTPException` para erros relacionados a requisições HTTP. As mensagens de `detail` devem ser claras e em português.
+-   **Códigos de Status HTTP**: Use as constantes do módulo `http.HTTPStatus` (ex: `HTTPStatus.CREATED`, `HTTPStatus.NOT_FOUND`).
+-   **Docstrings**: Documente todas as funções e classes públicas utilizando o formato Google Style.
+
+---
+
+## 4. REGRAS DE NEGÓCIO PRINCIPAIS
+
+-   **RN001 (Segurança de Senha)**: A senha do usuário deve ter no mínimo 8 caracteres, contendo letras maiúsculas, minúsculas, números e símbolos.
+-   **RN004 (Registro Diário)**: O paciente deve registrar diariamente o nível de dor (escala de 0 a 10) e seu estado emocional. Outros campos como localização da dor e qualidade do sono são encorajados.
+-   **RN006 (Consistência do Registro)**: O sistema permite apenas um registro diário por paciente. Um novo registro no mesmo dia sobrescreve o anterior.
+-   **RN008 (Transcrição de Áudio)**: Áudios de descrição de crises, com no máximo 60 segundos, devem ser enviados para um serviço de IA para transcrição.
+-   **RN012 (Isolamento de Dados)**: Os dados de um paciente são estritamente isolados e não podem ser acessados por outros pacientes.
+-   **RN015 (Não Diagnóstico)**: O sistema é uma ferramenta de monitoramento e **não fornece diagnósticos médicos**.
+
+---
+
+## 5. FLUXO DE DESENVOLVIMENTO
+
+1.  **Antes de Implementar**:
+    -   Consulte este documento e o `README.md` do projeto.
+    -   Verifique os requisitos funcionais e as regras de negócio aplicáveis.
+    -   Planeje os casos de teste que cobrirão a nova funcionalidade.
+
+2.  **Durante a Implementação**:
+    -   Escreva testes (unitários e de integração) junto com o código da funcionalidade.
+    -   Siga as convenções de código, nomenclatura e estilo definidas neste documento.
+    -   Documente o código com docstrings e anotações de tipo.
+
+3.  **Antes de Finalizar (Commit/PR)**:
+    -   Execute `task format` e `task lint` para garantir que o código está limpo.
+    -   Execute `task test` para garantir que todos os testes estão passando.
+    -   Verifique a cobertura de testes com `task test --cov`.
+    -   Se houver alterações nos `models.py`, crie uma nova migração com `alembic`.
+
+---
+## 6. EXEMPLOS DE CÓDIGO
+
+### Modelo SQLAlchemy
 ```python
-# Exemplo de anotações de tipo
-async def criar_paciente(
-    paciente: PacienteSchema,
-    session: Annotated[AsyncSession, Depends(get_session)]
-) -> PacientePublico:
-    ...
-```
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, func, ForeignKey
+from datetime import datetime
+from typing import List
 
-### 5.6 Async/Await
-- **Regra:** Todas as operações de I/O devem ser async
-- **Database:** Sempre usar `AsyncSession` e `await`
-- **HTTP Requests:** Usar `httpx.AsyncClient` em vez de `requests`
-- **Gerenciadores de Contexto:** Usar gerenciadores de contexto assíncronos quando aplicável
+from fibrolog_api.database import Base
 
-### 5.7 Status Codes HTTP
-- **Importação:** Sempre usar `from http import HTTPStatus`
-- **Constantes:** Usar `HTTPStatus.CREATED`, `HTTPStatus.NOT_FOUND`, etc.
-- **Evitar:** Magic numbers (200, 404, etc.)
-
-### 5.8 Tratamento de Erros
-```python
-# Padrão de erro com mensagens em português
-raise HTTPException(
-    status_code=HTTPStatus.NOT_FOUND,
-    detail='Paciente não encontrado'
-)
-```
-
-### 5.9 SQLAlchemy Models (Padrão Moderno)
-```python
-@table_registry.mapped_as_dataclass
-class Paciente:
-    """
-    Modelo que representa um paciente no sistema.
-    
-    Attributes:
-        id: Identificador único do paciente
-        nome: Nome completo do paciente
-        email: Email único para autenticação
-        password: Senha hasheada com Argon2
-        data_nascimento: Data de nascimento (opcional)
-        registros: Lista de registros do paciente
-        created_at: Data/hora de criação do registro
-        updated_at: Data/hora da última atualização
-    """
+class Paciente(Base):
     __tablename__ = 'pacientes'
-    
-    # Primary Key
-    id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    
-    # Campos obrigatórios (sem default)
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
     nome: Mapped[str] = mapped_column(String(255))
-    email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str]
-    
-    # Campos opcionais (com default)
-    data_nascimento: Mapped[Optional[datetime]] = mapped_column(
-        default=None
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String(255))
+
+    registros: Mapped[List['RegistroDiario']] = relationship(
+        'RegistroDiario', back_populates='paciente', cascade='all, delete-orphan'
     )
-    
-    # Relacionamentos
-    registros: Mapped[List["Registro"]] = relationship(
-        back_populates="paciente",
-        init=False
-    )
-    
-    # Timestamps automáticos
-    created_at: Mapped[datetime] = mapped_column(
-        init=False,
-        server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        init=False,
-        server_default=func.now(),
-        onupdate=func.now()
-    )
+
+    created_at: Mapped[datetime] = mapped_column(server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 ```
 
-### 5.10 Pydantic Schemas
+### Schema Pydantic
 ```python
-class PacienteSchema(BaseModel):
-    """Schema para criação de paciente."""
+from pydantic import BaseModel, EmailStr
+
+class PacienteCreate(BaseModel):
     nome: str
     email: EmailStr
     password: str
 
-
-class PacientePublico(BaseModel):
-    """Schema para retorno público de dados do paciente."""
+class PacientePublic(BaseModel):
     id: int
     nome: str
     email: EmailStr
-    created_at: datetime
-    updated_at: datetime
-    
+
     class Config:
-        from_attributes = True  # Para compatibilidade com SQLAlchemy
-
-
-class Mensagem(BaseModel):
-    """Schema para mensagens de resposta."""
-    mensagem: str
+        from_attributes = True
 ```
 
-### 4.10 Docstrings e Comentários
-- **Formato:** Google Style Python Docstrings
-- **Idioma:** Sempre em português
-- **Obrigatório para:**
-  - Todas as classes (models, schemas, routers)
-  - Todas as funções públicas
-  - Funções complexas (mesmo privadas)
-- **Opcional para:** Funções simples e auto-explicativas
+### Endpoint FastAPI
 ```python
-async def obter_paciente_por_id(
-    paciente_id: int,
-    session: AsyncSession
-) -> Paciente | None:
-    """
-    Busca um paciente pelo ID.
-    
-    Args:
-        paciente_id: ID do paciente a ser buscado
-        session: Sessão assíncrona do banco de dados
-        
-    Returns:
-        Instância do paciente se encontrado, None caso contrário
-        
-    Raises:
-        SQLAlchemyError: Em caso de erro na consulta ao banco
-    """
-    result = await session.execute(
-        select(Paciente).where(Paciente.id == paciente_id)
-    )
-    return result.scalar_one_or_none()
+from http import HTTPStatus
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from fibrolog_api.database import get_session
+from fibrolog_api.schemas import PacienteCreate, PacientePublic
+from fibrolog_api.services import create_paciente_service
+
+router = APIRouter(prefix='/pacientes', tags=['pacientes'])
+
+@router.post('/', status_code=HTTPStatus.CREATED, response_model=PacientePublic)
+async def create_paciente(
+    paciente: PacienteCreate,
+    db: Annotated[AsyncSession, Depends(get_session)],
+):
+    """Cria um novo paciente no sistema."""
+    return await create_paciente_service(db, paciente)
+
 ```
-
----
-## 5. REGRAS DE NEGÓCIO
-
-**Autenticação:**
-- RN001: Senha min. 8 caracteres (maiúsculas, minúsculas, números, símbolos)
-- RN002: JWT expira em 30 min
-- RN003: Hash Argon2
-
-**Sintomas:**
-- RN004: Registro diário obrigatório (dor 0-10 NRS + estado emocional)
-- RN005: NRS 0=sem dor, 10=dor máxima
-- RN006: 1 registro/dia (sobrescreve)
-- RN007: Registro crise a qualquer momento
-
-**Crises:**
-- RN008: Áudio max. 60s
-- RN009: Transcrição automática (IA)
-- RN010: Transcrição armazenada com registro
-
-**Privacidade:**
-- RN011: Criptografia dados sensíveis (LGPD)
-- RN012: Isolamento de dados por paciente
-- RN013: Rede apoio só notificações
-- RN014: Relatórios compartilháveis (PDF)
-
-**Ética:**
-- RN015: Sistema NÃO diagnostica
-- RN016: Apenas monitoramento
-
----
-
-## 6. REQUISITOS FUNCIONAIS
-- RF001-003: Autenticação (login, JWT, validação)
-- RF004-009: CRUD Pacientes (criar, listar, buscar, atualizar, deletar, email único)
-- RF010: CRUD Contatos Apoio
-- RF011: CRUD Alertas
-- RF012: CRUD Registros Diários
-- RF013: CRUD Registros Crises
-- RF014: Upload/transcrição áudio
-- RF015: Relatórios PDF
-- RF016: Notificações
-- RF017: Histórico/gráficos
-
----
-
----
-1. **Consultar `llm-prompt.md`:** Verificar convenções de tradução e termos técnicos
-2. **Verificar Requisitos Funcionais:** Confirmar que a funcionalidade está especificada
-3. **Validar Regras de Negócio:** Identificar RNs aplicáveis
-4. **Verificar Convenções de Código:** Revisar seção 4 deste documento
-5. **Planejar Testes:** Definir casos de teste antes da implementação
-
-### 12.2 Durante o Desenvolvimento
-1. **Idioma Português:** Código, comentários e strings em português (seguir `llm-prompt.md`)
-2. **Anotações de Tipo:** Usar type hints completos em TODAS as funções
-3. **Docstrings:** Documentar classes e funções públicas (Google Style)
-4. **Async/Await:** Seguir padrão assíncrono para operações de I/O
-5. **Mensagens de Erro:** Sempre em português e descritivas
-6. **Testes Paralelos:** Escrever testes junto com a implementação
-
-### 12.3 Antes de Commitar
-1. **Lint:** Rodar `task lint` (zero erros)
-2. **Format:** Rodar `task format` (auto-formatar)
-3. **Tests:** Rodar `task test` (100% passando)
-4. **Coverage:** Verificar cobertura de testes (mínimo 80%)
-5. **Migrations:** Se alterou models, criar migração Alembic
-
-### 12.4 Checklist de Criação de Arquivos Python
-Ao criar novos arquivos Python, sempre:
-- [ ] Consultar `llm-prompt.md` para traduções corretas
-- [ ] Usar imports organizados (Ruff I rule)
-- [ ] Incluir docstring no módulo (topo do arquivo)
-- [ ] Seguir estrutura de nomenclatura em português
-- [ ] Adicionar anotações de tipo em todas as funções
-- [ ] Criar testes correspondentes em `tests/`
-- [ ] Verificar se precisa de migration (models)
-
-## 📊 9. MODELOS DE DADOS (ORM)
-
-### 9.1 Entidades Implementadas
-- **Paciente:** Usuário principal do sistema
-- **ContatoApoio:** Rede de apoio do paciente
-- **Alerta:** Lembretes de medicação/consultas
-- **Registro:** Classe base para registros (herança)
-- **RegistroDiario:** Sintomas diários (dor, sono, fadiga, humor)
-- **RegistroCrise:** Episódios de crise com áudio
-
-### 9.2 Relacionamentos
-- `Paciente` 1:N `ContatoApoio`
-- `Paciente` 1:N `Alerta`
-- `Paciente` 1:N `Registro`
-- `Registro` herança `RegistroDiario`
-- `Registro` herança `RegistroCrise`
-
-### 9.3 Enums
-```python
-class EstadoEmocional(str, Enum):
-
-## 10. REFERÊNCIAS
-
-**GEMINI.md:** Contexto master (consultar antes de implementar)  
-**llm-prompt.md:** Traduções e glossário (consultar ao criar arquivos Python)  
-**README.md:** Setup e comandos  
-**pyproject.toml:** Dependências e config
-
-## 🎨 12. DIRETRIZES DE DESENVOLVIMENTO
-
-### 12.1 Antes de Codificar
-1. Verificar se a funcionalidade está nos Requisitos Funcionais
-2. Validar Regras de Negócio aplicáveis
-3. Verificar convenções de código (Ruff)
-## 🔐 10. SEGURANÇA
-
-**Variáveis .env:**
-```bash
-DATABASE_URL=sqlite+aiosqlite:///./fibrolog.db
-SECRET_KEY=xxx  # openssl rand -hex 32
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-**Boas Práticas:** Não commitar .env, SECRET_KEY forte (32+ bytes), rotacionar chaves
-
-## 📞 13. INFORMAÇÕES DO PROJETO
-
-- **Responsável:** Gustavo Aragão (gustavohenriquearagaosilva@gmail.com)
-- **Repositório:** gustaaragao/fibrolog
-- **Branch Atual:** feat/crud-sintomas-diarios
-- **Python Version:** 3.12+
-## 📚 11. REQUISITOS NÃO-FUNCIONAIS
-
-**Performance:** Registros <2s, relatórios <5s, 100+ usuários  
-**Usabilidade:** Interface p/ fibrofog, formulários simples, feedback imediato  
-**Disponibilidade:** 99%, backup automático
-- [ ] Upload de áudio
-- [ ] Integração com IA (transcrição)
-- [ ] Geração de relatórios PDF
-- [ ] Sistema de notificações
-
-### Fase 3 - Otimização e Deploy
-- [ ] Testes de carga
-- [ ] Otimização de queries
-- [ ] Deploy em produção
-- [ ] Monitoramento e logs
-
----
-
-**⚠️ IMPORTANTE:** Este documento deve ser consultado antes de implementar qualquer nova funcionalidade. Mantenha-o atualizado conforme o projeto evolui.## 📞 13. INFORMAÇÕES
-
-**Responsável:** Gustavo Aragão (gustavohenriquearagaosilva@gmail.com)  
-**Repo:** gustaaragao/fibrolog  
-**Branch:** feat/crud-sintomas-diarios  
-**Python:** 3.12+  
-**Status:** 🚧 Em desenvolvimento## 🔄 14. ROADMAP
-
-**Fase 1 (Atual):** [x] Auth JWT, CRUD Pacientes | [ ] CRUD Contatos, Alertas, Registros  
-**Fase 2:** Upload áudio, IA transcrição, PDF, notificações  
-**Fase 3:** Testes carga, otimização, deploy, monitoramento
