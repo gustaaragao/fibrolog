@@ -8,15 +8,19 @@ async def test_create_paciente(client):
     response = await client.post(
         '/pacientes/',
         json={
-            'nome': 'Gustavo',
+            'nome': 'Gustavo Silva',
             'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'password': 'Senha@123',
+            'data_nascimento': '1990-05-15T00:00:00',
+            'sexo': 'M',
+            'data_diagnostico': '2020-03-10T00:00:00',
+            'medicacoes': 'Pregabalina 75mg (2x/dia)',
         },
     )
 
     assert response.status_code == HTTPStatus.CREATED
     data = response.json()
-    assert data['nome'] == 'Gustavo'
+    assert data['nome'] == 'Gustavo Silva'
     assert data['email'] == 'gustavo@example.com'
     assert 'id' in data
     assert 'created_at' in data
@@ -30,9 +34,11 @@ async def test_create_paciente_duplicate_email(client):
     await client.post(
         '/pacientes/',
         json={
-            'nome': 'Gustavo',
-            'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'nome': 'Ana Costa',
+            'email': 'ana@example.com',
+            'password': 'Senha@123',
+            'data_nascimento': '1992-07-20T00:00:00',
+            'sexo': 'F',
         },
     )
 
@@ -40,14 +46,31 @@ async def test_create_paciente_duplicate_email(client):
     response = await client.post(
         '/pacientes/',
         json={
-            'nome': 'João',
-            'email': 'gustavo@example.com',
-            'password': 'outrasenha',
+            'nome': 'João Pedro',
+            'email': 'ana@example.com',
+            'password': 'Outra@123',
+            'data_nascimento': '1988-12-05T00:00:00',
+            'sexo': 'M',
         },
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json()['detail'] == 'Email already registered'
+    assert response.json()['detail'] == 'Email já cadastrado'
+
+
+@pytest.mark.asyncio
+async def test_create_paciente_invalid_password(client):
+    response = await client.post(
+        '/pacientes/',
+        json={
+            'nome': 'Carlos Alberto',
+            'email': 'carlos@example.com',
+            'password': 'fraca',
+            'data_nascimento': '1987-03-12T00:00:00',
+            'sexo': 'M',
+        },
+    )
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
@@ -66,17 +89,25 @@ async def test_get_pacientes(client):
     await client.post(
         '/pacientes/',
         json={
-            'nome': 'Gustavo',
-            'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'nome': 'Roberto Lima',
+            'email': 'roberto@example.com',
+            'password': 'Senha@123',
+            'data_nascimento': '1975-11-30T00:00:00',
+            'sexo': 'M',
+            'data_diagnostico': '2015-06-20T00:00:00',
+            'medicacoes': 'Gabapentina 300mg',
         },
     )
     await client.post(
         '/pacientes/',
         json={
-            'nome': 'João',
-            'email': 'joao@example.com',
-            'password': 'senha456',
+            'nome': 'Paula Oliveira',
+            'email': 'paula@example.com',
+            'password': 'Senha@456',
+            'data_nascimento': '1982-04-18T00:00:00',
+            'sexo': 'F',
+            'data_diagnostico': '2019-02-14T00:00:00',
+            'medicacoes': 'Pregabalina 150mg',
         },
     )
 
@@ -85,20 +116,24 @@ async def test_get_pacientes(client):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert 'pacientes' in data
-    assert data['pacientes'][0]['nome'] == 'Gustavo'
-    assert data['pacientes'][1]['nome'] == 'João'
+    assert data['pacientes'][0]['nome'] == 'Roberto Lima'
+    assert data['pacientes'][1]['nome'] == 'Paula Oliveira'
 
 
 @pytest.mark.asyncio
 async def test_get_pacientes_with_pagination(client):
     # Criar vários pacientes
+    sexos = ['M', 'F', 'M', 'F', 'M']
+    dates = ['1985-01-15', '1986-02-15', '1987-03-15', '1988-04-15', '1989-05-15']
     for i in range(5):
         await client.post(
             '/pacientes/',
             json={
-                'nome': f'Paciente {i}',
+                'nome': f'Paciente {i + 1}',
                 'email': f'paciente{i}@example.com',
-                'password': 'senha123',
+                'password': 'Senha@123',
+                'data_nascimento': f'{dates[i]}T00:00:00',
+                'sexo': sexos[i],
             },
         )
 
@@ -108,8 +143,8 @@ async def test_get_pacientes_with_pagination(client):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert 'pacientes' in data
-    assert data['pacientes'][0]['nome'] == 'Paciente 1'
-    assert data['pacientes'][1]['nome'] == 'Paciente 2'
+    assert data['pacientes'][0]['nome'] == 'Paciente 2'
+    assert data['pacientes'][1]['nome'] == 'Paciente 3'
 
 
 @pytest.mark.asyncio
@@ -118,9 +153,13 @@ async def test_get_paciente_by_id(client):
     create_response = await client.post(
         '/pacientes/',
         json={
-            'nome': 'Gustavo',
-            'email': 'gustavo@example.com',
-            'password': 'senha123',
+            'nome': 'Fernanda Rocha',
+            'email': 'fernanda@example.com',
+            'password': 'Senha@123',
+            'data_nascimento': '1993-09-08T00:00:00',
+            'sexo': 'F',
+            'data_diagnostico': '2021-05-25T00:00:00',
+            'medicacoes': 'Amitriptilina 25mg (noite)',
         },
     )
     paciente_id = create_response.json()['id']
@@ -131,8 +170,8 @@ async def test_get_paciente_by_id(client):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data['id'] == paciente_id
-    assert data['nome'] == 'Gustavo'
-    assert data['email'] == 'gustavo@example.com'
+    assert data['nome'] == 'Fernanda Rocha'
+    assert data['email'] == 'fernanda@example.com'
 
 
 @pytest.mark.asyncio
@@ -140,7 +179,7 @@ async def test_get_paciente_not_found(client):
     response = await client.get('/pacientes/999')
 
     assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json()['detail'] == 'Paciente not found'
+    assert response.json()['detail'] == 'Paciente não encontrado'
 
 
 @pytest.mark.asyncio
@@ -150,16 +189,20 @@ async def test_update_paciente(client, paciente, token):
         f'/pacientes/{paciente.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome': 'Gustavo Atualizado',
-            'email': 'gustavo.novo@example.com',
-            'password': 'novasenha123',
+            'nome': 'Gustavo Silva Pereira',
+            'email': 'gustavo.silva@example.com',
+            'password': 'NovaSenha@123',
+            'data_nascimento': '1990-05-15T00:00:00',
+            'sexo': 'M',
+            'data_diagnostico': '2020-03-10T00:00:00',
+            'medicacoes': 'Pregabalina 150mg (2x/dia), Duloxetina 60mg',
         },
     )
 
     assert response.status_code == HTTPStatus.OK
     data = response.json()
-    assert data['nome'] == 'Gustavo Atualizado'
-    assert data['email'] == 'gustavo.novo@example.com'
+    assert data['nome'] == 'Gustavo Silva Pereira'
+    assert data['email'] == 'gustavo.silva@example.com'
 
 
 @pytest.mark.asyncio
@@ -169,14 +212,16 @@ async def test_update_paciente_wrong_user(client, other_paciente, token):
         f'/pacientes/{other_paciente.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome': 'Tentando Atualizar',
+            'nome': 'Tentando Atualizar Maria',
             'email': 'tentando@example.com',
-            'password': 'senha123',
+            'password': 'Senha@789',
+            'data_nascimento': '1985-08-22T00:00:00',
+            'sexo': 'F',
         },
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json()['detail'] == 'Not enough permissions'
+    assert response.json()['detail'] == 'Permissões insuficientes'
 
 
 @pytest.mark.asyncio
@@ -188,14 +233,45 @@ async def test_update_paciente_duplicate_email(
         f'/pacientes/{paciente.id}',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'nome': 'Gustavo',
+            'nome': 'Gustavo Silva',
             'email': other_paciente.email,
-            'password': 'senha123',
+            'password': 'Senha@123',
+            'data_nascimento': '1990-05-15T00:00:00',
+            'sexo': 'M',
         },
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json()['detail'] == 'Email already exists'
+    assert response.json()['detail'] == 'Email já cadastrado'
+
+
+@pytest.mark.asyncio
+async def test_patch_paciente(client, paciente, token):
+    response = await client.patch(
+        f'/pacientes/{paciente.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'nome': 'Gustavo S. Pereira',
+            'medicacoes': 'Nenhuma medicação no momento',
+        },
+    )
+
+    assert response.status_code == HTTPStatus.OK
+    data = response.json()
+    assert data['nome'] == 'Gustavo S. Pereira'
+    assert data['medicacoes'] == 'Nenhuma medicação no momento'
+    assert data['email'] == paciente.email  # Verificar que não mudou
+
+
+@pytest.mark.asyncio
+async def test_patch_paciente_wrong_user(client, other_paciente, token):
+    response = await client.patch(
+        f'/pacientes/{other_paciente.id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={'nome': 'Nome Invasor'},
+    )
+    assert response.status_code == HTTPStatus.FORBIDDEN
+    assert response.json()['detail'] == 'Permissões insuficientes'
 
 
 @pytest.mark.asyncio
@@ -207,7 +283,7 @@ async def test_delete_paciente(client, paciente, token):
     )
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json()['message'] == 'Paciente deleted'
+    assert response.json()['message'] == 'Paciente excluído'
 
     # Verificar que foi deletado
     get_response = await client.get(f'/pacientes/{paciente.id}')
@@ -223,4 +299,4 @@ async def test_delete_paciente_wrong_user(client, other_paciente, token):
     )
 
     assert response.status_code == HTTPStatus.FORBIDDEN
-    assert response.json()['detail'] == 'Not enough permissions'
+    assert response.json()['detail'] == 'Permissões insuficientes'
