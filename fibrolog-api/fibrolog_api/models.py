@@ -120,10 +120,4 @@ class RegistroCrise(Registro):
         ForeignKey('registros.id'), primary_key=True, init=False
     )
     intensidade_dor: Mapped[int]
-    duracao: Mapped[str]  # Ex: "2h" [cite: 1520]
-    audio_path: Mapped[Optional[str]] = mapped_column(
-        default=None
-    )  # [cite: 409]
-    texto_transcrito: Mapped[Optional[str]] = mapped_column(
-        Text, default=None
-    )  # [cite: 411]
+    contexto: Mapped[str] = mapped_column(Text)
