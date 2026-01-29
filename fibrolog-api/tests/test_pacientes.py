@@ -124,7 +124,13 @@ async def test_get_pacientes(client):
 async def test_get_pacientes_with_pagination(client):
     # Criar vários pacientes
     sexos = ['M', 'F', 'M', 'F', 'M']
-    dates = ['1985-01-15', '1986-02-15', '1987-03-15', '1988-04-15', '1989-05-15']
+    dates = [
+        '1985-01-15',
+        '1986-02-15',
+        '1987-03-15',
+        '1988-04-15',
+        '1989-05-15',
+    ]
     for i in range(5):
         await client.post(
             '/pacientes/',

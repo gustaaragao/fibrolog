@@ -10,13 +10,13 @@ MIN_PASSWORD_LENGTH = 8
 def validate_password_strength(password: str) -> str:
     """
     Valida a força de uma senha de acordo com as regras de segurança.
-    
+
     Args:
         password: A senha a ser validada
-        
+
     Returns:
         A senha validada
-        
+
     Raises:
         ValueError: Se a senha não atender aos requisitos de segurança
     """
