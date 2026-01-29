@@ -242,7 +242,7 @@ async def test_update_paciente_duplicate_email(
     )
 
     assert response.status_code == HTTPStatus.CONFLICT
-    assert response.json()['detail'] == 'Email já existe'
+    assert response.json()['detail'] == 'Email já cadastrado'
 
 
 @pytest.mark.asyncio
