@@ -3,7 +3,7 @@ Rotas para o CRUD de registros diários de sintomas.
 """
 
 import zoneinfo
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Annotated
 
@@ -41,11 +41,18 @@ async def create_registro_diario(
     response: Response,
 ):
     today = datetime.now(zoneinfo.ZoneInfo('America/Sao_Paulo')).date()
+    tomorrow = datetime.combine(
+        today + timedelta(days=1), datetime.min.time()
+    ).replace(tzinfo=zoneinfo.ZoneInfo('America/Sao_Paulo'))
+    today_start = datetime.combine(today, datetime.min.time()).replace(
+        tzinfo=zoneinfo.ZoneInfo('America/Sao_Paulo')
+    )
 
     statement = (
         select(RegistroDiario)
         .where(RegistroDiario.paciente_id == paciente.id)
-        .where(RegistroDiario.data_hora >= today)
+        .where(RegistroDiario.data_hora >= today_start)
+        .where(RegistroDiario.data_hora < tomorrow)
     )
     result = await session.execute(statement)
     db_registro = result.scalar_one_or_none()

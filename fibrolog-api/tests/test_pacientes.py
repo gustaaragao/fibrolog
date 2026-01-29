@@ -124,6 +124,7 @@ async def test_get_pacientes(client):
 async def test_get_pacientes_with_pagination(client):
     # Criar vários pacientes
     sexos = ['M', 'F', 'M', 'F', 'M']
+    dates = ['1985-01-15', '1986-02-15', '1987-03-15', '1988-04-15', '1989-05-15']
     for i in range(5):
         await client.post(
             '/pacientes/',
@@ -131,7 +132,7 @@ async def test_get_pacientes_with_pagination(client):
                 'nome': f'Paciente {i + 1}',
                 'email': f'paciente{i}@example.com',
                 'password': 'Senha@123',
-                'data_nascimento': f'198{i}-0{i + 1}-15T00:00:00',
+                'data_nascimento': f'{dates[i]}T00:00:00',
                 'sexo': sexos[i],
             },
         )
