@@ -1,10 +1,10 @@
-# 🧠 CONTEXTO MESTRE: FibroLog (P2527)
+# CONTEXTO MESTRE: FibroLog (P2527)
 
 Diretrizes, tecnologias e convenções do sistema FibroLog.
 
 ---
 
-## 📋 1. VISÃO GERAL
+## 1. VISÃO GERAL
 
 **Produto:** Sistema Digital para Monitoramento da Fibromialgia  
 **Objetivo:** App mobile para registro de sintomas (dor, fadiga, sono, humor) e crises  
@@ -17,14 +17,7 @@ Diretrizes, tecnologias e convenções do sistema FibroLog.
 
 ---
 
-## 🛠️ 2. STACK TECNOLÓGICA ATUAL (API)
-
-### 2.1 Core Framework
-- **Python:** 3.12+
-- **Framework Web:** FastAPI 0.128.0+ (com suporte async/await)
-- **ASGI Server:** Uvicorn (incluso no FastAPI[standard])
-
-## 🛠️ 2. STACK TECNOLÓGICA
+## 2. STACK TECNOLÓGICA
 
 **Core:** Python 3.12+, FastAPI 0.128.0+, Uvicorn  
 **Database:** SQLite (aiosqlite), SQLAlchemy 2.0.46+ (async), Alembic 1.18.1+  
@@ -32,6 +25,7 @@ Diretrizes, tecnologias e convenções do sistema FibroLog.
 **Segurança:** JWT (PyJWT 2.10.1+), Argon2 (pwdlib[argon2] 0.3.0+), OAuth2  
 **Dev/Qualidade:** Poetry, Ruff 0.14.14+, pytest 9.0.2+, pytest-asyncio, pytest-cov, taskipy  
 **Outros:** httpx, ZoneInfo
+```
 fibrolog-api/
 ├── fibrolog_api/              # Código fonte principal
 │   ├── __init__.py
@@ -61,37 +55,41 @@ fibrolog-api/
 └── README.md                  # Documentação do projeto
 ```
 
-### 3.2 Camadas da Arquitetura
+### 3 Camadas da Arquitetura
 1. **Presentation Layer (Routers):** Endpoints FastAPI, validação de entrada
 2. **Application Layer (Schemas):** DTOs e validações Pydantic
 3. **Domain Layer (Models):** Lógica de negócio e entidades
 4. **Infrastructure Layer (Database/Security):** Persistência e serviços
 
-### 3.3 Padrões de Design Utilizados
+### 4. Padrões de Design Utilizados
 - **Dependency Injection:** Uso de `Depends()` do FastAPI
 - **Repository Pattern:** Session as unit of work
 - **DTO Pattern:** Separação clara entre modelos ORM e schemas Pydantic
 - **Factory Pattern:** Fixtures no conftest.py para testes
 
----
+## 5. CONVENÇÕES DE CÓDIGO
 
-## 📐 4. CONVENÇÕES DE CÓDIGO
-
-### 4.1 Idioma e Tradução
+### 5.1 Idioma e Tradução
 - **Idioma de Código:** Português (pt)
 - **Mensagens e Strings:** Sempre em português
 - **Comentários e Docstrings:** Sempre em português
 - **Documentação:** Seguir convenções do arquivo `llm-prompt.md`
 - **Termos Técnicos Preservados:** Alguns termos em inglês devem ser mantidos conforme glossário:
   - `async context manager` → "gerenciador de contexto assíncrono"
-### 4.3 Nomenclatura
-### 3.2 Camadas
+
+### 5.2 Nomenclatura
+- **Variáveis e Funções:** `snake_case` (ex: `get_current_paciente`)
+- **Classes:** `PascalCase` (ex: `Paciente`, `RegistroDiario`)
+- **Constantes:** `UPPER_SNAKE_CASE` (ex: `DATABASE_URL`)
+- **Routers:** Prefixo descritivo (ex: `/pacientes`, `/auth`)
+
+### 5.3 Camadas
 1. **Presentation (Routers):** Endpoints FastAPI
 2. **Application (Schemas):** DTOs Pydantic
 3. **Domain (Models):** Entidades e lógica
 4. **Infrastructure (Database/Security):** Persistência
 
-### 3.3 Padrões
+### 5.4 Padrões
 Dependency Injection, Repository Pattern, DTO Pattern, Factory Pattern (fixtures)
 - **Line Length:** 79 caracteres (PEP-8)
 - **Quotes:** Single quotes (`'`) para strings
@@ -99,12 +97,7 @@ Dependency Injection, Repository Pattern, DTO Pattern, Factory Pattern (fixtures
 - **Import Organization:** Automática via Ruff (I rule)
 - **Linting Rules:** `['I', 'F', 'E', 'W', 'PL', 'PT', 'FAST']`
 
-### 4.2 Nomenclatura
-- **Variáveis e Funções:** `snake_case` (ex: `get_current_paciente`)
-- **Classes:** `PascalCase` (ex: `Paciente`, `RegistroDiario`)
-- **Constantes:** `UPPER_SNAKE_CASE` (ex: `DATABASE_URL`)
-- **Routers:** Prefixo descritivo (ex: `/pacientes`, `/auth`)
-### 4.4 Anotações de Tipo (Type Hints)
+### 5.5 Anotações de Tipo (Type Hints)
 - **Obrigatório:** Todas as funções devem ter anotações de tipo completas
 - **SQLAlchemy:** Usar `Mapped[type]` para colunas
 - **FastAPI:** Usar `Annotated[Type, Depends()]` para injeção de dependências
@@ -115,30 +108,30 @@ async def criar_paciente(
     paciente: PacienteSchema,
     session: Annotated[AsyncSession, Depends(get_session)]
 ) -> PacientePublico:
-    """
-    Cria um novo paciente no sistema.
-    
-    Args:
-### 4.5 Async/Await
+    ...
+```
+
+### 5.6 Async/Await
 - **Regra:** Todas as operações de I/O devem ser async
 - **Database:** Sempre usar `AsyncSession` e `await`
 - **HTTP Requests:** Usar `httpx.AsyncClient` em vez de `requests`
 - **Gerenciadores de Contexto:** Usar gerenciadores de contexto assíncronos quando aplicável
 
-### 4.6 Status Codes HTTP
+### 5.7 Status Codes HTTP
 - **Importação:** Sempre usar `from http import HTTPStatus`
 - **Constantes:** Usar `HTTPStatus.CREATED`, `HTTPStatus.NOT_FOUND`, etc.
 - **Evitar:** Magic numbers (200, 404, etc.)
 
-### 4.7 Tratamento de Erros
+### 5.8 Tratamento de Erros
 ```python
 # Padrão de erro com mensagens em português
 raise HTTPException(
     status_code=HTTPStatus.NOT_FOUND,
     detail='Paciente não encontrado'
 )
+```
 
-### 4.8 SQLAlchemy Models (Padrão Moderno)
+### 5.9 SQLAlchemy Models (Padrão Moderno)
 ```python
 @table_registry.mapped_as_dataclass
 class Paciente:
@@ -188,7 +181,7 @@ class Paciente:
     )
 ```
 
-### 4.9 Pydantic Schemas
+### 5.10 Pydantic Schemas
 ```python
 class PacienteSchema(BaseModel):
     """Schema para criação de paciente."""
@@ -247,7 +240,7 @@ async def obter_paciente_por_id(
 ```
 
 ---
-## 🔒 5. REGRAS DE NEGÓCIO
+## 5. REGRAS DE NEGÓCIO
 
 **Autenticação:**
 - RN001: Senha min. 8 caracteres (maiúsculas, minúsculas, números, símbolos)
@@ -277,13 +270,9 @@ async def obter_paciente_por_id(
 
 ---
 
-## 🎯 6. REQUISITOS FUNCIONAIS
-
-**✅ Implementados:**
+## 6. REQUISITOS FUNCIONAIS
 - RF001-003: Autenticação (login, JWT, validação)
 - RF004-009: CRUD Pacientes (criar, listar, buscar, atualizar, deletar, email único)
-
-**🚧 Pendentes:**
 - RF010: CRUD Contatos Apoio
 - RF011: CRUD Alertas
 - RF012: CRUD Registros Diários
@@ -296,26 +285,26 @@ async def obter_paciente_por_id(
 ---
 
 ---
-1. ✅ **Consultar `llm-prompt.md`:** Verificar convenções de tradução e termos técnicos
-2. ✅ **Verificar Requisitos Funcionais:** Confirmar que a funcionalidade está especificada
-3. ✅ **Validar Regras de Negócio:** Identificar RNs aplicáveis
-4. ✅ **Verificar Convenções de Código:** Revisar seção 4 deste documento
-5. ✅ **Planejar Testes:** Definir casos de teste antes da implementação
+1. **Consultar `llm-prompt.md`:** Verificar convenções de tradução e termos técnicos
+2. **Verificar Requisitos Funcionais:** Confirmar que a funcionalidade está especificada
+3. **Validar Regras de Negócio:** Identificar RNs aplicáveis
+4. **Verificar Convenções de Código:** Revisar seção 4 deste documento
+5. **Planejar Testes:** Definir casos de teste antes da implementação
 
 ### 12.2 Durante o Desenvolvimento
-1. ✅ **Idioma Português:** Código, comentários e strings em português (seguir `llm-prompt.md`)
-2. ✅ **Anotações de Tipo:** Usar type hints completos em TODAS as funções
-3. ✅ **Docstrings:** Documentar classes e funções públicas (Google Style)
-4. ✅ **Async/Await:** Seguir padrão assíncrono para operações de I/O
-5. ✅ **Mensagens de Erro:** Sempre em português e descritivas
-6. ✅ **Testes Paralelos:** Escrever testes junto com a implementação
+1. **Idioma Português:** Código, comentários e strings em português (seguir `llm-prompt.md`)
+2. **Anotações de Tipo:** Usar type hints completos em TODAS as funções
+3. **Docstrings:** Documentar classes e funções públicas (Google Style)
+4. **Async/Await:** Seguir padrão assíncrono para operações de I/O
+5. **Mensagens de Erro:** Sempre em português e descritivas
+6. **Testes Paralelos:** Escrever testes junto com a implementação
 
 ### 12.3 Antes de Commitar
-1. ✅ **Lint:** Rodar `task lint` (zero erros)
-2. ✅ **Format:** Rodar `task format` (auto-formatar)
-3. ✅ **Tests:** Rodar `task test` (100% passando)
-4. ✅ **Coverage:** Verificar cobertura de testes (mínimo 80%)
-5. ✅ **Migrations:** Se alterou models, criar migração Alembic
+1. **Lint:** Rodar `task lint` (zero erros)
+2. **Format:** Rodar `task format` (auto-formatar)
+3. **Tests:** Rodar `task test` (100% passando)
+4. **Coverage:** Verificar cobertura de testes (mínimo 80%)
+5. **Migrations:** Se alterou models, criar migração Alembic
 
 ### 12.4 Checklist de Criação de Arquivos Python
 Ao criar novos arquivos Python, sempre:
@@ -347,38 +336,20 @@ Ao criar novos arquivos Python, sempre:
 ### 9.3 Enums
 ```python
 class EstadoEmocional(str, Enum):
----
 
-## 📄 15. REFERÊNCIAS
-
-**GEMINI.md:** Contexto master (consultar antes de implementar)  
-**llm-prompt.md:** Traduções e glossário (consultar ao criar arquivos Python)  
-**README.md:** Setup e comandos  
-**pyproject.toml:** Dependências e config
-
----
-
-**⚠️ IMPORTANTE:** Consultar GEMINI.md + llm-prompt.md ao criar código Python
-    TRISTE = "triste"
-```
-## 📄 15. REFERÊNCIAS
+## 10. REFERÊNCIAS
 
 **GEMINI.md:** Contexto master (consultar antes de implementar)  
 **llm-prompt.md:** Traduções e glossário (consultar ao criar arquivos Python)  
 **README.md:** Setup e comandos  
 **pyproject.toml:** Dependências e config
-
----
-
-**⚠️ IMPORTANTE:** Consultar GEMINI.md + llm-prompt.md ao criar código Python
----
 
 ## 🎨 12. DIRETRIZES DE DESENVOLVIMENTO
 
 ### 12.1 Antes de Codificar
-1. ✅ Verificar se a funcionalidade está nos Requisitos Funcionais
-2. ✅ Validar Regras de Negócio aplicáveis
-3. ✅ Verificar convenções de código (Ruff)
+1. Verificar se a funcionalidade está nos Requisitos Funcionais
+2. Validar Regras de Negócio aplicáveis
+3. Verificar convenções de código (Ruff)
 ## 🔐 10. SEGURANÇA
 
 **Variáveis .env:**
