@@ -117,9 +117,10 @@ async def update_paciente(
         await session.refresh(current_paciente)
         return current_paciente
     except IntegrityError:
+        await session.rollback()
         raise HTTPException(
             status_code=HTTPStatus.CONFLICT,
-            detail='Email já existe',
+            detail='Email já cadastrado',
         )
 
 

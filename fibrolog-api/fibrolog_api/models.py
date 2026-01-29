@@ -9,10 +9,10 @@ table_registry = registry()
 
 
 class EstadoEmocional(str, Enum):
-    FELIZ = 'feliz'
-    ANSIOSO = 'ansioso'
-    IRRITADO = 'irritado'
-    TRISTE = 'triste'
+    FELIZ = 'FELIZ'
+    ANSIOSO = 'ANSIOSO'
+    IRRITADO = 'IRRITADO'
+    TRISTE = 'TRISTE'
 
 
 @table_registry.mapped_as_dataclass

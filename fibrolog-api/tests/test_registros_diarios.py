@@ -18,7 +18,7 @@ def registro_diario_data():
         'intensidade_dor': 5,
         'qualidade_sono': 7,
         'nivel_fadiga': 6,
-        'estado_emocional': 'ansioso',
+        'estado_emocional': 'ANSIOSO',
         'localizacao_dor': 'Cabeça',
     }
 

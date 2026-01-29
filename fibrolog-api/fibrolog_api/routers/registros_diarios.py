@@ -3,7 +3,7 @@ Rotas para o CRUD de registros diários de sintomas.
 """
 
 import zoneinfo
-from datetime import datetime
+from datetime import datetime, timedelta
 from http import HTTPStatus
 from typing import Annotated
 
@@ -26,10 +26,12 @@ router = APIRouter(prefix='/registros-diarios', tags=['Registros Diários'])
 Session = Annotated[AsyncSession, Depends(get_session)]
 CurrentPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
+# Timezone for Brazil (São Paulo)
+TIMEZONE = zoneinfo.ZoneInfo('America/Sao_Paulo')
+
 
 @router.post(
     '/',
-    status_code=HTTPStatus.CREATED,
     response_model=RegistroDiarioPublic,
     summary='Criar registro diário',
     description='Cria ou atualiza o registro diário do dia atual',
@@ -40,12 +42,19 @@ async def create_registro_diario(
     paciente: CurrentPaciente,
     response: Response,
 ):
-    today = datetime.now(zoneinfo.ZoneInfo('America/Sao_Paulo')).date()
+    today = datetime.now(TIMEZONE).date()
+    tomorrow = datetime.combine(
+        today + timedelta(days=1), datetime.min.time()
+    ).replace(tzinfo=TIMEZONE)
+    today_start = datetime.combine(today, datetime.min.time()).replace(
+        tzinfo=TIMEZONE
+    )
 
     statement = (
         select(RegistroDiario)
         .where(RegistroDiario.paciente_id == paciente.id)
-        .where(RegistroDiario.data_hora >= today)
+        .where(RegistroDiario.data_hora >= today_start)
+        .where(RegistroDiario.data_hora < tomorrow)
     )
     result = await session.execute(statement)
     db_registro = result.scalar_one_or_none()
@@ -54,18 +63,18 @@ async def create_registro_diario(
         response.status_code = HTTPStatus.OK
         for key, value in registro_schema.model_dump().items():
             setattr(db_registro, key, value)
-        db_registro.data_hora = datetime.now(
-            zoneinfo.ZoneInfo('America/Sao_Paulo')
-        )
+        db_registro.data_hora = datetime.now(TIMEZONE)
         await session.commit()
         await session.refresh(db_registro)
         return db_registro
 
+    response.status_code = HTTPStatus.CREATED
     db_registro = RegistroDiario(
         **registro_schema.model_dump(),
         paciente_id=paciente.id,
         tipo_registro='diario',
     )
+    db_registro.data_hora = datetime.now(TIMEZONE)
     session.add(db_registro)
     await session.commit()
     await session.refresh(db_registro)

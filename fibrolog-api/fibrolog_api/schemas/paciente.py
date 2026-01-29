@@ -7,6 +7,40 @@ from pydantic import BaseModel, EmailStr, field_validator
 MIN_PASSWORD_LENGTH = 8
 
 
+def validate_password_strength(password: str) -> str:
+    """
+    Valida a força de uma senha de acordo com as regras de segurança.
+    
+    Args:
+        password: A senha a ser validada
+        
+    Returns:
+        A senha validada
+        
+    Raises:
+        ValueError: Se a senha não atender aos requisitos de segurança
+    """
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(
+            f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
+        )
+    if not re.search(r'[A-Z]', password):
+        raise ValueError(
+            'A senha deve conter pelo menos uma letra maiúscula'
+        )
+    if not re.search(r'[a-z]', password):
+        raise ValueError(
+            'A senha deve conter pelo menos uma letra minúscula'
+        )
+    if not re.search(r'\d', password):
+        raise ValueError('A senha deve conter pelo menos um número')
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise ValueError(
+            'A senha deve conter pelo menos um caractere especial'
+        )
+    return password
+
+
 class PacienteSchema(BaseModel):
     nome: str
     email: EmailStr
@@ -19,25 +53,7 @@ class PacienteSchema(BaseModel):
     @field_validator('password')
     @classmethod
     def validate_password(cls, v: str) -> str:
-        if len(v) < MIN_PASSWORD_LENGTH:
-            raise ValueError(
-                f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
-            )
-        if not re.search(r'[A-Z]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos uma letra maiúscula'
-            )
-        if not re.search(r'[a-z]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos uma letra minúscula'
-            )
-        if not re.search(r'\d', v):
-            raise ValueError('A senha deve conter pelo menos um número')
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos um caractere especial'
-            )
-        return v
+        return validate_password_strength(v)
 
 
 class PacienteUpdate(BaseModel):
@@ -54,25 +70,7 @@ class PacienteUpdate(BaseModel):
     def validate_password(cls, v: str | None) -> str | None:
         if v is None:
             return None
-        if len(v) < MIN_PASSWORD_LENGTH:
-            raise ValueError(
-                f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
-            )
-        if not re.search(r'[A-Z]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos uma letra maiúscula'
-            )
-        if not re.search(r'[a-z]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos uma letra minúscula'
-            )
-        if not re.search(r'\d', v):
-            raise ValueError('A senha deve conter pelo menos um número')
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
-            raise ValueError(
-                'A senha deve conter pelo menos um caractere especial'
-            )
-        return v
+        return validate_password_strength(v)
 
 
 class PacientePublic(BaseModel):

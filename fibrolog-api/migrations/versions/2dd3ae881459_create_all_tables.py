@@ -28,7 +28,7 @@ def upgrade() -> None:
     sa.Column('paciente_id', sa.Integer(), nullable=False),
     sa.Column('descricao', sa.Text(), nullable=False),
     sa.Column('ativo', sa.Boolean(), nullable=False),
-    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ),
+    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('contatos_apoio',
@@ -38,7 +38,7 @@ def upgrade() -> None:
     sa.Column('telefone', sa.String(), nullable=False),
     sa.Column('parentesco', sa.String(), nullable=False),
     sa.Column('paciente_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ),
+    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('registros',
@@ -46,7 +46,7 @@ def upgrade() -> None:
     sa.Column('tipo_registro', sa.String(), nullable=False),
     sa.Column('paciente_id', sa.Integer(), nullable=False),
     sa.Column('data_hora', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=False),
-    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ),
+    sa.ForeignKeyConstraint(['paciente_id'], ['pacientes.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('registros_crises',
@@ -55,7 +55,7 @@ def upgrade() -> None:
     sa.Column('duracao', sa.String(), nullable=False),
     sa.Column('audio_path', sa.String(), nullable=True),
     sa.Column('texto_transcrito', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['id'], ['registros.id'], ),
+    sa.ForeignKeyConstraint(['id'], ['registros.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('registros_diarios',
@@ -65,7 +65,7 @@ def upgrade() -> None:
     sa.Column('nivel_fadiga', sa.Integer(), nullable=False),
     sa.Column('estado_emocional', sa.Enum('FELIZ', 'ANSIOSO', 'IRRITADO', 'TRISTE', name='estadoemocional'), nullable=False),
     sa.Column('localizacao_dor', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['id'], ['registros.id'], ),
+    sa.ForeignKeyConstraint(['id'], ['registros.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.add_column('pacientes', sa.Column('data_nascimento', sa.DateTime(), nullable=True))
