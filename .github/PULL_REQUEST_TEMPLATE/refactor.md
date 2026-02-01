@@ -21,6 +21,11 @@ Motivo da refatoração:
 - [ ] Não
 - [ ] Sim (explique abaixo)
 
+### 🤖 IA & Code Review
+- [ ] A refatoração manteve a integridade dos testes existentes?
+- [ ] O Copilot identificou possíveis "code smells" antes da refatoração?
+- [ ] A tipagem (type hints) foi melhorada ou mantida?
+
 ### 🧪 Testes realizados
 Como garantir que nada quebrou?
 

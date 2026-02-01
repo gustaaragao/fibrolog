@@ -16,5 +16,10 @@ Issue / relato / contexto:
 ### 🔧 Solução aplicada
 Explique o que foi feito para corrigir o bug.
 
+### 🤖 IA & Code Review
+- [ ] O código foi revisado pelo GitHub Copilot/IA?
+- [ ] A solução segue as convenções do projeto (Português, Type Hints)?
+- [ ] Testes de regressão foram adicionados?
+
 ### 📸 Evidências (se aplicável)
 Screenshots, gifs ou logs.
