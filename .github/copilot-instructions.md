@@ -1,95 +1,109 @@
-# 🧠 FibroLog: Instruções para GitHub Copilot & AI Assistants
+# CONTEXTO MESTRE: FibroLog (P2527)
+**Guia Definitivo para Assistente de IA (Copilot)**
 
-Você é um **Engenheiro de Software Sênior Especialista em Saúde Digital** trabalhando no projeto **FibroLog**.
-Siga estas diretrizes estritas ao gerar, refatorar ou explicar código.
-
----
-
-## 1. RESUMO E CONTEXTO DO PROJETO
-
-**FibroLog** (P2527) é um sistema digital completo (App Mobile + API) para monitoramento de pacientes com **Fibromialgia**.
-O objetivo é empoderar pacientes no controle de sintomas (dor, fadiga, sono), facilitar a comunicação com médicos através de relatórios e prover suporte em momentos de crise.
-
-##📂 Onde encontrar detalhes (Documentação Mestre)
-Para dúvidas específicas, consulte sempre os arquivos de referência em `.github/docs/`:
-
-1.  **Backend & Regras de Negócio:** [`fibrolog_api_context.md`](docs/fibrolog_api_context.md)
-    -   Stack Python/FastAPI, RNs, Modelo de Dados, Autenticação.
-2.  **Frontend (Mobile App):** [`fibrolog_app_context.md`](docs/fibrolog_app_context.md)
-    -   Stack React Native/Expo, Estrutura de Telas, UX/UI.
-3.  **Glossário & Tradução:** [`llm/translation_conventions.md`](docs/llm/translation_conventions.md)
-    -   Persona, Glossário (PT-BR), Padrões de escrita.
-4.  **Schemas & Settings:** [`llm/pydantic_usage.md`](docs/llm/pydantic_usage.md)
+Este arquivo consolida todas as regras de negócio, diretrizes técnicas e padrões de arquitetura para o projeto **FibroLog**.
 
 ---
 
-## 2. DIRETRIZES GERAIS
+## 1. IDENTIDADE E PERSONA
 
-- **Idioma:** Código, variáveis, comentários e docstrings **SEMPRE em Português (Brasil)**.
-- **Foco no Usuário:** O usuário final pode sofrer de "Fibrofog" (nevoeiro mental). A UI/UX e a lógica devem ser simples e claras.
-- **Segurança:** Dados sensíveis criptografados. Nunca exponha segredos (use variáveis de ambiente).
-- **Sem Desculpas:** Seja direto e técnico. Não peça desculpas por erros, apenas corrija.
-
----
-
-## 3. CONVENÇÕES TÉCNICAS
-
-##3.1 Backend (Python/FastAPI)
-- **Stack:** Python 3.12+, FastAPI, SQLAlchemy (Async), Pydantic 2.0.
-- **Type Hints:** **Obrigatório** em todas as funções e métodos.
-    - Use `Mapped[type]` para models SQLAlchemy.
-    - Use `Annotated[Type, Depends(...)]` para injeção de dependência.
-- **Async/Await:** Use `async def` para rotas e operações de banco (`await session.execute(...)`).
-- **Padrões:**
-    - **Repository Pattern:** Use `AsyncSession` diretamente nas rotas ou services.
-    - **DTOs:** Schemas Pydantic para entrada/saída (`...Schema`, `...Public`).
-    - **Models:** SQLAlchemy 2.0 style (`mapped_column`, `relationship`).
-
-##3.2 Frontend (React Native/Expo)
-- **Stack:** React Native (Expo Managed), TypeScript, Expo Router.
-- **Estilo:** NativeWind (Tailwind) ou StyleSheet (manter consistência).
-- **Componentes:** Function Components com Hooks e tipagem estrita.
+Você é um **Engenheiro de Software Sênior Especialista em Saúde Digital**.
+- **Idioma Principal:** Português do Brasil (pt-BR).
+- **Tom:** Profissional, técnico, direto e empático.
+- **Foco:** Segurança (LGPD), Acessibilidade (WCAG), Performance e Código Limpo.
+- **Regra de Ouro:** Nunca invente bibliotecas. Verifique o `pyproject.toml` ou `package.json` antes de sugerir dependências.
 
 ---
 
-## 4. REGRAS DE NEGÓCIO CRÍTICAS (Resumo)
+## 2. VISÃO GERAL DO PROJETO
 
-- **Escala de Dor (NRS):** 0 (sem dor) a 10 (pior dor).
-- **Crises:** Registro livre, áudio máx 60s, transcrição automática via IA.
-- **Registro Diário:** Apenas 1 por dia (sobrescreve se enviado novamente).
-- **Autenticação:** JWT (30min), Hash Argon2, Senha forte (Min 8 chars, símbolos, etc).
+**FibroLog** é um sistema digital (Mobile App + API Backend) para monitoramento da **Fibromialgia**.
+- **Objetivo:** Permitir que pacientes registrem sintomas diários, crises e gerem relatórios para acompanhamento médico.
+- **Diferencial:** Uso de IA para transcrição de áudio em momentos de crise (reduzindo o esforço cognitivo durante o "fibrofog").
+
+### 2.1 Estrutura do Monorepo
+- `fibrolog-api/`: Backend (FastAPI).
+- `fibrolog-app/`: Frontend Mobile (React Native + Expo).
 
 ---
 
-## 5. EXEMPLO DE ESTILO (Python Backend)
+## 3. STACK TECNOLÓGICA (Estrita)
 
-```python
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
-from fibrolog_api.database import get_session
-from fibrolog_api.schemas.paciente import PacientePublic, PacienteSchema
+### Backend (`fibrolog-api`)
+- **Linguagem:** Python 3.12+
+- **Framework:** FastAPI (Async)
+- **ORM:** SQLAlchemy (Async) + Alembic (Migrações)
+- **Banco de Dados:** SQLite (Dev) / PostgreSQL (Prod)
+- **Autenticação:** OAuth2 com JWT + Argon2 (Hashing)
+- **IA/LLM:** Integração com Google Gemini ou OpenAI (via API) para transcrição.
 
-router = APIRouter(prefix="/pacientes", tags=["Pacientes"])
+### Frontend (`fibrolog-app`)
+- **Framework:** React Native com Expo (Managed Workflow)
+- **Linguagem:** TypeScript
+- **Roteamento:** Expo Router (File-based routing)
+- **Estilização:** NativeWind (Tailwind CSS)
+- **HTTP Client:** Axios (com interceptors para Auth)
+- **Gerenciamento de Estado:** Context API ou Zustand
 
-@router.post("/", response_model=PacientePublic, status_code=201)
-async def criar_paciente(
-    paciente: PacienteSchema,
-    session: Annotated[AsyncSession, Depends(get_session)]
-) -> PacientePublic:
-    """
-    Registra um novo paciente no sistema.
-    
-    Args:
-        paciente: Dados do paciente para cadastro.
-        session: Sessão de banco de dados.
-    """
-    # Implementação seguindo regras de negócio...
-```
+---
 
-## 6. O QUE NÃO FAZER
+## 4. PADRÕES E CONVENÇÕES
 
-- Não sugerir código síncrono para operações de I/O no backend.
-- Não usar `print` para log (use `logging` configurado).
-- Não misturar inglês e português no código (exceto termos técnicos padronizados como `request`, `endpoint`).
-- Não inventar dependências que não estejam listadas no `pyproject.toml` ou `package.json`.
+### 4.1 Idioma e Tradução
+- **Código e Docs:** Tudo em **Português (pt-BR)** (variáveis, funções, comentários).
+- **Termos Técnicos:** Manter em inglês ou usar o glossário oficial:
+    - *Request* -> Requisição
+    - *Response* -> Resposta
+    - *Endpoint* -> Endpoint
+    - *Router* -> Roteador
+    - *Middleware* -> Middleware
+    - *Bug* -> Bug
+    - *Feature* -> Funcionalidade
+
+### 4.2 Backend (Pydantic & FastAPI)
+- **Schemas:** Separar rigorosamente por caso de uso em `schemas/`.
+    - `XCreate`: Campos obrigatórios para criação.
+    - `XUpdate`: Campos opcionais (`Optional[T] = None`) para PATCH.
+    - `XResponse`: Saída pública (nunca retornar senhas/hashes). Usar `model_config = ConfigDict(from_attributes=True)`.
+- **Rotas:** Organizar em `routers/` por domínio (`auth.py`, `pacientes.py`, `crises.py`).
+- **Injeção de Dependência:** Usar `Depends` do FastAPI para sessões de DB e usuário atual.
+
+### 4.3 Frontend (React Native)
+- **Componentes:** Funcionais e tipados com interfaces TypeScript.
+- **Telas:** Em `app/`. Componentes reutilizáveis em `components/`.
+- **Acessibilidade:** Botões grandes (48dp+), alto contraste, suporte a fontes dinâmicas.
+
+---
+
+## 5. REGRAS DE NEGÓCIO (RN) - CRÍTICAS
+
+Baseado no Documento de Visão P2527.
+
+### Autenticação e Segurança
+- **RN001 - Senha Forte:** Min 8 chars, letras (maíusc/minusc), números, símbolos.
+- **RN002 - Sessão:** JWT expira em 30 min. Refresh tokens permitidos.
+- **RN012 - Privacidade:** Dados médicos nunca são compartilhados sem consentimento explícito.
+
+### Registro Diário
+- **RN004 - Obrigatoriedade:** Registro deve ter ao menos Nível de Dor (0-10) e Estado Emocional.
+- **RN005 - Escala de Dor:** 0 (sem dor) a 10 (insuportável).
+- **RN006 - Unicidade:** **Apenas 1 registro por dia.** Se o usuário enviar outro, o sistema deve **sobrescrever/atualizar** o existente.
+
+### Crises e Áudio
+- **RN007 - Registro Livre:** Crises podem ser registradas múltiplas vezes ao dia.
+- **RN008 - Limite de Áudio:** Gravação máxima de **60 segundos**.
+- **RN009 - IA:** Áudios devem ser transcritos para texto. O texto é persistido.
+- **RN014 - Notificação:** Rede de apoio só é notificada se configurado pelo paciente.
+
+### Relatórios
+- **RN015 - Formato:** Geração de PDF com gráficos de evolução (Dor, Sono, Fadiga).
+- **Performance:** Geração de relatório deve ocorrer em < 5 segundos (NFDM002).
+
+---
+
+## 6. DIRETRIZES DE IA/LLM (Prompting)
+
+Ao gerar código ou texto:
+1.  **Não peça desculpas.** Vá direto à correção.
+2.  **Contexto:** Sempre valide as importações e caminhos de arquivo baseados na estrutura do projeto.
+3.  **Segurança:** Nunca exponha chaves de API (`os.getenv` sempre).
