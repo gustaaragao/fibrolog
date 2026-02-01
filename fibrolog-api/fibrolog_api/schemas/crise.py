@@ -13,6 +13,13 @@ class CriseCreate(BaseModel):
     contexto: str
 
 
+class CriseUpdate(BaseModel):
+    """Schema para atualização parcial de uma crise."""
+
+    intensidade_dor: int | None = Field(None, ge=0, le=10)
+    contexto: str | None = None
+
+
 class CrisePublic(CriseCreate):
     """Schema para retorno público de uma crise."""
 
