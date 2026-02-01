@@ -191,7 +191,7 @@ async def test_delete_crise(
     )
     crise_id = create_response.json()['id']
 
-    # Delete a crise
+    # Deletes a crise
     response = await client.delete(
         f'/crises/{crise_id}', headers={'Authorization': f'Bearer {token}'}
     )
