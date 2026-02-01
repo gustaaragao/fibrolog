@@ -13,6 +13,11 @@ Essa mudança:
 - [ ] Alteração 1
 - [ ] Alteração 2
 
+### 🤖 IA & Code Review
+- [ ] O código foi gerado/assistido por IA?
+- [ ] A lógica de negócio (RNs) foi validada manualmente?
+- [ ] O código segue estritamente o `fibrolog_api_context.md`?
+
 ### 🧪 Como testar
 Passos para testar a funcionalidade:
 1. 

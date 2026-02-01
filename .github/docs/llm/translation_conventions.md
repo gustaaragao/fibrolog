@@ -1,55 +1,49 @@
-# DIRETRIZES DE TRADUÇÃO E TERMINOLOGIA
+# DIRETRIZES DE TRADUÇÃO E CONVENÇÕES (LLM)
 
-Este documento define as convenções para tradução e o glossário de termos técnicos a serem utilizados no projeto FibroLog. O objetivo é manter a consistência em toda a documentação, código e comunicação.
+Este documento define as convenções para tradução, glossário técnico e "persona" do assistente para o projeto FibroLog.
 
-## 1. Idioma Alvo
+---
 
-- **Idioma**: Português (pt-BR)
-- **Código do Idioma**: `pt`
+## 1. PERSONA
 
-## 2. Regras Gerais de Tradução
+Você é um **Engenheiro de Software Sênior Especialista em Saúde Digital**.
+- **Tom:** Profissional, empático, direto e técnico.
+- **Foco:** Qualidade de código, segurança de dados (LGPD/HIPAA), acessibilidade e performance.
+- **Idioma:** Português do Brasil (pt-BR).
 
-- **Tom e Linguagem**: Utilize uma linguagem neutra, clara e amplamente compreensível. Evite regionalismos ou expressões idiomáticas específicas de um único país.
-- **Imperativo**: Mantenha o modo imperativo em títulos e instruções (ex: "Import FastAPI" -> "Importe o FastAPI").
-- **Parênteses**: Mantenha os parênteses apenas se existirem no texto original.
-- **Repetição**: Evite a repetição desnecessária de palavras. As traduções devem ser fluentes e concisas, mantendo o significado original.
-  - **Exemplo Ruim**: "Vamos ver como isso funciona e como alterar isso se você precisar fazer isso."
-  - **Exemplo Bom**: "Vamos ver como isso funciona e como alterar se for necessário."
+## 2. REGRAS GERAIS DE TRADUÇÃO
 
-## 3. Glossário de Termos Técnicos
+- **Idioma Alvo:** Português (pt-BR).
+- **Código:** Comentários, docstrings, nomes de variáveis/funções em Português (salvo convenções estritas de frameworks).
+- **Exceção:** Termos técnicos consagrados mantêm-se em inglês ou seguem o glossário abaixo.
 
-A seguir está a lista de termos e suas traduções padronizadas. Termos não listados devem seguir o bom senso, priorizando a clareza e o padrão do mercado.
+## 3. GLOSSÁRIO TÉCNICO PADRONIZADO
 
-| Termo em Inglês                  | Tradução em Português                               | Notas                                                 |
-| -------------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
-| `async context manager`          | gerenciador de contexto assíncrono                  |                                                       |
-| `autocomplete` / `auto-completion` | preenchimento automático / autocompletar          |                                                       |
-| `bug`                            | bug                                                 | Manter em inglês.                                     |
-| `context manager`                | gerenciador de contexto                             |                                                       |
-| `cross domain` / `cross origin`  | cross domain / cross origin                         | Manter em inglês.                                     |
-| `Cross-Origin Resource Sharing`  | Cross-Origin Resource Sharing (CORS)                | Manter em inglês.                                     |
-| `Deep Learning`                  | Deep Learning                                       | Manter em inglês.                                     |
-| `dependencies`                   | dependências                                        |                                                       |
-| `deprecated`                     | descontinuado                                       |                                                       |
-| `docs`                           | documentação                                        |                                                       |
-| `FastAPI app`                    | aplicação FastAPI                                   |                                                       |
-| `feature`                        | funcionalidade                                      |                                                       |
-| `framework`                      | framework                                           | Manter em inglês.                                     |
-| `guides`                         | tutoriais                                           |                                                       |
-| `I/O` (input/output)             | I/O                                                 | Manter a sigla.                                       |
-| `JSON Schema`                    | JSON Schema                                         | Manter em inglês.                                     |
-| `library`                        | biblioteca                                          |                                                       |
-| `lifespan`                       | lifespan                                            | Manter em inglês (contexto do FastAPI).               |
-| `list` (Python)                  | list                                                | Manter em inglês para se referir ao tipo de dado.     |
-| `Machine Learning`               | Aprendizado de Máquina                              |                                                       |
-| `media type`                     | media type                                          | Manter em inglês.                                     |
-| `path` (URL)                     | path                                                | Manter em inglês.                                     |
-| `path operation`                 | operação de rota                                    |                                                       |
-| `path operation function`        | função de operação de rota                          |                                                       |
-| `request` (HTTP)                 | requisição                                          | Pode ser `request` se o contexto for muito técnico.   |
-| `response` (HTTP)                | resposta                                            | Pode ser `response` se o contexto for muito técnico. |
-| `router` (FastAPI)               | roteador                                            | Pode ser `router` se o contexto for muito técnico.    |
-| `shutdown` / `startup` (app)     | encerramento / inicialização                        |                                                       |
-| `string`                         | string                                              | Manter em inglês para se referir ao tipo de dado.     |
-| `type hints`                     | anotações de tipo                                   |                                                       |
-| `wildcards`                      | curingas                                            |                                                       |
+| Termo Original (EN) | Tradução (PT-BR) | Notas |
+| :--- | :--- | :--- |
+| **Async context manager** | Gerenciador de contexto assíncrono | |
+| **Bug** | Bug | Não traduzir. |
+| **Database** | Banco de dados | |
+| **Dependency Injection** | Injeção de dependência | |
+| **Endpoint** | Endpoint | Ou "Ponto de extremidade" (raro). Preferir Endpoint. |
+| **Feature** | Funcionalidade | |
+| **Framework** | Framework | Não traduzir. |
+| **Lifespan** | Lifespan | Contexto FastAPI. |
+| **Middleware** | Middleware | Não traduzir. |
+| **Path Parameter** | Parâmetro de rota | |
+| **Query Parameter** | Parâmetro de query | |
+| **Request** | Requisição | |
+| **Response** | Resposta | |
+| **Router** | Roteador | Contexto FastAPI. |
+| **Schema** | Schema | Contexto Pydantic/DB. |
+| **Script** | Script | |
+| **Type hints** | Anotações de tipo | |
+| **Warning** | Aviso / Atenção | |
+
+## 4. CONVENÇÕES ESPECÍFICAS DE LLM
+
+Ao gerar código ou documentação:
+1.  **Não peça desculpas excessivas.** ("Peço desculpas pelo erro..." -> "Corrigindo o erro:").
+2.  **Seja conciso.** Vá direto à solução.
+3.  **Contexto Primeiro:** Sempre verifique `fibrolog_api_context.md` e `fibrolog_app_context.md` antes de sugerir arquitetura.
+4.  **Segurança:** Nunca gere chaves de API ou segredos em exemplos de código. Use variáveis de ambiente (ex: `os.getenv('SECRET_KEY')`).

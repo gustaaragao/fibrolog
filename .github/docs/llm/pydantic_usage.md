@@ -1,80 +1,106 @@
-# DIRETRIZES DE USO: PYDANTIC
+# 🛡️ DIRETRIZES DE USO: PYDANTIC (FibroLog)
 
-Este documento resume como a biblioteca Pydantic deve ser utilizada no projeto FibroLog, garantindo consistência e boas práticas.
+Este documento define os padrões para validação de dados e gestão de configurações no backend do FibroLog.
 
-## 1. Propósito do Pydantic no Projeto
+---
 
-O Pydantic é utilizado para duas finalidades principais:
+## 1. OBJETIVO
 
-1.  **Validação de Dados (Schemas)**: Para validar os dados que entram e saem da API. Isso garante que a API receba os dados no formato esperado e que as respostas sigam uma estrutura predefinida.
-2.  **Configurações da Aplicação**: Para gerenciar as configurações do ambiente (variáveis de ambiente) de forma segura e tipada.
+Garantir robustez, tipagem estrita e segurança nos dados que transitam pela API e nas configurações do ambiente.
 
-## 2. Validação de Dados com Schemas
+---
 
--   **Localização**: Todos os schemas Pydantic devem ser definidos no arquivo `fibrolog_api/schemas.py`.
--   **Herança**: Todos os schemas devem herdar de `pydantic.BaseModel`.
+## 2. SCHEMAS (Data Transfer Objects)
 
-### 2.1. Tipos de Schemas
+-   **Localização**: Os schemas devem ser organizados como um pacote em `fibrolog_api/schemas/`, separados por domínio (ex: `paciente.py`, `crise.py`, `auth.py`).
+-   **Herança**: Todos devem herdar de `pydantic.BaseModel` ou `ConfigBase` (se houver uma classe base customizada).
 
-Crie schemas específicos para diferentes operações, seguindo o padrão DTO (Data Transfer Object):
+### 2.1 Padrão de Nomenclatura e Estrutura
 
--   **Schema de Criação (`...Create`)**: Usado para os dados de entrada ao criar um novo recurso.
+Para cada entidade, geralmente teremos 3 variações de schema:
+
+1.  **Input de Criação (`XCreate`)**:
+    -   Campos obrigatórios para criar o registro.
+    -   Validações fortes (regex de senha, email).
     ```python
-    from pydantic import BaseModel, EmailStr
-
     class PacienteCreate(BaseModel):
         nome: str
         email: EmailStr
-        password: str
+        password: str  # Plain text, será hasheado no service
     ```
 
--   **Schema de Atualização (`...Update`)**: Usado para os dados de entrada ao atualizar um recurso existente. Geralmente, os campos são opcionais.
+2.  **Input de Atualização (`XUpdate`)**:
+    -   Campos opcionais (`Optional[T] = None`).
+    -   Permite atualização parcial (PATCH).
     ```python
-    from typing import Optional
-
     class PacienteUpdate(BaseModel):
-        nome: Optional[str] = None
-        email: Optional[EmailStr] = None
+        nome: str | None = None
+        email: EmailStr | None = None
     ```
 
--   **Schema de Resposta Pública (`...Public`)**: Usado para os dados de saída retornados pela API. Este schema **nunca** deve incluir dados sensíveis como senhas.
+3.  **Output Público (`XPublic` ou `XResponse`)**:
+    -   O que é retornado para o frontend.
+    -   **PROIBIDO**: Retornar senhas, hashes ou metadados internos.
+    -   `from_attributes = True` para compatibilidade com SQLAlchemy.
     ```python
     class PacientePublic(BaseModel):
         id: int
         nome: str
         email: EmailStr
+        created_at: datetime
 
-        class Config:
-            from_attributes = True # Permite mapear diretamente de um modelo SQLAlchemy
+        model_config = ConfigDict(from_attributes=True)
     ```
 
--   **Schema Interno (`...DB` ou apenas o nome do modelo)**: Pode ser usado para representar dados lidos diretamente do banco de dados, incluindo campos privados.
+### 2.2 Validação Avançada
 
-### 2.2. Validação Avançada
+-   Use `Field(...)` para validações simples (`min_length`, `gt`, `le`).
+-   Use `@field_validator` para regras de negócio complexas.
 
--   **Tipos Especiais**: Use os tipos do Pydantic sempre que possível para validação automática (ex: `EmailStr`, `HttpUrl`).
--   **Validadores Customizados**: Para regras de negócio complexas (ex: força da senha), use o decorador `@validator` (Pydantic v1) ou `@field_validator` (Pydantic v2).
+```python
+from pydantic import BaseModel, Field, field_validator
 
-## 3. Gerenciamento de Configurações
+class RegistroDor(BaseModel):
+    nivel: int = Field(..., ge=0, le=10, description="NRS 0-10")
 
--   **Localização**: As configurações da aplicação são gerenciadas no arquivo `fibrolog_api/settings.py`.
--   **Implementação**: Crie uma classe que herda de `pydantic_settings.BaseSettings`. O Pydantic carregará automaticamente as variáveis de ambiente correspondentes.
+    @field_validator('nivel')
+    @classmethod
+    def validar_nivel_dor(cls, v: int) -> int:
+        if v > 10:
+            raise ValueError('Dor não pode ser maior que 10')
+        return v
+```
 
--   **Exemplo**:
-    ```python
-    from pydantic_settings import BaseSettings
+---
 
-    class Settings(BaseSettings):
-        DATABASE_URL: str
-        SECRET_KEY: str
-        ALGORITHM: str = 'HS256'
-        ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+## 3. SETTINGS (Variáveis de Ambiente)
 
-        class Config:
-            env_file = '.env' # Especifica o arquivo de onde ler as variáveis
+-   **Localização**: `fibrolog_api/settings.py`.
+-   **Ferramenta**: `pydantic-settings`.
 
-    # Instancie as configurações para uso na aplicação
-    settings = Settings()
-    ```
+```python
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-Ao seguir estas diretrizes, garantimos que o uso do Pydantic no projeto seja padronizado, seguro e fácil de manter.
+class Settings(BaseSettings):
+    DATABASE_URL: str
+    SECRET_KEY: str
+    ALGORITHM: str = 'HS256'
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        extra='ignore'
+    )
+
+settings = Settings()
+```
+
+---
+
+## 4. CHECKLIST DE QUALIDADE
+
+- [ ] Schemas de Input nunca usam `orm_mode` (agora `from_attributes`).
+- [ ] Schemas de Output não expõem campos sensíveis.
+- [ ] Módulos em `schemas/` estão focados em um único domínio.
+- [ ] Testes validam se o Pydantic está rejeitando dados inválidos corretamente.
