@@ -1,98 +1,131 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useState, useEffect } from 'react';
+import { StyleSheet, ScrollView, View, ActivityIndicator, Alert } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { BotaoPrimario } from '@/components/ui/primary-button';
+import { useAuth } from '@/contexts/auth-context';
+import { api } from '@/services/api';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Olá mundo!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { usuario } = useAuth();
+  const [carregando, setCarregando] = useState(false);
+  const [dadosPaciente, setDadosPaciente] = useState<any>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+  useEffect(() => {
+    carregarDadosPaciente();
+  }, []);
+
+  async function carregarDadosPaciente() {
+    setCarregando(true);
+    try {
+      const response: any = await api.get('/api/pacientes/me');
+      setDadosPaciente(response.data);
+    } catch (error: any) {
+      const mensagem = error.response?.data?.detail || error.message || 'Erro ao carregar dados';
+      console.error('Erro ao carregar dados do paciente:', error);
+      Alert.alert('Erro', mensagem);
+    } finally {
+      setCarregando(false);
+    }
+  }
+
+  return (
+    <ThemedView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ThemedText type="title" style={styles.titulo}>
+          FibroLog
         </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        
+        <View style={styles.secao}>
+          <ThemedText type="subtitle">Bem-vindo(a)!</ThemedText>
+          <ThemedText style={styles.texto}>
+            {usuario?.nome || 'Usuário'}
+          </ThemedText>
+          <ThemedText style={styles.textoSecundario}>
+            {usuario?.email || 'email@exemplo.com'}
+          </ThemedText>
+        </View>
+
+        {carregando && (
+          <View style={styles.secao}>
+            <ActivityIndicator size="large" />
+            <ThemedText style={styles.textoSecundario}>Carregando dados...</ThemedText>
+          </View>
+        )}
+
+        {!carregando && dadosPaciente && (
+          <View style={styles.secao}>
+            <ThemedText type="subtitle">Seus Dados</ThemedText>
+            <View style={styles.dadosContainer}>
+              <ThemedText style={styles.dadosLabel}>ID:</ThemedText>
+              <ThemedText style={styles.dadosValor}>{dadosPaciente.id}</ThemedText>
+              
+              <ThemedText style={styles.dadosLabel}>Nome:</ThemedText>
+              <ThemedText style={styles.dadosValor}>{dadosPaciente.nome}</ThemedText>
+              
+              <ThemedText style={styles.dadosLabel}>Email:</ThemedText>
+              <ThemedText style={styles.dadosValor}>{dadosPaciente.email}</ThemedText>
+              
+              <ThemedText style={styles.dadosLabel}>Data de Nascimento:</ThemedText>
+              <ThemedText style={styles.dadosValor}>
+                {dadosPaciente.data_nascimento || 'Não informado'}
+              </ThemedText>
+            </View>
+          </View>
+        )}
+
+        <View style={styles.secao}>
+          <BotaoPrimario
+            titulo="Recarregar Dados"
+            onPress={carregarDadosPaciente}
+            disabled={carregando}
+          />
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
+  scrollContent: {
+    padding: 24,
+    gap: 24,
+  },
+  titulo: {
+    textAlign: 'center',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  secao: {
+    gap: 12,
+  },
+  texto: {
+    fontSize: 16,
+  },
+  textoSecundario: {
+    fontSize: 14,
+    opacity: 0.7,
+  },
+  dadosContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    padding: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  dadosLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    opacity: 0.7,
+    marginTop: 8,
+  },
+  dadosValor: {
+    fontSize: 16,
+  },
+  dadosTexto: {
+    fontSize: 12,
+    fontFamily: 'monospace',
   },
 });

@@ -25,13 +25,9 @@ def validate_password_strength(password: str) -> str:
             f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
         )
     if not re.search(r'[A-Z]', password):
-        raise ValueError(
-            'A senha deve conter pelo menos uma letra maiúscula'
-        )
+        raise ValueError('A senha deve conter pelo menos uma letra maiúscula')
     if not re.search(r'[a-z]', password):
-        raise ValueError(
-            'A senha deve conter pelo menos uma letra minúscula'
-        )
+        raise ValueError('A senha deve conter pelo menos uma letra minúscula')
     if not re.search(r'\d', password):
         raise ValueError('A senha deve conter pelo menos um número')
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
