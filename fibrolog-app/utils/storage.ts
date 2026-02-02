@@ -1,37 +1,28 @@
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
+import * as SecureStore from "expo-secure-store";
+import { Platform } from "react-native";
 
-/**
- * Wrapper para armazenamento seguro que funciona tanto em mobile quanto na web.
- * No mobile usa SecureStore, na web usa localStorage.
- */
-
-async function setItemAsync(chave: string, valor: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    localStorage.setItem(chave, valor);
-  } else {
-    await SecureStore.setItemAsync(chave, valor);
-  }
-}
-
-async function getItemAsync(chave: string): Promise<string | null> {
-  if (Platform.OS === 'web') {
-    return localStorage.getItem(chave);
-  } else {
-    return await SecureStore.getItemAsync(chave);
-  }
-}
-
-async function deleteItemAsync(chave: string): Promise<void> {
-  if (Platform.OS === 'web') {
-    localStorage.removeItem(chave);
-  } else {
-    await SecureStore.deleteItemAsync(chave);
-  }
-}
-
+// Para web, usa localStorage; para mobile, usa SecureStore
 export const storage = {
-  setItemAsync,
-  getItemAsync,
-  deleteItemAsync,
+  async getItemAsync(key: string): Promise<string | null> {
+    if (Platform.OS === "web") {
+      return localStorage.getItem(key);
+    }
+    return await SecureStore.getItemAsync(key);
+  },
+
+  async setItemAsync(key: string, value: string): Promise<void> {
+    if (Platform.OS === "web") {
+      localStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  },
+
+  async deleteItemAsync(key: string): Promise<void> {
+    if (Platform.OS === "web") {
+      localStorage.removeItem(key);
+    } else {
+      await SecureStore.deleteItemAsync(key);
+    }
+  },
 };
