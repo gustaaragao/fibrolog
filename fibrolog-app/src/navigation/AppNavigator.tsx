@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { LoadingScreen } from '../components/LoadingScreen';
 
@@ -8,6 +9,7 @@ import { LoadingScreen } from '../components/LoadingScreen';
 export type RootStackParamList = {
   Loading: undefined;
   Login: undefined;
+  Register: undefined;
   Home: undefined;
 };
 
@@ -37,7 +39,10 @@ export const AppNavigator: React.FC<AppNavigatorProps> = ({ isAuthenticated, isL
         <Stack.Screen name="Home" component={HomeScreen} />
       ) : (
         // Unauthenticated stack  
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+        </>
       )}
     </Stack.Navigator>
   );

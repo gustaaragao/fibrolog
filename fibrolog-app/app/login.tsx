@@ -11,6 +11,7 @@ import {
     TextInput,
     TouchableOpacity,
     View,
+    SafeAreaView,
 } from "react-native";
 
 export default function LoginScreen() {
@@ -37,103 +38,145 @@ export default function LoginScreen() {
     }
   };
 
+  const handleGoToRegister = () => {
+    router.push("/register");
+  };
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <View style={styles.content}>
-        <Text style={styles.titulo}>FibroLog</Text>
-        <Text style={styles.subtitulo}>
-          Sistema de Monitoramento da Fibromialgia
-        </Text>
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <View style={styles.formContainer}>
+          <Text style={styles.title}>FibroLog</Text>
+          <Text style={styles.subtitle}>Entre na sua conta</Text>
 
-        <View style={styles.formulario}>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            editable={!carregando}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite seu email"
+              placeholderTextColor="#999"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!carregando}
+            />
+          </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Senha"
-            value={senha}
-            onChangeText={setSenha}
-            secureTextEntry
-            editable={!carregando}
-          />
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite sua senha"
+              placeholderTextColor="#999"
+              value={senha}
+              onChangeText={setSenha}
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!carregando}
+            />
+          </View>
 
           <TouchableOpacity
-            style={[styles.botao, carregando && styles.botaoDesabilitado]}
+            style={[styles.loginButton, carregando && styles.loginButtonDisabled]}
             onPress={handleLogin}
             disabled={carregando}
           >
             {carregando ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text style={styles.textoBotao}>Entrar</Text>
+              <Text style={styles.loginButtonText}>Entrar</Text>
             )}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleGoToRegister}
+            disabled={carregando}
+          >
+            <Text style={styles.registerButtonText}>
+              Não tem uma conta? Cadastre-se
+            </Text>
+          </TouchableOpacity>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E6F4FE",
+    backgroundColor: "#faf5ff", // purple-50
   },
-  content: {
+  keyboardAvoidingView: {
+    flex: 1,
+  },
+  formContainer: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 32,
+    paddingBottom: 50,
   },
-  titulo: {
-    fontSize: 36,
+  title: {
+    fontSize: 32,
     fontWeight: "bold",
-    color: "#0066CC",
+    textAlign: "center",
+    color: "#6b21a8", // purple-800
     marginBottom: 8,
   },
-  subtitulo: {
+  subtitle: {
     fontSize: 16,
-    color: "#666",
-    marginBottom: 40,
     textAlign: "center",
+    color: "#9333ea", // purple-600
+    marginBottom: 48,
   },
-  formulario: {
-    width: "100%",
-    maxWidth: 400,
+  inputContainer: {
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#6b21a8", // purple-800
+    marginBottom: 8,
   },
   input: {
     backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-    fontSize: 16,
     borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  botao: {
-    backgroundColor: "#0066CC",
-    padding: 16,
+    borderColor: "#e9d5ff", // purple-200
     borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#6b21a8", // purple-800
+  },
+  loginButton: {
+    backgroundColor: "#a855f7", // purple-500
+    borderRadius: 8,
+    paddingVertical: 16,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 16,
   },
-  botaoDesabilitado: {
-    opacity: 0.6,
+  loginButtonDisabled: {
+    backgroundColor: "#d8b4fe", // purple-300 for disabled state
   },
-  textoBotao: {
+  loginButtonText: {
     color: "#fff",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
+  },
+  registerButton: {
+    marginTop: 24,
+    alignItems: "center",
+  },
+  registerButtonText: {
+    color: "#9333ea", // purple-600
+    fontSize: 16,
+    fontWeight: "500",
   },
 });

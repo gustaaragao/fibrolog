@@ -16,10 +16,10 @@ import { loginSchema, LoginFormData } from '../validation/schemas';
 import { useAuth } from '../contexts/AuthContext';
 
 interface LoginScreenProps {
-  // Props for navigation will be added later
+  navigation?: any; // Will be properly typed when navigation is set up
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = () => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [loginError, setLoginError] = React.useState<string | null>(null);
   const { login } = useAuth();
@@ -54,6 +54,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
       setLoginError(errorMessage);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoToRegister = () => {
+    try {
+      if (navigation) {
+        navigation.navigate('Register');
+      }
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback: Could show an error message or retry
     }
   };
 
@@ -145,6 +156,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
               {isLoading ? 'Entrando...' : 'Entrar'}
             </Text>
           </TouchableOpacity>
+
+          {/* Register Button */}
+          <TouchableOpacity
+            style={styles.registerButton}
+            onPress={handleGoToRegister}
+            disabled={isLoading}
+          >
+            <Text style={styles.registerButtonText}>
+              Não tem uma conta? Cadastre-se
+            </Text>
+          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -154,7 +176,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#faf5ff', // purple-50
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -169,25 +191,25 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#7f8c8d',
+    color: '#9333ea', // purple-600
     marginBottom: 48,
   },
   errorContainer: {
-    backgroundColor: '#fdf2f2',
-    borderColor: '#fca5a5',
+    backgroundColor: '#fef2f2', // error-50
+    borderColor: '#fca5a5', // error-200
     borderWidth: 1,
     borderRadius: 8,
     padding: 12,
     marginBottom: 24,
   },
   errorMessage: {
-    color: '#dc2626',
+    color: '#dc2626', // error-600
     fontSize: 14,
     textAlign: 'center',
   },
@@ -197,40 +219,49 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     marginBottom: 8,
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#e1e5e9',
+    borderColor: '#e9d5ff', // purple-200
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
   },
   inputError: {
-    borderColor: '#e74c3c',
+    borderColor: '#ef4444', // error-500
   },
   errorText: {
-    color: '#e74c3c',
+    color: '#ef4444', // error-500
     fontSize: 14,
     marginTop: 4,
   },
   loginButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#a855f7', // purple-500
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 16,
   },
   loginButtonDisabled: {
-    backgroundColor: '#bdc3c7',
+    backgroundColor: '#d8b4fe', // purple-300 for disabled state
   },
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  registerButton: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  registerButtonText: {
+    color: '#9333ea', // purple-600
+    fontSize: 16,
+    fontWeight: '500',
   },
 });

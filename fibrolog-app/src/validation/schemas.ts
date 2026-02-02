@@ -16,13 +16,33 @@ export const passwordSchema = z
   .regex(/\d/, 'A senha deve conter pelo menos um número')
   .regex(/[!@#$%^&*(),.?":{}|<>]/, 'A senha deve conter pelo menos um caractere especial');
 
+// Name validation schema
+export const nameSchema = z
+  .string()
+  .min(1, 'Nome é obrigatório')
+  .min(2, 'Nome deve ter pelo menos 2 caracteres')
+  .max(100, 'Nome é muito longo')
+  .regex(/^[a-zA-ZÀ-ÿ\s]*$/, 'Nome deve conter apenas letras e espaços');
+
 // Complete login form schema
 export const loginSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
 });
 
+// Complete registration form schema
+export const registrationSchema = z.object({
+  name: nameSchema,
+  email: emailSchema,
+  password: passwordSchema,
+  confirmPassword: z.string().min(1, 'Confirmação de senha é obrigatória'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'As senhas não coincidem',
+  path: ['confirmPassword'],
+});
+
 export type LoginFormData = z.infer<typeof loginSchema>;
+export type RegistrationFormData = z.infer<typeof registrationSchema>;
 
 // Real-time validation helpers
 export const validateEmailRealTime = (email: string): string | null => {
@@ -44,6 +64,18 @@ export const validatePasswordRealTime = (password: string): string | null => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return error.issues[0]?.message || 'Senha inválida';
+    }
+    return 'Erro de validação';
+  }
+};
+
+export const validateNameRealTime = (name: string): string | null => {
+  try {
+    nameSchema.parse(name);
+    return null;
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return error.issues[0]?.message || 'Nome inválido';
     }
     return 'Erro de validação';
   }

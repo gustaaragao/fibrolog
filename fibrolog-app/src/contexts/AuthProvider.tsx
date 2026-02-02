@@ -75,6 +75,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Register function
+  const register = async (name: string, email: string, password: string) => {
+    try {
+      const response = await authService.register(name, email, password);
+      
+      // Create user object from registration data
+      const userData: User = {
+        id: 1, // Mock data - in real app, get from registration response
+        nome: name,
+        email: email,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      
+      await setAuthData(response.access_token, userData);
+    } catch (error) {
+      throw error; // Re-throw to let the UI handle the error
+    }
+  };
+
   // Logout function
   const logout = async () => {
     await clearAuthData();
@@ -136,6 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     isLoading,
     login,
+    register,
     logout,
     setAuthData,
     clearAuthData,

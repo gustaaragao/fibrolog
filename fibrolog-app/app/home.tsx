@@ -36,24 +36,24 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#faf5ff", // purple-50
     padding: 20,
   },
   header: {
     paddingTop: 40,
     paddingBottom: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: "#e9d5ff", // purple-200
   },
   titulo: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#0066CC",
+    color: "#6b21a8", // purple-800
     marginBottom: 8,
   },
   usuario: {
     fontSize: 16,
-    color: "#666",
+    color: "#9333ea", // purple-600
   },
   content: {
     flex: 1,
@@ -62,11 +62,11 @@ const styles = StyleSheet.create({
   },
   mensagem: {
     fontSize: 18,
-    color: "#666",
+    color: "#9333ea", // purple-600
     textAlign: "center",
   },
   botao: {
-    backgroundColor: "#dc3545",
+    backgroundColor: "#ef4444", // error-500
     padding: 16,
     borderRadius: 8,
     alignItems: "center",

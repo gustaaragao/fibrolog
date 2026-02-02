@@ -58,31 +58,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 32,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#faf5ff', // purple-50
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#9333ea', // purple-600
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
   },
   errorText: {
     fontSize: 12,
-    color: '#e74c3c',
+    color: '#ef4444', // error-500
     textAlign: 'center',
     marginBottom: 32,
     fontFamily: 'monospace',
   },
   button: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#a855f7', // purple-500
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 8,

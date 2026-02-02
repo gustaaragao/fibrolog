@@ -108,7 +108,7 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#faf5ff', // purple-50
   },
   scrollView: {
     flex: 1,
@@ -123,19 +123,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#7f8c8d',
+    color: '#9333ea', // purple-600
   },
   userCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e9d5ff', // purple-200
     padding: 20,
     marginBottom: 24,
-    shadowColor: '#000',
+    shadowColor: '#9333ea', // purple-600 shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -144,9 +146,11 @@ const styles = StyleSheet.create({
   actionsCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e9d5ff', // purple-200
     padding: 20,
     marginBottom: 32,
-    shadowColor: '#000',
+    shadowColor: '#9333ea', // purple-600 shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -155,7 +159,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     marginBottom: 16,
   },
   userInfo: {
@@ -169,19 +173,19 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#7f8c8d',
+    color: '#9333ea', // purple-600
     fontWeight: '500',
     flex: 1,
   },
   infoValue: {
     fontSize: 14,
-    color: '#2c3e50',
+    color: '#6b21a8', // purple-800
     fontWeight: '400',
     flex: 2,
     textAlign: 'right',
   },
   actionButton: {
-    backgroundColor: '#3498db',
+    backgroundColor: '#a855f7', // purple-500
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -194,13 +198,13 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   logoutButton: {
-    backgroundColor: '#e74c3c',
+    backgroundColor: '#ef4444', // error-500
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
   },
   logoutButtonDisabled: {
-    backgroundColor: '#bdc3c7',
+    backgroundColor: '#d8b4fe', // purple-300
   },
   logoutButtonText: {
     color: '#fff',
