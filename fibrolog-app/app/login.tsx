@@ -6,12 +6,12 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
+    SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
-    SafeAreaView,
 } from "react-native";
 
 export default function LoginScreen() {
@@ -83,7 +83,10 @@ export default function LoginScreen() {
           </View>
 
           <TouchableOpacity
-            style={[styles.loginButton, carregando && styles.loginButtonDisabled]}
+            style={[
+              styles.loginButton,
+              carregando && styles.loginButtonDisabled,
+            ]}
             onPress={handleLogin}
             disabled={carregando}
           >

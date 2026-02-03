@@ -1,55 +1,55 @@
-import { useState } from 'react';
+import { useAuth } from "@/contexts/auth-context";
+import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useAuth } from '@/contexts/auth-context';
+    ActivityIndicator,
+    Alert,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 export default function RegisterScreen() {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
-  const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [confirmarSenha, setConfirmarSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
 
   const handleRegister = async () => {
     if (!nome || !email || !senha || !confirmarSenha) {
-      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      Alert.alert("Erro", "Por favor, preencha todos os campos");
       return;
     }
 
     if (senha !== confirmarSenha) {
-      Alert.alert('Erro', 'As senhas não coincidem');
+      Alert.alert("Erro", "As senhas não coincidem");
       return;
     }
 
     if (senha.length < 6) {
-      Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
+      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres");
       return;
     }
 
     setCarregando(true);
     try {
       await signUp({ nome, email, senha });
-      Alert.alert('Sucesso', 'Cadastro realizado com sucesso!', [
+      Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
         {
-          text: 'OK',
-          onPress: () => router.replace('/home'),
+          text: "OK",
+          onPress: () => router.replace("/home"),
         },
       ]);
     } catch (error) {
-      Alert.alert('Erro', 'Falha ao criar conta. Tente novamente.');
+      Alert.alert("Erro", "Falha ao criar conta. Tente novamente.");
     } finally {
       setCarregando(false);
     }
@@ -58,7 +58,7 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
@@ -120,7 +120,9 @@ export default function RegisterScreen() {
               onPress={() => router.back()}
               disabled={carregando}
             >
-              <Text style={styles.textoVoltar}>Já tem uma conta? Faça login</Text>
+              <Text style={styles.textoVoltar}>
+                Já tem uma conta? Faça login
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -132,63 +134,63 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E6F4FE',
+    backgroundColor: "#E6F4FE",
   },
   scrollContent: {
     flexGrow: 1,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   titulo: {
     fontSize: 36,
-    fontWeight: 'bold',
-    color: '#0066CC',
+    fontWeight: "bold",
+    color: "#0066CC",
     marginBottom: 8,
   },
   subtitulo: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
     marginBottom: 40,
-    textAlign: 'center',
+    textAlign: "center",
   },
   formulario: {
-    width: '100%',
+    width: "100%",
     maxWidth: 400,
   },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 16,
     borderRadius: 8,
     marginBottom: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   botao: {
-    backgroundColor: '#0066CC',
+    backgroundColor: "#0066CC",
     padding: 16,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   botaoDesabilitado: {
     opacity: 0.6,
   },
   textoBotao: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   botaoVoltar: {
     marginTop: 24,
-    alignItems: 'center',
+    alignItems: "center",
   },
   textoVoltar: {
-    color: '#0066CC',
+    color: "#0066CC",
     fontSize: 16,
   },
 });
