@@ -9,7 +9,10 @@ export interface LoginRequest {
 export interface RegisterRequest {
   nome: string;
   email: string;
-  password: string;
+  senha: string; // Changed from 'password' to match backend
+  data_nascimento: string; // Required by backend (ISO format)
+  sexo: string; // Required by backend
+  data_diagnostico: string; // Required by backend (ISO format)
 }
 
 export interface TokenResponse {
@@ -24,9 +27,14 @@ export interface ApiError {
 class AuthService {
   async login(email: string, password: string): Promise<TokenResponse> {
     try {
-      const response = await apiClient.post<TokenResponse>('/auth', {
-        email,
-        password,
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+
+      const response = await apiClient.post<TokenResponse>('/auth/token', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
       
       return response.data;
@@ -53,10 +61,17 @@ class AuthService {
 
   async register(name: string, email: string, password: string): Promise<TokenResponse> {
     try {
+      // Note: This is a simplified registration that may not work with the backend
+      // as the backend requires additional fields: data_nascimento, sexo, data_diagnostico
+      // The UI should be updated to collect these fields
       const response = await apiClient.post<TokenResponse>('/pacientes', {
         nome: name,
         email,
-        password,
+        senha: password, // Backend expects 'senha', not 'password'
+        // Missing required fields - these should be collected from the UI:
+        // data_nascimento: string (ISO date format)
+        // sexo: string
+        // data_diagnostico: string (ISO date format)
       });
       
       return response.data;

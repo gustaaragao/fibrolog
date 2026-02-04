@@ -1,9 +1,36 @@
 import axios, { AxiosInstance } from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { getApiUrl } from '../config/api';
 
 const TOKEN_STORAGE_KEY = 'auth_token';
 const USER_STORAGE_KEY = 'auth_user';
+
+// Storage abstraction for secure token storage
+const secureStorage = {
+  async getItem(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    }
+    return await SecureStore.getItemAsync(key);
+  },
+
+  async setItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  },
+
+  async removeItem(key: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+    } else {
+      await SecureStore.deleteItemAsync(key);
+    }
+  },
+};
 
 // Check if we're in development mode
 const isDevelopment = __DEV__;
@@ -21,7 +48,7 @@ export const apiClient: AxiosInstance = axios.create({
 apiClient.interceptors.request.use(
   async (config) => {
     try {
-      const token = await AsyncStorage.getItem(TOKEN_STORAGE_KEY);
+      const token = await secureStorage.getItem(TOKEN_STORAGE_KEY);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -80,7 +107,8 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid, clear auth data
       try {
-        await AsyncStorage.multiRemove([TOKEN_STORAGE_KEY, USER_STORAGE_KEY]);
+        await secureStorage.removeItem(TOKEN_STORAGE_KEY);
+        await secureStorage.removeItem(USER_STORAGE_KEY);
         
         // You can emit an event here to notify the auth context
         // For now, we'll just clear the storage and let the UI handle the redirect
