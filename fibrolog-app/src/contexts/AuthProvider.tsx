@@ -55,8 +55,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(authToken);
     setUser(userData);
     
-    await secureStorage.setItem(TOKEN_STORAGE_KEY, authToken);
-    await secureStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+    await Promise.all([
+      secureStorage.setItem(TOKEN_STORAGE_KEY, authToken),
+      secureStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData)),
+    ]);
   };
 
   // Clear authentication data from state and storage
@@ -64,8 +66,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUser(null);
     
-    await secureStorage.removeItem(TOKEN_STORAGE_KEY);
-    await secureStorage.removeItem(USER_STORAGE_KEY);
+    await Promise.all([
+      secureStorage.removeItem(TOKEN_STORAGE_KEY),
+      secureStorage.removeItem(USER_STORAGE_KEY),
+    ]);
   };
 
   // Check if token is expired (basic JWT parsing)

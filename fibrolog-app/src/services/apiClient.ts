@@ -113,8 +113,10 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid, clear auth data
       try {
-        await secureStorage.removeItem(TOKEN_STORAGE_KEY);
-        await secureStorage.removeItem(USER_STORAGE_KEY);
+        await Promise.all([
+          secureStorage.removeItem(TOKEN_STORAGE_KEY),
+          secureStorage.removeItem(USER_STORAGE_KEY),
+        ]);
         
         // You can emit an event here to notify the auth context
         // For now, we'll just clear the storage and let the UI handle the redirect
