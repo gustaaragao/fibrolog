@@ -18,6 +18,7 @@ const TOKEN_STORAGE_KEY = 'auth_token';
 const USER_STORAGE_KEY = 'auth_user';
 
 // Storage abstraction for secure token storage
+// Note: Web platform uses localStorage (unencrypted). Consider using httpOnly cookies for production.
 const secureStorage = {
   async getItem(key: string): Promise<string | null> {
     if (Platform.OS === 'web') {

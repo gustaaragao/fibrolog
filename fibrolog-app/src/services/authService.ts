@@ -15,10 +15,10 @@ export interface LoginRequest {
 export interface RegisterRequest {
   nome: string;
   email: string;
-  senha: string; // Changed from 'password' to match backend
-  data_nascimento: string; // Required by backend (ISO format)
-  sexo: string; // Required by backend
-  data_diagnostico: string; // Required by backend (ISO format)
+  senha: string; // Password for the account (backend expects 'senha')
+  data_nascimento: string; // Date of birth in ISO format (required by backend)
+  sexo: string; // Gender (required by backend)
+  data_diagnostico: string; // Diagnosis date in ISO format (required by backend)
 }
 
 export interface TokenResponse {
@@ -67,14 +67,13 @@ class AuthService {
 
   async register(name: string, email: string, password: string): Promise<TokenResponse> {
     try {
-      // Note: This is a simplified registration that may not work with the backend
-      // as the backend requires additional fields: data_nascimento, sexo, data_diagnostico
-      // The UI should be updated to collect these fields
+      // DEPRECATED: Do not use this implementation. Update root-level services/auth-service.ts instead.
+      // Note: This simplified registration is missing required backend fields.
       const response = await apiClient.post<TokenResponse>('/pacientes', {
         nome: name,
         email,
         senha: password, // Backend expects 'senha', not 'password'
-        // Missing required fields - these should be collected from the UI:
+        // Missing required fields that should be collected from the UI:
         // data_nascimento: string (ISO date format)
         // sexo: string
         // data_diagnostico: string (ISO date format)
