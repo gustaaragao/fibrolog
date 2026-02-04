@@ -1,5 +1,6 @@
 import { AuthProvider } from "@/contexts/auth-context";
 import { Stack } from "expo-router";
+import Toast from "react-native-toast-message";
 
 export default function RootLayout() {
   return (
@@ -14,6 +15,7 @@ export default function RootLayout() {
         <Stack.Screen name="register" />
         <Stack.Screen name="home" />
       </Stack>
+      <Toast />
     </AuthProvider>
   );
 }

@@ -60,11 +60,10 @@ async def paciente(session):
     paciente = Paciente(
         nome='Gustavo Silva',
         email='gustavo@example.com',
-        password=get_password_hash(password_plain),
+        senha=get_password_hash(password_plain),
         data_nascimento=datetime(1990, 5, 15),
         sexo='M',
         data_diagnostico=datetime(2020, 3, 10),
-        medicacoes='Pregabalina 75mg (2x/dia), Duloxetina 60mg (1x/dia)',
     )
     session.add(paciente)
     await session.commit()
@@ -81,11 +80,10 @@ async def other_paciente(session):
     paciente = Paciente(
         nome='Maria Santos',
         email='maria@example.com',
-        password=get_password_hash(password_plain),
+        senha=get_password_hash(password_plain),
         data_nascimento=datetime(1985, 8, 22),
         sexo='F',
         data_diagnostico=datetime(2018, 11, 5),
-        medicacoes='Gabapentina 300mg (3x/dia), Amitriptilina 25mg (1x/dia)',
     )
     session.add(paciente)
     await session.commit()

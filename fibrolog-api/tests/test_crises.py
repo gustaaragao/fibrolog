@@ -207,7 +207,9 @@ async def test_get_crises_unauthorized_without_token(client: AsyncClient):
     response = await client.get('/crises/')
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json()['detail'] == 'Não foi possível validar as credenciais'
+    assert (
+        response.json()['detail'] == 'Não foi possível validar as credenciais'
+    )
 
 
 async def test_get_crises_unauthorized_invalid_token(client: AsyncClient):
@@ -216,4 +218,6 @@ async def test_get_crises_unauthorized_invalid_token(client: AsyncClient):
     )
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
-    assert response.json()['detail'] == 'Não foi possível validar as credenciais'
+    assert (
+        response.json()['detail'] == 'Não foi possível validar as credenciais'
+    )

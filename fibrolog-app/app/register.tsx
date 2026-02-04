@@ -2,54 +2,115 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function RegisterScreen() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [dataDiagnostico, setDataDiagnostico] = useState("");
   const [carregando, setCarregando] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
 
+  // Função para formatar data enquanto digita (DD/MM/AAAA)
+  const formatarData = (texto: string) => {
+    // Remove tudo que não é número
+    const numeros = texto.replace(/\D/g, "");
+    
+    // Aplica a máscara
+    if (numeros.length <= 2) {
+      return numeros;
+    } else if (numeros.length <= 4) {
+      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+    } else {
+      return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4, 8)}`;
+    }
+  };
+
+  // Converter DD/MM/AAAA para ISO
+  const converterParaISO = (dataFormatada: string): string => {
+    const [dia, mes, ano] = dataFormatada.split("/");
+    return new Date(`${ano}-${mes}-${dia}`).toISOString();
+  };
+
   const handleRegister = async () => {
-    if (!nome || !email || !senha || !confirmarSenha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
+    if (!nome || !email || !senha || !confirmarSenha || !dataNascimento || !sexo || !dataDiagnostico) {
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Por favor, preencha todos os campos",
+      });
+      return;
+    }
+
+    if (dataNascimento.length !== 10 || dataDiagnostico.length !== 10) {
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "As datas devem estar no formato DD/MM/AAAA",
+      });
       return;
     }
 
     if (senha !== confirmarSenha) {
-      Alert.alert("Erro", "As senhas não coincidem");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "As senhas não coincidem",
+      });
       return;
     }
 
     if (senha.length < 6) {
-      Alert.alert("Erro", "A senha deve ter pelo menos 6 caracteres");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "A senha deve ter pelo menos 6 caracteres",
+      });
       return;
     }
 
     setCarregando(true);
     try {
-      await signUp({ nome, email, senha });
-      Alert.alert("Sucesso", "Cadastro realizado com sucesso!", [
-        {
-          text: "OK",
-          onPress: () => router.replace("/home"),
-        },
-      ]);
+      await signUp({ 
+        nome, 
+        email, 
+        senha,
+        data_nascimento: converterParaISO(dataNascimento),
+        sexo,
+        data_diagnostico: converterParaISO(dataDiagnostico)
+      });
+      
+      Toast.show({
+        type: "success",
+        text1: "Sucesso!",
+        text2: "Cadastro realizado com sucesso",
+      });
+      
+      // Redirecionar após pequeno delay para mostrar o toast
+      setTimeout(() => {
+        router.replace("/home");
+      }, 1000);
     } catch (error) {
-      Alert.alert("Erro", "Falha ao criar conta. Tente novamente.");
+      Toast.show({
+        type: "error",
+        text1: "Erro",
+        text2: "Falha ao criar conta. Tente novamente.",
+      });
     } finally {
       setCarregando(false);
     }
@@ -65,43 +126,125 @@ export default function RegisterScreen() {
           <Text style={styles.titulo}>Criar Conta</Text>
           <Text style={styles.subtitulo}>Cadastre-se no FibroLog</Text>
 
-          <View style={styles.formulario}>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome completo"
-              value={nome}
-              onChangeText={setNome}
-              autoCapitalize="words"
-              editable={!carregando}
-            />
+          <View style={styles.formContainer}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Nome completo</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Nome completo"
+                placeholderTextColor="#999"
+                value={nome}
+                onChangeText={setNome}
+                autoCapitalize="words"
+                editable={!carregando}
+              />
+            </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              editable={!carregando}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#999"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                editable={!carregando}
+              />
+            </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              value={senha}
-              onChangeText={setSenha}
-              secureTextEntry
-              editable={!carregando}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Data de nascimento</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="DD/MM/AAAA"
+                placeholderTextColor="#999"
+                value={dataNascimento}
+                onChangeText={(texto) => setDataNascimento(formatarData(texto))}
+                keyboardType="numeric"
+                maxLength={10}
+                editable={!carregando}
+              />
+            </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Confirmar senha"
-              value={confirmarSenha}
-              onChangeText={setConfirmarSenha}
-              secureTextEntry
-              editable={!carregando}
-            />
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Sexo</Text>
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  style={styles.radioButton}
+                  onPress={() => setSexo("M")}
+                  disabled={carregando}
+                >
+                  <View style={styles.radioCircle}>
+                    {sexo === "M" && <View style={styles.radioChecked} />}
+                  </View>
+                  <Text style={styles.radioLabel}>Masculino</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioButton}
+                  onPress={() => setSexo("F")}
+                  disabled={carregando}
+                >
+                  <View style={styles.radioCircle}>
+                    {sexo === "F" && <View style={styles.radioChecked} />}
+                  </View>
+                  <Text style={styles.radioLabel}>Feminino</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.radioButton}
+                  onPress={() => setSexo("O")}
+                  disabled={carregando}
+                >
+                  <View style={styles.radioCircle}>
+                    {sexo === "O" && <View style={styles.radioChecked} />}
+                  </View>
+                  <Text style={styles.radioLabel}>Outro</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Data do diagnóstico</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="DD/MM/AAAA"
+                placeholderTextColor="#999"
+                value={dataDiagnostico}
+                onChangeText={(texto) => setDataDiagnostico(formatarData(texto))}
+                keyboardType="numeric"
+                maxLength={10}
+                editable={!carregando}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Senha</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Senha"
+                placeholderTextColor="#999"
+                value={senha}
+                onChangeText={setSenha}
+                secureTextEntry
+                editable={!carregando}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Confirmar senha</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Confirmar senha"
+                placeholderTextColor="#999"
+                value={confirmarSenha}
+                onChangeText={setConfirmarSenha}
+                secureTextEntry
+                editable={!carregando}
+              />
+            </View>
 
             <TouchableOpacity
               style={[styles.botao, carregando && styles.botaoDesabilitado]}
@@ -132,9 +275,10 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Container e layout
   container: {
     flex: 1,
-    backgroundColor: "#E6F4FE",
+    backgroundColor: "#faf5ff", // purple-50
   },
   scrollContent: {
     flexGrow: 1,
@@ -143,42 +287,92 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    paddingHorizontal: 32,
   },
+  formContainer: {
+    width: "100%",
+    maxWidth: 400,
+    paddingBottom: 50,
+  },
+  // Texto
   titulo: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#0066CC",
+    color: "#6b21a8", // purple-800
     marginBottom: 8,
   },
   subtitulo: {
     fontSize: 16,
-    color: "#666",
-    marginBottom: 40,
+    color: "#9333ea", // purple-600
+    marginBottom: 48,
     textAlign: "center",
   },
-  formulario: {
-    width: "100%",
-    maxWidth: 400,
+  label: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#6b21a8", // purple-800
+    marginBottom: 8,
+  },
+  // Inputs
+  inputContainer: {
+    marginBottom: 24,
   },
   input: {
     backgroundColor: "#fff",
     padding: 16,
     borderRadius: 8,
-    marginBottom: 16,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#e9d5ff", // purple-200
+    color: "#6b21a8", // purple-800
   },
+  // Radio buttons
+  radioGroup: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  radioButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e9d5ff", // purple-200
+  },
+  radioCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#a855f7", // purple-500
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 8,
+  },
+  radioChecked: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#a855f7", // purple-500
+  },
+  radioLabel: {
+    fontSize: 14,
+    color: "#6b21a8", // purple-800
+    fontWeight: "500",
+  },
+  // Botões
   botao: {
-    backgroundColor: "#0066CC",
+    backgroundColor: "#a855f7", // purple-500
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
-    marginTop: 8,
+    marginTop: 16,
   },
   botaoDesabilitado: {
-    opacity: 0.6,
+    backgroundColor: "#d8b4fe", // purple-300
   },
   textoBotao: {
     color: "#fff",
@@ -190,7 +384,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textoVoltar: {
-    color: "#0066CC",
+    color: "#9333ea", // purple-600
     fontSize: 16,
+    fontWeight: "500",
   },
 });

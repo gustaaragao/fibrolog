@@ -1,5 +1,5 @@
-import { api, type ApiError } from '@/services/api';
 import { API_BASE_URL } from '@/constants/api';
+import { api } from '@/services/api';
 
 type AuthTokenResponse = {
   access_token: string;
@@ -15,6 +15,9 @@ type DadosCadastro = {
   nome: string;
   email: string;
   senha: string;
+  data_nascimento: string;
+  sexo: string;
+  data_diagnostico: string;
 };
 
 export type ResultadoAuth = {
@@ -65,7 +68,10 @@ async function signup(dados: DadosCadastro): Promise<ResultadoAuth> {
   const body = {
     nome: dados.nome,
     email: dados.email,
-    password: dados.senha,
+    senha: dados.senha,
+    data_nascimento: dados.data_nascimento,
+    sexo: dados.sexo,
+    data_diagnostico: dados.data_diagnostico,
   };
 
   try {

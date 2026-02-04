@@ -22,11 +22,10 @@ class Paciente:
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
     nome: Mapped[str] = mapped_column(String(255))
     email: Mapped[str] = mapped_column(unique=True)
-    password: Mapped[str]
-    data_nascimento: Mapped[Optional[datetime]] = mapped_column(default=None)
-    sexo: Mapped[Optional[str]] = mapped_column(String(50), default=None)
-    data_diagnostico: Mapped[Optional[datetime]] = mapped_column(default=None)
-    medicacoes: Mapped[Optional[str]] = mapped_column(Text, default=None)
+    senha: Mapped[str]
+    data_nascimento: Mapped[datetime]
+    sexo: Mapped[str] = mapped_column(String(50))
+    data_diagnostico: Mapped[datetime]
 
     # Relacionamentos
     contatos: Mapped[List['ContatoApoio']] = relationship(
@@ -38,7 +37,31 @@ class Paciente:
     registros: Mapped[List['Registro']] = relationship(
         back_populates='paciente', cascade='all, delete-orphan', init=False
     )
+    medicacoes: Mapped[List['Medicacao']] = relationship(
+        back_populates='paciente', cascade='all, delete-orphan', init=False
+    )
 
+    created_at: Mapped[datetime] = mapped_column(
+        init=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        init=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+@table_registry.mapped_as_dataclass
+class Medicacao:
+    __tablename__ = 'medicacoes'
+
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    nome: Mapped[str]
+    dosagem: Mapped[str]
+    frequencia: Mapped[str]
+    paciente_id: Mapped[int] = mapped_column(ForeignKey('pacientes.id'))
+
+    paciente: Mapped['Paciente'] = relationship(
+        back_populates='medicacoes', init=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
     )
@@ -55,7 +78,7 @@ class ContatoApoio:
     nome: Mapped[str]
     email: Mapped[str]
     telefone: Mapped[str]
-    parentesco: Mapped[str]  # [cite: 880]
+    parentesco: Mapped[str]
     paciente_id: Mapped[int] = mapped_column(ForeignKey('pacientes.id'))
 
     paciente: Mapped['Paciente'] = relationship(
@@ -68,7 +91,7 @@ class Alerta:
     __tablename__ = 'alertas'
 
     id: Mapped[int] = mapped_column(primary_key=True, init=False)
-    tipo: Mapped[str]  # "medicação" ou "consulta" [cite: 1310]
+    tipo: Mapped[str]
     data_hora: Mapped[datetime]
     paciente_id: Mapped[int] = mapped_column(ForeignKey('pacientes.id'))
     descricao: Mapped[str] = mapped_column(Text)

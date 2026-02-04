@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-import { authService } from '@/services/auth-service';
 import { api } from '@/services/api';
+import { authService } from '@/services/auth-service';
 import { storage } from '@/utils/storage';
 
 type Usuario = {
@@ -19,6 +19,9 @@ type DadosCadastro = {
   nome: string;
   email: string;
   senha: string;
+  data_nascimento: string;
+  sexo: string;
+  data_diagnostico: string;
 };
 
 type AuthContextValue = {

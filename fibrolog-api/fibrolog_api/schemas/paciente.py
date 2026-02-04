@@ -40,30 +40,28 @@ def validate_password_strength(password: str) -> str:
 class PacienteSchema(BaseModel):
     nome: str
     email: EmailStr
-    password: str
-    data_nascimento: Optional[datetime] = None
-    sexo: Optional[str] = None
-    data_diagnostico: Optional[datetime] = None
-    medicacoes: Optional[str] = None
+    senha: str
+    data_nascimento: datetime
+    sexo: str
+    data_diagnostico: datetime
 
-    @field_validator('password')
+    @field_validator('senha')
     @classmethod
-    def validate_password(cls, v: str) -> str:
+    def validate_senha(cls, v: str) -> str:
         return validate_password_strength(v)
 
 
 class PacienteUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
-    password: Optional[str] = None
+    senha: Optional[str] = None
     data_nascimento: Optional[datetime] = None
     sexo: Optional[str] = None
     data_diagnostico: Optional[datetime] = None
-    medicacoes: Optional[str] = None
 
-    @field_validator('password')
+    @field_validator('senha')
     @classmethod
-    def validate_password(cls, v: str | None) -> str | None:
+    def validate_senha(cls, v: str | None) -> str | None:
         if v is None:
             return None
         return validate_password_strength(v)
@@ -76,7 +74,6 @@ class PacientePublic(BaseModel):
     data_nascimento: Optional[datetime]
     sexo: Optional[str]
     data_diagnostico: Optional[datetime]
-    medicacoes: Optional[str]
     created_at: datetime
     updated_at: datetime
 
