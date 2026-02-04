@@ -1,3 +1,9 @@
+/**
+ * @deprecated This file is deprecated and should not be used.
+ * Use the root-level utils/storage.ts with expo-secure-store instead.
+ * This file exists for backward compatibility only.
+ */
+
 import axios, { AxiosInstance } from 'axios';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';

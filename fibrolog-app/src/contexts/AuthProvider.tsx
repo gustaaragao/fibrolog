@@ -1,3 +1,9 @@
+/**
+ * @deprecated This file is deprecated and should not be used.
+ * Use the root-level contexts/auth-context.tsx instead.
+ * This file exists for backward compatibility only.
+ */
+
 import React, { useState, useEffect } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';

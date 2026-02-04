@@ -1,3 +1,9 @@
+/**
+ * @deprecated This file is deprecated and should not be used.
+ * Use the root-level services/auth-service.ts instead.
+ * This file exists for backward compatibility only.
+ */
+
 import apiClient from './apiClient';
 
 // Types matching FastAPI backend responses

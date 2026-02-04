@@ -1,3 +1,9 @@
+/**
+ * @deprecated This navigator is deprecated and should not be used.
+ * The app uses Expo Router for navigation (see app/_layout.tsx).
+ * This file exists for backward compatibility only.
+ */
+
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { LoginScreen } from '../screens/LoginScreen';
