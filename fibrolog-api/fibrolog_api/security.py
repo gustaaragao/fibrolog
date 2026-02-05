@@ -39,7 +39,7 @@ def verify_password(plain_password: str, hashed_password: str):
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl='auth/token', refreshUrl='auth/refresh'
+    tokenUrl='auth/token', refreshUrl='auth/refresh', auto_error=False
 )
 
 
@@ -52,6 +52,9 @@ async def get_current_paciente(
         detail='Não foi possível validar as credenciais',
         headers={'WWW-Authenticate': 'Bearer'},
     )
+
+    if not token:
+        raise credentials_exception
 
     try:
         payload = decode(

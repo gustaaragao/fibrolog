@@ -29,7 +29,7 @@ async def login(
     )
 
     credentials_ok = paciente and verify_password(
-        form_data.password, paciente.password
+        form_data.password, paciente.senha
     )
     if not credentials_ok:
         raise HTTPException(

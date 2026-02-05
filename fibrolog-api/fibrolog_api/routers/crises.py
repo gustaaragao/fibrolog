@@ -116,7 +116,7 @@ async def update_crise(
     '/{crise_id}',
     response_model=CrisePublic,
     summary='Atualizar parcialmente crise',
-    description='Atualiza parcialmente uma crise existente do paciente autenticado.',
+    description='Atualiza parcialmente uma crise existente.',
 )
 async def patch_crise(
     crise_id: int,

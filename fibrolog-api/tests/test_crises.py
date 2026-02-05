@@ -49,9 +49,7 @@ async def test_get_crises_vazio(client: AsyncClient, token: str):
     assert response.json() == {'crises': []}
 
 
-async def test_get_crises(
-    client: AsyncClient, token: str, crise_data: dict
-):
+async def test_get_crises(client: AsyncClient, token: str, crise_data: dict):
     # Cria uma crise
     await client.post(
         '/crises/',
@@ -66,8 +64,7 @@ async def test_get_crises(
     data = response.json()
     assert len(data['crises']) == 1
     assert (
-        data['crises'][0]['intensidade_dor']
-        == crise_data['intensidade_dor']
+        data['crises'][0]['intensidade_dor'] == crise_data['intensidade_dor']
     )
     assert data['crises'][0]['contexto'] == crise_data['contexto']
 
@@ -102,9 +99,7 @@ async def test_get_crise_not_found(client: AsyncClient, token: str):
     assert response.json()['detail'] == 'Crise não encontrada.'
 
 
-async def test_update_crise(
-    client: AsyncClient, token: str, crise_data: dict
-):
+async def test_update_crise(client: AsyncClient, token: str, crise_data: dict):
     # Cria uma crise
     create_response = await client.post(
         '/crises/',
@@ -144,9 +139,7 @@ async def test_update_crise_not_found(client: AsyncClient, token: str):
     assert response.json()['detail'] == 'Crise não encontrada.'
 
 
-async def test_patch_crise(
-    client: AsyncClient, token: str, crise_data: dict
-):
+async def test_patch_crise(client: AsyncClient, token: str, crise_data: dict):
     # Cria uma crise
     create_response = await client.post(
         '/crises/',
@@ -180,9 +173,7 @@ async def test_patch_crise_not_found(client: AsyncClient, token: str):
     assert response.json()['detail'] == 'Crise não encontrada.'
 
 
-async def test_delete_crise(
-    client: AsyncClient, token: str, crise_data: dict
-):
+async def test_delete_crise(client: AsyncClient, token: str, crise_data: dict):
     # Cria uma crise
     create_response = await client.post(
         '/crises/',
@@ -210,3 +201,23 @@ async def test_delete_crise_not_found(client: AsyncClient, token: str):
     )
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json()['detail'] == 'Crise não encontrada.'
+
+
+async def test_get_crises_unauthorized_without_token(client: AsyncClient):
+    response = await client.get('/crises/')
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert (
+        response.json()['detail'] == 'Não foi possível validar as credenciais'
+    )
+
+
+async def test_get_crises_unauthorized_invalid_token(client: AsyncClient):
+    response = await client.get(
+        '/crises/', headers={'Authorization': 'Bearer invalid-token'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert (
+        response.json()['detail'] == 'Não foi possível validar as credenciais'
+    )

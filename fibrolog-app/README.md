@@ -1,39 +1,53 @@
-# Welcome to your Expo app 👋
+# FibroLog App 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile do FibroLog para monitoramento de Fibromialgia.
 
-## Get started
+## Configuração Inicial
 
-1. Install dependencies
+1. **Instalar dependências**
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. **Configurar variáveis de ambiente**
+
+   Copie o arquivo `.env.example` para `.env`:
+   
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edite o `.env` e configure a URL da API:
+   
+   ```
+   EXPO_PUBLIC_API_URL=http://localhost:8000
+   ```
+
+3. **Iniciar o app**
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## Variáveis de Ambiente
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- `EXPO_PUBLIC_API_URL`: URL base da API backend (padrão: `http://localhost:8000`)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Desenvolvimento
 
-## Get a fresh project
+Este projeto usa [Expo Router](https://docs.expo.dev/router/introduction) para navegação baseada em arquivos.
 
-When you're ready, run:
+### Estrutura de Pastas
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- `app/` - Telas e navegação
+  - `(auth)/` - Telas de autenticação (login, signup)
+  - `(tabs)/` - Telas principais com navegação por tabs
+- `components/` - Componentes reutilizáveis
+- `contexts/` - Contextos React (autenticação, etc)
+- `services/` - Serviços de API
+- `constants/` - Constantes e configurações
+- `utils/` - Utilitários
 
 ## Learn more
 
