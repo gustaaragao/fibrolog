@@ -1,6 +1,7 @@
 """
 Schemas para validação de dados de crises.
 """
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field

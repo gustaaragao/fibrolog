@@ -44,11 +44,10 @@ async def create_paciente(paciente: PacienteSchema, session: Session):
     db_paciente = Paciente(
         nome=paciente.nome,
         email=paciente.email,
-        password=get_password_hash(paciente.password),
+        senha=get_password_hash(paciente.senha),
         data_nascimento=paciente.data_nascimento,
         sexo=paciente.sexo,
         data_diagnostico=paciente.data_diagnostico,
-        medicacoes=paciente.medicacoes,
     )
     session.add(db_paciente)
     await session.commit()
@@ -108,11 +107,10 @@ async def update_paciente(
     try:
         current_paciente.nome = paciente.nome
         current_paciente.email = paciente.email
-        current_paciente.password = get_password_hash(paciente.password)
+        current_paciente.senha = get_password_hash(paciente.senha)
         current_paciente.data_nascimento = paciente.data_nascimento
         current_paciente.sexo = paciente.sexo
         current_paciente.data_diagnostico = paciente.data_diagnostico
-        current_paciente.medicacoes = paciente.medicacoes
         await session.commit()
         await session.refresh(current_paciente)
         return current_paciente
@@ -144,7 +142,7 @@ async def patch_paciente(
     paciente_data = paciente.model_dump(exclude_unset=True)
 
     for key, value in paciente_data.items():
-        if key == 'password':
+        if key == 'senha':
             setattr(current_paciente, key, get_password_hash(value))
         else:
             setattr(current_paciente, key, value)

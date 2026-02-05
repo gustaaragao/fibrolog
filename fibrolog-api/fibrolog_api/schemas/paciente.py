@@ -25,13 +25,9 @@ def validate_password_strength(password: str) -> str:
             f'A senha deve ter pelo menos {MIN_PASSWORD_LENGTH} caracteres'
         )
     if not re.search(r'[A-Z]', password):
-        raise ValueError(
-            'A senha deve conter pelo menos uma letra maiúscula'
-        )
+        raise ValueError('A senha deve conter pelo menos uma letra maiúscula')
     if not re.search(r'[a-z]', password):
-        raise ValueError(
-            'A senha deve conter pelo menos uma letra minúscula'
-        )
+        raise ValueError('A senha deve conter pelo menos uma letra minúscula')
     if not re.search(r'\d', password):
         raise ValueError('A senha deve conter pelo menos um número')
     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
@@ -44,30 +40,28 @@ def validate_password_strength(password: str) -> str:
 class PacienteSchema(BaseModel):
     nome: str
     email: EmailStr
-    password: str
-    data_nascimento: Optional[datetime] = None
-    sexo: Optional[str] = None
-    data_diagnostico: Optional[datetime] = None
-    medicacoes: Optional[str] = None
+    senha: str
+    data_nascimento: datetime
+    sexo: str
+    data_diagnostico: datetime
 
-    @field_validator('password')
+    @field_validator('senha')
     @classmethod
-    def validate_password(cls, v: str) -> str:
+    def validate_senha(cls, v: str) -> str:
         return validate_password_strength(v)
 
 
 class PacienteUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
-    password: Optional[str] = None
+    senha: Optional[str] = None
     data_nascimento: Optional[datetime] = None
     sexo: Optional[str] = None
     data_diagnostico: Optional[datetime] = None
-    medicacoes: Optional[str] = None
 
-    @field_validator('password')
+    @field_validator('senha')
     @classmethod
-    def validate_password(cls, v: str | None) -> str | None:
+    def validate_senha(cls, v: str | None) -> str | None:
         if v is None:
             return None
         return validate_password_strength(v)
@@ -80,7 +74,6 @@ class PacientePublic(BaseModel):
     data_nascimento: Optional[datetime]
     sexo: Optional[str]
     data_diagnostico: Optional[datetime]
-    medicacoes: Optional[str]
     created_at: datetime
     updated_at: datetime
 
