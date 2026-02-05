@@ -1,5 +1,12 @@
+/**
+ * @deprecated This file is deprecated and should not be used.
+ * Use the root-level contexts/auth-context.tsx instead.
+ * This file exists for backward compatibility only.
+ */
+
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { AuthContext, AuthContextType, User } from './AuthContext';
 import { authService } from '../services/authService';
 
@@ -9,6 +16,33 @@ interface AuthProviderProps {
 
 const TOKEN_STORAGE_KEY = 'auth_token';
 const USER_STORAGE_KEY = 'auth_user';
+
+// Storage abstraction for secure token storage
+// Note: Web platform uses localStorage (unencrypted). Consider using httpOnly cookies for production.
+const secureStorage = {
+  async getItem(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      return localStorage.getItem(key);
+    }
+    return await SecureStore.getItemAsync(key);
+  },
+
+  async setItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+    } else {
+      await SecureStore.setItemAsync(key, value);
+    }
+  },
+
+  async removeItem(key: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+    } else {
+      await SecureStore.deleteItemAsync(key);
+    }
+  },
+};
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -22,9 +56,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(authToken);
     setUser(userData);
     
-    await AsyncStorage.multiSet([
-      [TOKEN_STORAGE_KEY, authToken],
-      [USER_STORAGE_KEY, JSON.stringify(userData)],
+    await Promise.all([
+      secureStorage.setItem(TOKEN_STORAGE_KEY, authToken),
+      secureStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData)),
     ]);
   };
 
@@ -33,7 +67,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUser(null);
     
-    await AsyncStorage.multiRemove([TOKEN_STORAGE_KEY, USER_STORAGE_KEY]);
+    await Promise.all([
+      secureStorage.removeItem(TOKEN_STORAGE_KEY),
+      secureStorage.removeItem(USER_STORAGE_KEY),
+    ]);
   };
 
   // Check if token is expired (basic JWT parsing)
@@ -104,13 +141,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkExistingToken = async () => {
       try {
-        const [storedToken, storedUser] = await AsyncStorage.multiGet([
-          TOKEN_STORAGE_KEY,
-          USER_STORAGE_KEY,
-        ]);
-
-        const tokenValue = storedToken[1];
-        const userValue = storedUser[1];
+        const tokenValue = await secureStorage.getItem(TOKEN_STORAGE_KEY);
+        const userValue = await secureStorage.getItem(USER_STORAGE_KEY);
 
         if (tokenValue && userValue) {
           // Check if token is expired

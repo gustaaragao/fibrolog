@@ -1,3 +1,9 @@
+/**
+ * @deprecated This file is deprecated and should not be used.
+ * Use the root-level services/auth-service.ts instead.
+ * This file exists for backward compatibility only.
+ */
+
 import apiClient from './apiClient';
 
 // Types matching FastAPI backend responses
@@ -9,7 +15,10 @@ export interface LoginRequest {
 export interface RegisterRequest {
   nome: string;
   email: string;
-  password: string;
+  senha: string; // Password for the account (backend expects 'senha')
+  data_nascimento: string; // Date of birth in ISO format (required by backend)
+  sexo: string; // Gender (required by backend)
+  data_diagnostico: string; // Diagnosis date in ISO format (required by backend)
 }
 
 export interface TokenResponse {
@@ -24,9 +33,14 @@ export interface ApiError {
 class AuthService {
   async login(email: string, password: string): Promise<TokenResponse> {
     try {
-      const response = await apiClient.post<TokenResponse>('/auth', {
-        email,
-        password,
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+
+      const response = await apiClient.post<TokenResponse>('/auth/token', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
       
       return response.data;
@@ -53,10 +67,16 @@ class AuthService {
 
   async register(name: string, email: string, password: string): Promise<TokenResponse> {
     try {
+      // DEPRECATED: Do not use this implementation. Update root-level services/auth-service.ts instead.
+      // Note: This simplified registration is missing required backend fields.
       const response = await apiClient.post<TokenResponse>('/pacientes', {
         nome: name,
         email,
-        password,
+        senha: password, // Backend expects 'senha', not 'password'
+        // Missing required fields that should be collected from the UI:
+        // data_nascimento: string (ISO date format)
+        // sexo: string
+        // data_diagnostico: string (ISO date format)
       });
       
       return response.data;
