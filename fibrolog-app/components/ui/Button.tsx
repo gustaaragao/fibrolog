@@ -4,7 +4,7 @@ import { TouchableOpacity, Text, ActivityIndicator, ViewStyle, TextStyle } from 
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'text';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   disabled?: boolean;
@@ -25,7 +25,7 @@ export default function Button({
       case 'primary':
         return disabled || loading
           ? 'bg-pink-300'
-          : 'bg-pink-600 active:bg-pink-700';
+          : 'bg-pink-500 active:bg-pink-600';
       case 'secondary':
         return disabled || loading
           ? 'bg-gray-300'
@@ -33,13 +33,16 @@ export default function Button({
       case 'outline':
         return disabled || loading
           ? 'bg-transparent border-2 border-pink-300'
-          : 'bg-transparent border-2 border-pink-600 active:bg-pink-50';
+          : 'bg-transparent border-2 border-pink-500 active:bg-pink-50';
+      case 'text':
+        return 'bg-transparent';
       default:
-        return 'bg-pink-600 active:bg-pink-700';
+        return 'bg-pink-500 active:bg-pink-600';
     }
   };
 
   const getSizeStyles = () => {
+    if (variant === 'text') return 'px-0 py-2';
     switch (size) {
       case 'sm':
         return 'px-3 py-2 rounded-md';
@@ -56,7 +59,7 @@ export default function Button({
     const baseStyles = 'font-semibold text-center';
     const sizeStyles = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base';
     
-    if (variant === 'outline') {
+    if (variant === 'outline' || variant === 'text') {
       const colorStyles = disabled || loading ? 'text-pink-300' : 'text-pink-600';
       return `${baseStyles} ${sizeStyles} ${colorStyles}`;
     } else {

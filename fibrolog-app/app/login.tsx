@@ -2,37 +2,49 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    ActivityIndicator,
-    Alert,
-    KeyboardAvoidingView,
-    Platform,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Text,
+  View,
 } from "react-native";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [carregando, setCarregando] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
+  const [carregando, setCarregando] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      senha: "",
+    },
+  });
 
+  const handleLogin = async (data: LoginFormValues) => {
     setCarregando(true);
     try {
-      await signIn({ email, senha });
+      await signIn({ email: data.email, senha: data.senha });
       router.replace("/home");
     } catch (error) {
-      Alert.alert("Erro", "Email ou senha incorretos");
+      console.error(error);
     } finally {
       setCarregando(false);
     }
@@ -43,143 +55,62 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-pink-50">
       <KeyboardAvoidingView
-        style={styles.keyboardAvoidingView}
+        className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>FibroLog</Text>
-          <Text style={styles.subtitle}>Entre na sua conta</Text>
+        <View className="flex-1 justify-center px-10 pb-16">
+          <View className="items-center mb-16">
+            <Text 
+              className="text-7xl text-pink-800"
+              style={{ fontFamily: 'Carattere_400Regular' }}
+            >
+              FibroLog
+            </Text>
+            <Text className="text-xl text-pink-600 mt-2 font-medium">
+              Entre na sua conta
+            </Text>
+          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
+          <View className="space-y-6">
+            <Input
+              name="email"
+              control={control}
+              label="Email"
               placeholder="Digite seu email"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              autoCorrect={false}
-              editable={!carregando}
+              error={errors.email?.message}
             />
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={styles.input}
+            <Input
+              name="senha"
+              control={control}
+              label="Senha"
               placeholder="Digite sua senha"
-              placeholderTextColor="#999"
-              value={senha}
-              onChangeText={setSenha}
               secureTextEntry
               autoCapitalize="none"
-              autoCorrect={false}
-              editable={!carregando}
+              error={errors.senha?.message}
             />
+
+            <View className="mt-8 space-y-4">
+              <Button
+                title="Entrar"
+                onPress={handleSubmit(handleLogin)}
+                loading={carregando}
+                size="lg"
+              />
+
+              <Button
+                title="Não tem uma conta? Cadastre-se"
+                onPress={handleGoToRegister}
+                variant="text"
+              />
+            </View>
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              carregando && styles.loginButtonDisabled,
-            ]}
-            onPress={handleLogin}
-            disabled={carregando}
-          >
-            {carregando ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={handleGoToRegister}
-            disabled={carregando}
-          >
-            <Text style={styles.registerButtonText}>
-              Não tem uma conta? Cadastre-se
-            </Text>
-          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fdf2f9", // pink-50
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  formContainer: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    paddingBottom: 50,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#7d1e60", // pink-800
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#b5228a", // pink-600
-    marginBottom: 48,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#7d1e60", // pink-800
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#facfe9", // pink-200
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#7d1e60", // pink-800
-  },
-  loginButton: {
-    backgroundColor: "#D330AA", // pink-500
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 16,
-  },
-  loginButtonDisabled: {
-    backgroundColor: "#f7a9d7", // pink-300 for disabled state
-  },
-  loginButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  registerButton: {
-    marginTop: 24,
-    alignItems: "center",
-  },
-  registerButtonText: {
-    color: "#b5228a", // pink-600
-    fontSize: 16,
-    fontWeight: "500",
-  },
-});
