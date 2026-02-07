@@ -37,7 +37,7 @@ export default function Input({
               border-2 rounded-lg px-4 py-3 text-base
               ${error ? 'border-red-500' : 'border-gray-300'}
               ${error ? 'bg-red-50' : 'bg-white'}
-              focus:border-purple-600
+              focus:border-pink-600
             `}
             placeholder={placeholder}
             onBlur={onBlur}

@@ -1,6 +1,6 @@
 ## Context
 
-The application is a React Native Expo app using NativeWind (Tailwind CSS) for styling. Currently, there's no consistent color scheme across the UI components. The app has authentication screens (login) and a home screen, with navigation handled by React Navigation. The goal is to implement a cohesive purple color palette while enhancing the authentication flow.
+The application is a React Native Expo app using NativeWind (Tailwind CSS) for styling. Currently, there's no consistent color scheme across the UI components. The app has authentication screens (login) and a home screen, with navigation handled by React Navigation. The goal is to implement a cohesive pink color palette while enhancing the authentication flow.
 
 **Current State:**
 - React Native Expo app with TypeScript
@@ -18,11 +18,11 @@ The application is a React Native Expo app using NativeWind (Tailwind CSS) for s
 ## Goals / Non-Goals
 
 **Goals:**
-- Establish a comprehensive purple color palette using Tailwind CSS custom colors
+- Establish a comprehensive pink color palette using Tailwind CSS custom colors
 - Create a consistent theming system across all UI components
 - Add registration screen with navigation from login screen
 - Implement direct navigation to Home screen after successful registration
-- Ensure accessibility and contrast compliance for the purple palette
+- Ensure accessibility and contrast compliance for the pink palette
 
 **Non-Goals:**
 - Complete UI/UX redesign beyond color palette
@@ -33,7 +33,7 @@ The application is a React Native Expo app using NativeWind (Tailwind CSS) for s
 ## Decisions
 
 ### 1. Color System Implementation
-**Decision:** Use Tailwind CSS custom colors configuration to define the purple palette
+**Decision:** Use Tailwind CSS custom colors configuration to define the pink palette
 **Rationale:** 
 - Leverages existing NativeWind setup
 - Provides consistent color variables across the app
@@ -45,14 +45,14 @@ The application is a React Native Expo app using NativeWind (Tailwind CSS) for s
 - React Native StyleSheet with constants: Less flexible and harder to maintain
 
 ### 2. Color Palette Structure
-**Decision:** Implement a semantic color system with primary (purple), secondary, accent, neutral, and state colors
+**Decision:** Implement a semantic color system with primary (pink), secondary, accent, neutral, and state colors
 **Rationale:**
 - Semantic naming makes code more readable and maintainable
 - Provides flexibility for different UI states (hover, pressed, disabled)
 - Supports accessibility requirements with proper contrast ratios
 
 **Color scheme:**
-- Primary: Various shades of purple (50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
+- Primary: Various shades of pink (50, 100, 200, 300, 400, 500, 600, 700, 800, 900)
 - Secondary: Complementary colors for variety
 - Neutral: Grays and whites for backgrounds and text
 - State: Success (green), warning (yellow), error (red)
@@ -86,14 +86,14 @@ The application is a React Native Expo app using NativeWind (Tailwind CSS) for s
 
 **[Risk: Breaking existing styles during migration]** → Mitigation: Update components one by one, maintain backward compatibility during transition, thorough testing on each change
 
-**[Risk: Purple palette may not suit all users]** → Mitigation: Choose purple shades that are professional and widely acceptable, ensure good contrast with text and backgrounds
+**[Risk: Pink palette may not suit all users]** → Mitigation: Choose pink shades that are professional and widely acceptable, ensure good contrast with text and backgrounds
 
 **[Risk: NativeWind configuration issues]** → Mitigation: Follow NativeWind best practices for custom colors, test configuration thoroughly
 
 ## Migration Plan
 
 **Phase 1:** Theme system setup
-1. Configure Tailwind with custom purple color palette
+1. Configure Tailwind with custom pink color palette
 2. Update NativeWind configuration
 3. Create theme constants and utilities
 
@@ -117,5 +117,5 @@ The application is a React Native Expo app using NativeWind (Tailwind CSS) for s
 ## Open Questions
 
 - Should we add a system preference detection for users who might prefer different themes in the future?
-- Do we need to consider cultural implications of purple color choice for international users?
+- Do we need to consider cultural implications of pink color choice for international users?
 - Should animation transitions be added when switching between login/register screens?

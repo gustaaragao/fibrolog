@@ -24,18 +24,18 @@ export default function Button({
     switch (variant) {
       case 'primary':
         return disabled || loading
-          ? 'bg-purple-300'
-          : 'bg-purple-600 active:bg-purple-700';
+          ? 'bg-pink-300'
+          : 'bg-pink-600 active:bg-pink-700';
       case 'secondary':
         return disabled || loading
           ? 'bg-gray-300'
           : 'bg-gray-600 active:bg-gray-700';
       case 'outline':
         return disabled || loading
-          ? 'bg-transparent border-2 border-purple-300'
-          : 'bg-transparent border-2 border-purple-600 active:bg-purple-50';
+          ? 'bg-transparent border-2 border-pink-300'
+          : 'bg-transparent border-2 border-pink-600 active:bg-pink-50';
       default:
-        return 'bg-purple-600 active:bg-purple-700';
+        return 'bg-pink-600 active:bg-pink-700';
     }
   };
 
@@ -57,7 +57,7 @@ export default function Button({
     const sizeStyles = size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-lg' : 'text-base';
     
     if (variant === 'outline') {
-      const colorStyles = disabled || loading ? 'text-purple-300' : 'text-purple-600';
+      const colorStyles = disabled || loading ? 'text-pink-300' : 'text-pink-600';
       return `${baseStyles} ${sizeStyles} ${colorStyles}`;
     } else {
       const colorStyles = disabled || loading ? 'text-white' : 'text-white';
@@ -80,7 +80,7 @@ export default function Button({
       {loading ? (
         <ActivityIndicator 
           size="small" 
-          color={variant === 'outline' ? '#9333ea' : '#ffffff'} 
+          color={variant === 'outline' ? '#b5228a' : '#ffffff'} 
         />
       ) : (
         <Text className={getTextStyles()}>

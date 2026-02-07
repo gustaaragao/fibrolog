@@ -12,7 +12,7 @@ Current constraints:
 
 **Goals:**
 - Implement complete user registration flow with medical-specific fields
-- Establish TailwindCSS styling system with custom purple theme
+- Establish TailwindCSS styling system with custom pink theme
 - Create reusable form components for future healthcare forms
 - Ensure accessibility and responsive design across all platforms
 - Integrate seamlessly with existing React Hook Form and Zod validation
@@ -30,8 +30,8 @@ Current constraints:
 **Rationale**: Standard TailwindCSS doesn't work with React Native. NativeWind provides TailwindCSS-like utilities that compile to React Native styles.
 **Alternatives considered**: Styled Components, React Native StyleSheet - rejected for consistency with web development practices and design system scalability.
 
-### 2. Purple Color Palette Implementation
-**Decision**: Create custom color palette in tailwind.config.js with purple variants (purple-50 to purple-950)
+### 2. Pink Color Palette Implementation
+**Decision**: Create custom color palette in tailwind.config.js with pink variants (pink-50 to pink-950)
 **Rationale**: Provides consistent branding across the app and allows for theming flexibility.
 **Alternatives considered**: CSS-in-JS color constants - rejected for lack of design system integration.
 
@@ -55,6 +55,6 @@ Current constraints:
 **[NativeWind Learning Curve]** → Team may need time to adapt from standard TailwindCSS to NativeWind syntax
 **[Platform-specific Styling Issues]** → Some TailwindCSS utilities may not work consistently across platforms → Mitigation: Thorough testing on all target platforms and fallback styles
 **[Form Performance with Medical Data]** → Large forms with validation may impact performance → Mitigation: Use React Hook Form's optimized re-render strategy and lazy validation
-**[Purple Theme Accessibility]** → Purple color palette may not meet accessibility contrast requirements → Mitigation: Ensure all purple variants meet WCAG AA standards for contrast ratios
+**[Pink Theme Accessibility]** → Pink color palette may not meet accessibility contrast requirements → Mitigation: Ensure all pink variants meet WCAG AA standards for contrast ratios
 **[Date Input Complexity]** → Date inputs (data_nascimento, data_diagnostico) are complex in React Native → Mitigation: Use platform-specific date pickers with consistent styling
 **[Medical Data Sensitivity]** → Healthcare data requires special handling → Mitigation: Implement proper validation, sanitization, and ensure no sensitive data logging

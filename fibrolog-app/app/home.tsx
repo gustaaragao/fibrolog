@@ -1,80 +1,131 @@
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useRouter, Stack } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View, Alert, ScrollView } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function HomeScreen() {
   const { usuario, signOut } = useAuth();
   const router = useRouter();
 
-  const handleLogout = async () => {
+  const handleLogoutPress = () => {
+    Alert.alert(
+      "Sair",
+      "Tem certeza que deseja sair?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        { text: "Sair", style: "destructive", onPress: performLogout }
+      ]
+    );
+  };
+
+  const performLogout = async () => {
     await signOut();
     router.replace("/login");
   };
 
+  const menuItems = [
+    { name: "Registrar Sintoma", icon: "edit", route: "/symptoms" },
+    { name: "Registrar Crise", icon: "warning", route: "/crisis" },
+    { name: "Lembrete", icon: "notifications", route: "/reminder" },
+    { name: "Histórico", icon: "history", route: "/history" },
+    { name: "Áudio Descrição", icon: "mic", route: "/audio-desc" },
+    { name: "Gerar PDF", icon: "picture-as-pdf", route: "/pdf" },
+    { name: "Informações", icon: "info", route: "/info" },
+    { name: "Rede de Apoio", icon: "group", route: "/support" },
+  ];
+
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
+      <Stack.Screen
+        options={{
+          title: "FibroLog",
+          headerRight: () => (
+            <TouchableOpacity onPress={handleLogoutPress} style={{ marginRight: 15 }}>
+              <MaterialIcons name="logout" size={24} color="#7d1e60" />
+            </TouchableOpacity>
+          ),
+          headerShown: true,
+          headerTintColor: "#7d1e60",
+          headerTitleStyle: { fontWeight: "bold" },
+          headerBackVisible: false, // Prevent going back to login if stack allows
+        }}
+      />
+
       <View style={styles.header}>
-        <Text style={styles.titulo}>Bem-vindo ao FibroLog</Text>
-        {usuario && (
-          <Text style={styles.usuario}>Usuário: {usuario.email}</Text>
-        )}
+        <Text style={styles.welcomeText}>Olá, {usuario?.email?.split('@')[0] || 'Usuário'}</Text>
+        <Text style={styles.subText}>Como você está se sentindo hoje?</Text>
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.mensagem}>
-          Sistema de monitoramento da fibromialgia
-        </Text>
+      <View style={styles.grid}>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.card}
+            onPress={() => router.push(item.route as any)}
+          >
+            <View style={styles.iconContainer}>
+              <MaterialIcons name={item.icon as any} size={32} color="#7d1e60" />
+            </View>
+            <Text style={styles.cardText}>{item.name}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
-
-      <TouchableOpacity style={styles.botao} onPress={handleLogout}>
-        <Text style={styles.textoBotao}>Sair</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#faf5ff", // purple-50
-    padding: 20,
+    backgroundColor: "#fdf2f9", // pink-50
   },
   header: {
-    paddingTop: 40,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9d5ff", // purple-200
+    padding: 20,
+    marginBottom: 10,
   },
-  titulo: {
+  welcomeText: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#6b21a8", // purple-800
-    marginBottom: 8,
+    color: "#641c4d", // pink-900
   },
-  usuario: {
+  subText: {
     fontSize: 16,
-    color: "#9333ea", // purple-600
+    color: "#7d1e60", // pink-800
+    marginTop: 5,
   },
-  content: {
-    flex: 1,
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  card: {
+    width: "48%",
+    backgroundColor: "white",
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 15,
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  mensagem: {
-    fontSize: 18,
-    color: "#9333ea", // purple-600
+  iconContainer: {
+    marginBottom: 10,
+    backgroundColor: "#fce7f5", // pink-100
+    padding: 10,
+    borderRadius: 50,
+  },
+  cardText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#641c4d", // pink-900
     textAlign: "center",
-  },
-  botao: {
-    backgroundColor: "#ef4444", // error-500
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  textoBotao: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });

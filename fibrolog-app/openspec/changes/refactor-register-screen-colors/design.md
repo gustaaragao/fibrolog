@@ -4,7 +4,7 @@ A tela de registro atualmente utiliza uma paleta de cores azul enquanto a tela d
 
 **Estado atual:**
 - `app/register.tsx`: Usa cores azuis (`#E6F4FE`, `#0066CC`, `#ddd`)
-- `app/login.tsx`: Usa paleta roxa padronizada (`#faf5ff`, `#6b21a8`, `#9333ea`, `#a855f7`, `#e9d5ff`)
+- `app/login.tsx`: Usa paleta roxa padronizada (`#fdf2f9`, `#7d1e60`, `#b5228a`, `#D330AA`, `#facfe9`)
 - Estrutura dos inputs difere: login tem labels explícitos, registro usa apenas placeholders
 
 **Constraints:**
@@ -16,7 +16,7 @@ A tela de registro atualmente utiliza uma paleta de cores azul enquanto a tela d
 ## Goals / Non-Goals
 
 **Goals:**
-- Padronizar paleta de cores da tela de registro para roxo (purple-50 a purple-800)
+- Padronizar paleta de cores da tela de registro para roxo (pink-50 a pink-800)
 - Alinhar estrutura visual com tela de login (labels, espaçamentos, hierarquia)
 - Manter consistência de UX entre fluxos de autenticação
 - Preservar todos os comportamentos funcionais existentes (validação, navegação, loading states)
@@ -68,19 +68,19 @@ A tela de registro atualmente utiliza uma paleta de cores azul enquanto a tela d
 
 **Mapeamento específico:**
 ```
-container.backgroundColor: #E6F4FE → #faf5ff (purple-50)
-titulo.color: #0066CC → #6b21a8 (purple-800)
-subtitulo.color: #666 → #9333ea (purple-600)
-input.borderColor: #ddd → #e9d5ff (purple-200)
-input.color: (herdado) → #6b21a8 (purple-800)
-botao.backgroundColor: #0066CC → #a855f7 (purple-500)
-botaoDesabilitado: opacity: 0.6 → backgroundColor: #d8b4fe (purple-300)
-textoVoltar.color: #0066CC → #9333ea (purple-600)
+container.backgroundColor: #E6F4FE → #fdf2f9 (pink-50)
+titulo.color: #0066CC → #7d1e60 (pink-800)
+subtitulo.color: #666 → #b5228a (pink-600)
+input.borderColor: #ddd → #facfe9 (pink-200)
+input.color: (herdado) → #7d1e60 (pink-800)
+botao.backgroundColor: #0066CC → #D330AA (pink-500)
+botaoDesabilitado: opacity: 0.6 → backgroundColor: #f7a9d7 (pink-300)
+textoVoltar.color: #0066CC → #b5228a (pink-600)
 ```
 
 ### 4. Estado de Loading do Botão
 
-**Decisão:** Mudar de `opacity: 0.6` para cor de fundo específica (`#d8b4fe`).
+**Decisão:** Mudar de `opacity: 0.6` para cor de fundo específica (`#f7a9d7`).
 
 **Rationale:**
 - Segue padrão já implementado em `app/login.tsx` (`.loginButtonDisabled`)

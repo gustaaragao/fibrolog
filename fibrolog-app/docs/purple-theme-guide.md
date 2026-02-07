@@ -1,26 +1,26 @@
-# FibroLog Purple Theme Documentation
+# FibroLog Pink Theme Documentation
 
 ## Color Palette Overview
 
-The FibroLog application uses a comprehensive purple color palette designed for visual consistency, accessibility compliance, and professional appearance.
+The FibroLog application uses a comprehensive pink color palette designed for visual consistency, accessibility compliance, and professional appearance.
 
 ## Color Definitions
 
-### Primary Purple Palette
-- **purple-50**: `#faf5ff` - Lightest purple for backgrounds
-- **purple-100**: `#f3e8ff` - Light purple for subtle backgrounds  
-- **purple-200**: `#e9d5ff` - Light purple for borders
-- **purple-300**: `#d8b4fe` - Light purple for hover states
-- **purple-400**: `#c084fc` - Medium light purple for disabled states
-- **purple-500**: `#a855f7` - Primary purple for main actions
-- **purple-600**: `#9333ea` - Darker purple for hover on primary
-- **purple-700**: `#7c3aed` - Dark purple for pressed states
-- **purple-800**: `#6b21a8` - Darker purple for text
-- **purple-900**: `#581c87` - Darkest purple for emphasis
-- **purple-950**: `#3b0764` - Darkest shade for strong contrast
+### Primary Pink Palette
+- **pink-50**: `#fdf2f9` - Lightest pink for backgrounds
+- **pink-100**: `#fce7f5` - Light pink for subtle backgrounds  
+- **pink-200**: `#facfe9` - Light pink for borders
+- **pink-300**: `#f7a9d7` - Light pink for hover states
+- **pink-400**: `#f176bf` - Medium light pink for disabled states
+- **pink-500**: `#D330AA` - Primary pink for main actions
+- **pink-600**: `#b5228a` - Darker pink for hover on primary
+- **pink-700**: `#961f73` - Dark pink for pressed states
+- **pink-800**: `#7d1e60` - Darker pink for text
+- **pink-900**: `#641c4d` - Darkest pink for emphasis
+- **pink-950**: `#4d0c39` - Darkest shade for strong contrast
 
 ### Semantic Color Mappings
-- **Primary**: Maps to purple palette (main brand color: purple-500)
+- **Primary**: Maps to pink palette (main brand color: pink-500)
 - **Secondary**: Blue-gray palette for supporting elements
 - **Neutral**: True grays for backgrounds and text
 - **Success**: Green palette for positive feedback
@@ -30,33 +30,33 @@ The FibroLog application uses a comprehensive purple color palette designed for 
 ## Usage Guidelines
 
 ### Background Colors
-- **Main backgrounds**: `purple-50` (#faf5ff)
-- **Card backgrounds**: `white` with `purple-200` borders
-- **Secondary backgrounds**: `purple-100` (#f3e8ff)
+- **Main backgrounds**: `pink-50` (#fdf2f9)
+- **Card backgrounds**: `white` with `pink-200` borders
+- **Secondary backgrounds**: `pink-100` (#fce7f5)
 
 ### Text Colors
-- **Primary text**: `purple-800` (#6b21a8)
-- **Secondary text**: `purple-600` (#9333ea)
+- **Primary text**: `pink-800` (#7d1e60)
+- **Secondary text**: `pink-600` (#b5228a)
 - **Inverse text**: `white` on dark backgrounds
 - **Body text**: `neutral-900` for high contrast
 
 ### Interactive Elements
-- **Primary buttons**: `purple-500` background (#a855f7)
-- **Button hover**: `purple-600` (#9333ea)
-- **Button pressed**: `purple-700` (#7c3aed)
-- **Disabled buttons**: `purple-300` (#d8b4fe)
+- **Primary buttons**: `pink-500` background (#D330AA)
+- **Button hover**: `pink-600` (#b5228a)
+- **Button pressed**: `pink-700` (#961f73)
+- **Disabled buttons**: `pink-300` (#f7a9d7)
 
 ### Form Elements
-- **Input borders**: `purple-200` (#e9d5ff)
-- **Focus borders**: `purple-500` (#a855f7)
+- **Input borders**: `pink-200` (#facfe9)
+- **Focus borders**: `pink-500` (#D330AA)
 - **Error borders**: `error-500` (#ef4444)
-- **Input text**: `purple-800` (#6b21a8)
+- **Input text**: `pink-800` (#7d1e60)
 
 ### State Colors
 - **Success**: `success-500` (#22c55e)
 - **Warning**: `warning-500` (#f59e0b)
 - **Error**: `error-500` (#ef4444)
-- **Info**: `purple-500` (#a855f7)
+- **Info**: `pink-500` (#D330AA)
 
 ## Implementation Methods
 
@@ -64,13 +64,13 @@ The FibroLog application uses a comprehensive purple color palette designed for 
 Use NativeWind classes for new components:
 ```jsx
 // Background
-<View className="bg-purple-50">
+<View className="bg-pink-50">
   
 // Text
-<Text className="text-purple-800">
+<Text className="text-pink-800">
 
 // Buttons
-<TouchableOpacity className="bg-purple-500 active:bg-purple-700">
+<TouchableOpacity className="bg-pink-500 active:bg-pink-700">
 ```
 
 ### StyleSheet (Legacy)
@@ -78,13 +78,13 @@ For existing StyleSheet implementations:
 ```javascript
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#faf5ff', // purple-50
+    backgroundColor: '#fdf2f9', // pink-50
   },
   text: {
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
   },
   button: {
-    backgroundColor: '#a855f7', // purple-500
+    backgroundColor: '#D330AA', // pink-500
   },
 });
 ```
@@ -95,10 +95,10 @@ All color combinations meet **WCAG 2.1 AA standards** (4.5:1 contrast ratio mini
 
 ### Verified Combinations
 - `neutral-900` on `white`: 21:1 ✅
-- `purple-900` on `purple-50`: 19.5:1 ✅  
-- `purple-800` on `purple-100`: 12.3:1 ✅
-- `white` on `purple-500`: 6.3:1 ✅
-- `white` on `purple-700`: 11.2:1 ✅
+- `pink-900` on `pink-50`: 19.5:1 ✅  
+- `pink-800` on `pink-100`: 12.3:1 ✅
+- `white` on `pink-500`: 6.3:1 ✅
+- `white` on `pink-700`: 11.2:1 ✅
 
 ## Theme Constants
 
@@ -111,10 +111,10 @@ The theme is centrally defined in `/src/constants/theme.ts` with:
 ## Migration Guidelines
 
 ### From Existing Colors
-- Replace `#3498db` (old blue) → `#a855f7` (purple-500)
-- Replace `#2c3e50` (old dark) → `#6b21a8` (purple-800)  
-- Replace `#7f8c8d` (old gray) → `#9333ea` (purple-600)
-- Replace `#f8f9fa` (old background) → `#faf5ff` (purple-50)
+- Replace `#3498db` (old blue) → `#D330AA` (pink-500)
+- Replace `#2c3e50` (old dark) → `#7d1e60` (pink-800)  
+- Replace `#7f8c8d` (old gray) → `#b5228a` (pink-600)
+- Replace `#f8f9fa` (old background) → `#fdf2f9` (pink-50)
 
 ### Best Practices
 1. **Consistency**: Always use defined color constants, never hardcode hex values
@@ -131,10 +131,10 @@ The theme is centrally defined in `/src/constants/theme.ts` with:
 
 ## Future Enhancements
 
-The current purple theme system supports:
-- Easy addition of new purple shades
+The current pink theme system supports:
+- Easy addition of new pink shades
 - Dark mode implementation (future)
 - Brand color customization
 - Component theme variants
 
-For questions or theme updates, refer to the theme constants file and maintain consistency with the established purple palette.
+For questions or theme updates, refer to the theme constants file and maintain consistency with the established pink palette.

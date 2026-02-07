@@ -11,9 +11,9 @@ The system SHALL provide a registration screen that allows new users to create a
 - **WHEN** users submit registration data
 - **THEN** the system SHALL validate all input fields using the same validation patterns as the login screen
 
-#### Scenario: Registration form uses purple theme
+#### Scenario: Registration form uses pink theme
 - **WHEN** the registration screen is displayed
-- **THEN** it SHALL use the purple color palette for consistent visual styling with the rest of the application
+- **THEN** it SHALL use the pink color palette for consistent visual styling with the rest of the application
 
 ### Requirement: Login to Registration Navigation
 The system SHALL enable seamless navigation from the login screen to the registration screen while maintaining the current login screen design.

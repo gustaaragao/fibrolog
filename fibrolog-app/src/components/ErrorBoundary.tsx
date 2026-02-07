@@ -58,18 +58,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 32,
-    backgroundColor: '#faf5ff', // purple-50
+    backgroundColor: '#fdf2f9', // pink-50
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
     fontSize: 16,
-    color: '#9333ea', // purple-600
+    color: '#b5228a', // pink-600
     textAlign: 'center',
     marginBottom: 32,
     lineHeight: 24,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   button: {
-    backgroundColor: '#a855f7', // purple-500
+    backgroundColor: '#D330AA', // pink-500
     paddingHorizontal: 32,
     paddingVertical: 12,
     borderRadius: 8,

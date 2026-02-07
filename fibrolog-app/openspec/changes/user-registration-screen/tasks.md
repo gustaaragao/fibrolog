@@ -3,10 +3,10 @@
 - [x] 1.1 Install NativeWind and TailwindCSS dependencies
 - [x] 1.2 Create tailwind.config.js with React Native configuration
 - [x] 1.3 Configure NativeWind in babel.config.js
-- [x] 1.4 Add custom purple color palette (purple-50 to purple-950) to theme
-- [x] 1.5 Set purple-600 as primary brand color in theme config
+- [x] 1.4 Add custom pink color palette (pink-50 to pink-950) to theme
+- [x] 1.5 Set pink-600 as primary brand color in theme config
 - [x] 1.6 Test TailwindCSS compilation and hot reload functionality
-- [x] 1.7 Verify purple color utilities work (bg-purple-*, text-purple-*, border-purple-*)
+- [x] 1.7 Verify pink color utilities work (bg-pink-*, text-pink-*, border-pink-*)
 
 ## 2. Form Validation Schema
 
@@ -20,11 +20,11 @@
 
 ## 3. Atomic Form Components
 
-- [x] 3.1 Create reusable Input component with purple theme styling
+- [x] 3.1 Create reusable Input component with pink theme styling
 - [x] 3.2 Create TextArea component for medication field
 - [x] 3.3 Create DatePicker component with platform-specific date selection
 - [x] 3.4 Create Select/Dropdown component for gender selection
-- [x] 3.5 Create Button component with purple styling and loading states
+- [x] 3.5 Create Button component with pink styling and loading states
 - [x] 3.6 Add error display functionality to all input components
 - [x] 3.7 Implement appropriate keyboard types for each input type
 
@@ -52,7 +52,7 @@
 ## 6. Registration Screen Implementation
 
 - [x] 6.1 Create UserRegistrationScreen component
-- [x] 6.2 Add screen layout with proper spacing and purple theme
+- [x] 6.2 Add screen layout with proper spacing and pink theme
 - [x] 6.3 Add screen title and description text
 - [x] 6.4 Integrate UserRegistrationForm component
 - [x] 6.5 Add submit button with loading state functionality
@@ -65,7 +65,7 @@
 - [x] 7.2 Test form usability on iOS, Android, and Web platforms
 - [x] 7.3 Verify appropriate keyboard types appear for each input
 - [x] 7.4 Test date picker functionality across all platforms
-- [x] 7.5 Ensure purple color palette meets WCAG AA contrast requirements
+- [x] 7.5 Ensure pink color palette meets WCAG AA contrast requirements
 - [x] 7.6 Add proper accessibility labels and hints for screen readers
 - [x] 7.7 Test form navigation with keyboard and assistive technologies
 

@@ -34,10 +34,10 @@
 
 ### RegisterScreen (src/screens/RegisterScreen.tsx)
 - **Antes**: Usando NativeWind com classes CSS
-- **Depois**: Usando StyleSheet com cores purple consistentes
+- **Depois**: Usando StyleSheet com cores pink consistentes
 - **Melhorias**:
   - Mesmo layout e estrutura da LoginScreen
-  - Cores purple consistentes (#faf5ff, #6b21a8, #9333ea, etc.)
+  - Cores pink consistentes (#fdf2f9, #7d1e60, #b5228a, etc.)
   - Mesmo sistema de validação e feedback de erro
   - Botão "Já tem uma conta? Fazer login" para navegação reversa
 
@@ -49,11 +49,11 @@
 ## Características do Design Unificado
 
 ### ✅ Paleta de Cores Consistente
-- **Background**: purple-50 (#faf5ff)
-- **Título**: purple-800 (#6b21a8)
-- **Subtítulo**: purple-600 (#9333ea)
-- **Botões primários**: purple-500 (#a855f7)
-- **Bordas**: purple-200 (#e9d5ff)
+- **Background**: pink-50 (#fdf2f9)
+- **Título**: pink-800 (#7d1e60)
+- **Subtítulo**: pink-600 (#b5228a)
+- **Botões primários**: pink-500 (#D330AA)
+- **Bordas**: pink-200 (#facfe9)
 - **Estados de erro**: error-500 (#ef4444)
 - **Estados de sucesso**: success-700 (#15803d)
 
@@ -108,10 +108,10 @@
 ## Resultado Final
 
 Agora ambas as telas (Login e Registro) compartilham:
-- ✅ **Design visual idêntico** com tema purple consistente
+- ✅ **Design visual idêntico** com tema pink consistente
 - ✅ **Estrutura de código similar** usando StyleSheet
 - ✅ **Navegação bidirecional** funcionando perfeitamente
 - ✅ **Integração completa** com AuthContext
 - ✅ **Experiência do usuário** fluida e profissional
 
-As correções garantem que os usuários tenham uma experiência consistente ao navegar entre as telas de autenticação, mantendo o design profissional do tema purple em toda a aplicação.
+As correções garantem que os usuários tenham uma experiência consistente ao navegar entre as telas de autenticação, mantendo o design profissional do tema pink em toda a aplicação.

@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   // Container e layout
   container: {
     flex: 1,
-    backgroundColor: "#faf5ff", // purple-50
+    backgroundColor: "#fdf2f9", // pink-50
   },
   scrollContent: {
     flexGrow: 1,
@@ -298,19 +298,19 @@ const styles = StyleSheet.create({
   titulo: {
     fontSize: 36,
     fontWeight: "bold",
-    color: "#6b21a8", // purple-800
+    color: "#7d1e60", // pink-800
     marginBottom: 8,
   },
   subtitulo: {
     fontSize: 16,
-    color: "#9333ea", // purple-600
+    color: "#b5228a", // pink-600
     marginBottom: 48,
     textAlign: "center",
   },
   label: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#6b21a8", // purple-800
+    color: "#7d1e60", // pink-800
     marginBottom: 8,
   },
   // Inputs
@@ -323,8 +323,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: "#e9d5ff", // purple-200
-    color: "#6b21a8", // purple-800
+    borderColor: "#facfe9", // pink-200
+    color: "#7d1e60", // pink-800
   },
   // Radio buttons
   radioGroup: {
@@ -340,14 +340,14 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#e9d5ff", // purple-200
+    borderColor: "#facfe9", // pink-200
   },
   radioCircle: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#a855f7", // purple-500
+    borderColor: "#D330AA", // pink-500
     alignItems: "center",
     justifyContent: "center",
     marginRight: 8,
@@ -356,23 +356,23 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#a855f7", // purple-500
+    backgroundColor: "#D330AA", // pink-500
   },
   radioLabel: {
     fontSize: 14,
-    color: "#6b21a8", // purple-800
+    color: "#7d1e60", // pink-800
     fontWeight: "500",
   },
   // Botões
   botao: {
-    backgroundColor: "#a855f7", // purple-500
+    backgroundColor: "#D330AA", // pink-500
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 16,
   },
   botaoDesabilitado: {
-    backgroundColor: "#d8b4fe", // purple-300
+    backgroundColor: "#f7a9d7", // pink-300
   },
   textoBotao: {
     color: "#fff",
@@ -384,7 +384,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   textoVoltar: {
-    color: "#9333ea", // purple-600
+    color: "#b5228a", // pink-600
     fontSize: 16,
     fontWeight: "500",
   },
