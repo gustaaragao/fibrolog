@@ -1,8 +1,8 @@
 # Rollback Procedures and Migration Documentation
-## FibroLog Purple Theme Implementation
+## FibroLog Pink Theme Implementation
 
 ### Overview
-This document provides comprehensive procedures for rolling back the purple theme implementation and guidance for future theme migrations. All changes are designed to be non-destructive and reversible.
+This document provides comprehensive procedures for rolling back the pink theme implementation and guidance for future theme migrations. All changes are designed to be non-destructive and reversible.
 
 ---
 
@@ -16,7 +16,7 @@ This document provides comprehensive procedures for rolling back the purple them
 cd /home/gustavo/ufs/fibrolog/fibrolog-app
 
 # Create backup of current tailwind.config.js
-cp tailwind.config.js tailwind.config.js.purple-backup
+cp tailwind.config.js tailwind.config.js.pink-backup
 
 # Restore original configuration
 git checkout HEAD~N tailwind.config.js
@@ -68,20 +68,20 @@ export const emergencyStyles = {
 #### Phase 1: File Reversion
 ```bash
 # Create rollback branch
-git checkout -b rollback-purple-theme
+git checkout -b rollback-pink-theme
 
 # Identify changed files
-git diff --name-only [commit-before-purple]..HEAD
+git diff --name-only [commit-before-pink]..HEAD
 
 # Revert specific files systematically
-git checkout [commit-before-purple] -- app/login.tsx
-git checkout [commit-before-purple] -- app/home.tsx
-git checkout [commit-before-purple] -- app/(tabs)/_layout.tsx
-git checkout [commit-before-purple] -- src/screens/LoginScreen.tsx
-git checkout [commit-before-purple] -- src/screens/HomeScreen.tsx
+git checkout [commit-before-pink] -- app/login.tsx
+git checkout [commit-before-pink] -- app/home.tsx
+git checkout [commit-before-pink] -- app/(tabs)/_layout.tsx
+git checkout [commit-before-pink] -- src/screens/LoginScreen.tsx
+git checkout [commit-before-pink] -- src/screens/HomeScreen.tsx
 
 # Commit rollback changes
-git commit -m "Rollback: Revert purple theme implementation"
+git commit -m "Rollback: Revert pink theme implementation"
 ```
 
 #### Phase 2: Component Restoration
@@ -110,11 +110,11 @@ const styles = StyleSheet.create({
 });
 ```
 
-#### Phase 3: Remove Purple Dependencies
+#### Phase 3: Remove Pink Dependencies
 ```bash
-# Remove purple-specific files
+# Remove pink-specific files
 rm -rf src/constants/theme.ts
-rm -rf docs/purple-theme-guide.md
+rm -rf docs/pink-theme-guide.md
 rm -rf docs/style-guide.md
 rm -rf docs/accessibility-compliance.md
 rm -rf src/tests/
@@ -155,9 +155,9 @@ git checkout [commit] -- app/
 ```typescript
 // Keep RegisterScreen, revert to blue theme
 const styles = StyleSheet.create({
-  container: { backgroundColor: "#E6F4FE" }, // Blue instead of purple
-  title: { color: "#0066CC" },             // Blue instead of purple
-  // ... convert purple colors to blue
+  container: { backgroundColor: "#E6F4FE" }, // Blue instead of pink
+  title: { color: "#0066CC" },             // Blue instead of pink
+  // ... convert pink colors to blue
 });
 ```
 
@@ -166,13 +166,13 @@ const styles = StyleSheet.create({
 // Add theme toggle capability
 const USE_PURPLE_THEME = false; // Set to false for rollback
 
-const getThemeColor = (purpleColor: string, fallbackColor: string) => {
-  return USE_PURPLE_THEME ? purpleColor : fallbackColor;
+const getThemeColor = (pinkColor: string, fallbackColor: string) => {
+  return USE_PURPLE_THEME ? pinkColor : fallbackColor;
 };
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: getThemeColor('#faf5ff', '#E6F4FE'),
+    backgroundColor: getThemeColor('#fdf2f9', '#E6F4FE'),
   },
 });
 ```
@@ -184,14 +184,14 @@ const styles = StyleSheet.create({
 ### Pre-Migration Checklist
 
 #### Environment Preparation
-- [ ] Create full git backup: `git tag pre-purple-theme-$(date +%Y%m%d)`
+- [ ] Create full git backup: `git tag pre-pink-theme-$(date +%Y%m%d)`
 - [ ] Document current color scheme values
 - [ ] Take screenshots of all current screens
 - [ ] Verify build processes work correctly
 - [ ] Test on all target platforms (iOS, Android, Web)
 
 #### Team Preparation
-- [ ] Review purple theme design specifications
+- [ ] Review pink theme design specifications
 - [ ] Assign team members to component updates
 - [ ] Set up testing procedures and checklist
 - [ ] Establish rollback decision criteria
@@ -220,12 +220,12 @@ const styles = StyleSheet.create({
 #### Phase 2: Core Components (Days 2-3)
 1. **Authentication Screens**
    - Update LoginScreen styling
-   - Implement RegisterScreen with purple theme
+   - Implement RegisterScreen with pink theme
    - Test authentication flow
 
 2. **Navigation Components**  
    - Update AppNavigator theming
-   - Apply tab bar purple colors
+   - Apply tab bar pink colors
    - Test navigation transitions
 
 #### Phase 3: Supporting Components (Days 4-5)
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
 
 2. **Layout Components**
    - Update HomeScreen
-   - Apply purple backgrounds
+   - Apply pink backgrounds
    - Test component interactions
 
 #### Phase 4: Testing and Validation (Day 6)
@@ -466,7 +466,7 @@ All functionality remains available. Thank you for your patience."
 ### Created Files (can be safely removed)
 ```bash
 src/constants/theme.ts
-docs/purple-theme-guide.md
+docs/pink-theme-guide.md
 docs/style-guide.md  
 docs/accessibility-compliance.md
 docs/component-documentation.md
@@ -496,21 +496,21 @@ src/components/ErrorBoundary.tsx
 ### Git Commands for Full Rollback
 ```bash
 # Create rollback branch
-git checkout -b emergency-rollback-purple-theme
+git checkout -b emergency-rollback-pink-theme
 
-# Remove all purple theme files
-git rm docs/purple-theme-guide.md docs/style-guide.md docs/accessibility-compliance.md
+# Remove all pink theme files
+git rm docs/pink-theme-guide.md docs/style-guide.md docs/accessibility-compliance.md
 git rm -rf src/tests/
 
 # Restore original files
-git checkout [pre-purple-commit] -- tailwind.config.js babel.config.js
-git checkout [pre-purple-commit] -- app/ src/screens/ src/components/
+git checkout [pre-pink-commit] -- tailwind.config.js babel.config.js
+git checkout [pre-pink-commit] -- app/ src/screens/ src/components/
 
 # Commit rollback
-git commit -m "Emergency rollback: Remove purple theme implementation"
+git commit -m "Emergency rollback: Remove pink theme implementation"
 
 # Deploy rollback
-git push origin emergency-rollback-purple-theme
+git push origin emergency-rollback-pink-theme
 ```
 
-This comprehensive rollback and migration documentation ensures that the purple theme implementation can be safely reversed if needed and provides a roadmap for future theme migrations with reduced risk and improved processes.
+This comprehensive rollback and migration documentation ensures that the pink theme implementation can be safely reversed if needed and provides a roadmap for future theme migrations with reduced risk and improved processes.

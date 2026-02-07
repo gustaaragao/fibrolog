@@ -42,7 +42,7 @@ export default function DatePicker({
               className={`
                 border-2 rounded-lg px-4 py-3
                 ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}
-                focus:border-purple-600
+                focus:border-pink-600
               `}
               onPress={() => setShowPicker(true)}
             >
