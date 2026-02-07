@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'; import { Stack } from 'expo-router';
+import { View, Text, StyleSheet } from 'react-native';
+import { Stack } from 'expo-router';
 
 export default function Screen() {
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: 'support', headerShown: true }} />
-      <Text style={styles.text}>Bem vindo a página support</Text>
+      <Stack.Screen options={{ title: 'Rede de Apoio', headerShown: true }} />
+      <Text style={styles.text}>Bem-vindo à página de Rede de Apoio</Text>
     </View>
   );
 }

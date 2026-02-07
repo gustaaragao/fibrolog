@@ -10,16 +10,11 @@ import {
 } from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import Toast from "react-native-toast-message";
+import { loginSchema } from "@/validation/schemas";
+import type { LoginFormData } from "@/validation/schemas";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-
-const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -30,21 +25,39 @@ export default function LoginScreen() {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
+  } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
-      senha: "",
+      password: "",
     },
   });
 
-  const handleLogin = async (data: LoginFormValues) => {
+  const handleLogin = async (data: LoginFormData) => {
     setCarregando(true);
     try {
-      await signIn({ email: data.email, senha: data.senha });
+      // Mapear campos do schema (inglês) para API (português)
+      await signIn({ email: data.email, senha: data.password });
       router.replace("/home");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
+      
+      // Determinar tipo de erro e mostrar mensagem apropriada
+      let errorMessage = "Erro ao fazer login. Tente novamente";
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "Email ou senha incorretos";
+      } else if (error?.message?.toLowerCase().includes("network")) {
+        errorMessage = "Erro de conexão. Verifique sua internet";
+      }
+      
+      Toast.show({
+        type: "error",
+        text1: "Erro no Login",
+        text2: errorMessage,
+        position: "top",
+        visibilityTime: 4000,
+      });
     } finally {
       setCarregando(false);
     }
@@ -85,13 +98,13 @@ export default function LoginScreen() {
             />
 
             <Input
-              name="senha"
+              name="password"
               control={control}
               label="Senha"
               placeholder="Digite sua senha"
               secureTextEntry
               autoCapitalize="none"
-              error={errors.senha?.message}
+              error={errors.password?.message}
             />
 
             <View className="mt-8 space-y-4">

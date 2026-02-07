@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'; import { Stack } from 'expo-router';
+import { View, Text, StyleSheet } from 'react-native';
+import { Stack } from 'expo-router';
 
 export default function Screen() {
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: 'history', headerShown: true }} />
-      <Text style={styles.text}>Bem vindo a página history</Text>
+      <Stack.Screen options={{ title: 'Histórico', headerShown: true }} />
+      <Text style={styles.text}>Bem-vindo à página de Histórico</Text>
     </View>
   );
 }

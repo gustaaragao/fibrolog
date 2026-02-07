@@ -33,7 +33,7 @@ export default function TextArea({
               border-2 rounded-lg px-4 py-3 text-base
               ${error ? 'border-red-500' : 'border-gray-300'}
               ${error ? 'bg-red-50' : 'bg-white'}
-              focus:border-pink-600
+              focus:border-pink-500
             `}
             placeholder={placeholder}
             onBlur={onBlur}

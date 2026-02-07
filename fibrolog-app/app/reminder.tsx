@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from 'react-native'; import { Stack } from 'expo-router';
+import { View, Text, StyleSheet } from 'react-native';
+import { Stack } from 'expo-router';
 
 export default function Screen() {
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: 'reminder', headerShown: true }} />
-      <Text style={styles.text}>Bem vindo a página reminder</Text>
+      <Stack.Screen options={{ title: 'Lembretes', headerShown: true }} />
+      <Text style={styles.text}>Bem-vindo à página de Lembretes</Text>
     </View>
   );
 }
