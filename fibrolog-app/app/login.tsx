@@ -47,7 +47,7 @@ export default function LoginScreen() {
       
       if (error?.response?.status === 401) {
         errorMessage = "Email ou senha incorretos";
-      } else if (error?.message?.includes("Network")) {
+      } else if (error?.message?.toLowerCase().includes("network")) {
         errorMessage = "Erro de conexão. Verifique sua internet";
       }
       
