@@ -36,17 +36,20 @@ export default function LoginScreen() {
   const handleLogin = async (data: LoginFormData) => {
     setCarregando(true);
     try {
+      // Mapear campos do schema (inglês) para API (português)
       await signIn({ email: data.email, senha: data.password });
       router.replace("/home");
     } catch (error: any) {
       console.error(error);
       
       // Determinar tipo de erro e mostrar mensagem apropriada
-      const errorMessage = error?.response?.status === 401
-        ? "Email ou senha incorretos"
-        : error?.message?.includes("Network")
-        ? "Erro de conexão. Verifique sua internet"
-        : "Erro ao fazer login. Tente novamente";
+      let errorMessage = "Erro ao fazer login. Tente novamente";
+      
+      if (error?.response?.status === 401) {
+        errorMessage = "Email ou senha incorretos";
+      } else if (error?.message?.includes("Network")) {
+        errorMessage = "Erro de conexão. Verifique sua internet";
+      }
       
       Toast.show({
         type: "error",
