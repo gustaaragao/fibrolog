@@ -25,7 +25,7 @@ export default function Button({
       case 'primary':
         return disabled || loading
           ? 'bg-pink-300'
-          : 'bg-pink-500 active:bg-pink-600';
+          : 'bg-pink-500 active:bg-pink-700';
       case 'secondary':
         return disabled || loading
           ? 'bg-gray-300'

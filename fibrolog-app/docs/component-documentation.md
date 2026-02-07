@@ -28,11 +28,10 @@ import LoginScreen from '@/screens/LoginScreen';
 **Purpose**: User registration interface with modern pink styling
 
 **Theme Updates**:
-- Uses NativeWind classes for pink theming
-- Error states: error-50, error-200, error-700
-- Success states: success-50, success-200, success-700
-- Form styling: pink-200 borders, pink-500 focus
-- Text: pink-800 for labels, pink-600 for secondary
+- Uses `StyleSheet` with pink color palette (consistent with LoginScreen)
+- Error states: Inline validation with pink accent colors
+- Form styling: Pink-themed borders and focus states
+- Text: Pink tones for branding and interactive elements
 
 **Usage**:
 ```typescript
@@ -80,36 +79,16 @@ import AppNavigator from '@/navigation/AppNavigator';
 ```typescript
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fdf2f9', // pink-50
+    backgroundColor: '#ffffff', // white background
   },
-  loadingText: {
-    color: '#b5228a', // pink-600
-  },
-});
-
-// ActivityIndicator color
-<ActivityIndicator size="large" color="#D330AA" />
-```
-
-### ErrorBoundary (`src/components/ErrorBoundary.tsx`)
-**Purpose**: Error boundary with pink themed error display
-
-**Theme Implementation**:
-```typescript
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#fdf2f9', // pink-50
-  },
-  title: {
-    color: '#7d1e60', // pink-800
-  },
-  message: {
-    color: '#b5228a', // pink-600
-  },
-  button: {
-    backgroundColor: '#D330AA', // pink-500
+  brandF: {
+    fontFamily: 'Carattere_400Regular',
+    fontSize: 120,
+    color: '#B1278E', // pink brand color
   },
 });
+
+// Renders "Fibrolog" text with Carattere font
 ```
 
 ### Button Components (`components/ui/Button.tsx`)
