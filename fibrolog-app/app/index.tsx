@@ -19,7 +19,7 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#0066CC" />
+      <ActivityIndicator size="large" color="#D330AA" />
     </View>
   );
 }
@@ -29,6 +29,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
+    backgroundColor: "#fdf2f9", // pink-50
   },
 });

@@ -11,6 +11,8 @@ interface InputProps {
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   error?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
 }
 
 export default function Input({
@@ -21,28 +23,30 @@ export default function Input({
   secureTextEntry = false,
   keyboardType = 'default',
   autoCapitalize = 'sentences',
-  error
+  error,
+  value,
+  onChangeText
 }: InputProps) {
   return (
     <View className="mb-4">
-      <Text className="text-gray-700 font-medium mb-2 text-base">
+      <Text className="text-pink-800 font-semibold mb-2 text-base">
         {label}
       </Text>
       <Controller
         control={control}
         name={name}
-        render={({ field: { onChange, onBlur, value } }) => (
+        render={({ field: { onChange, onBlur, value: fieldValue } }) => (
           <TextInput
             className={`
               border-2 rounded-lg px-4 py-3 text-base
-              ${error ? 'border-red-500' : 'border-gray-300'}
+              ${error ? 'border-red-500' : 'border-pink-200'}
               ${error ? 'bg-red-50' : 'bg-white'}
-              focus:border-purple-600
+              focus:border-pink-500
             `}
             placeholder={placeholder}
             onBlur={onBlur}
-            onChangeText={onChange}
-            value={value}
+            onChangeText={onChangeText || onChange}
+            value={value !== undefined ? value : fieldValue}
             secureTextEntry={secureTextEntry}
             keyboardType={keyboardType}
             autoCapitalize={autoCapitalize}
