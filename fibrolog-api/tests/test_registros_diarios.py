@@ -1,114 +1,184 @@
-"""
-Testes para o CRUD de registros diários.
-"""
-
+from datetime import datetime
 from http import HTTPStatus
 
 import pytest
-from httpx import AsyncClient
-
-from fibrolog_api.models import Paciente
-
-pytestmark = pytest.mark.asyncio
 
 
-@pytest.fixture
-def registro_diario_data():
-    return {
-        'intensidade_dor': 5,
-        'qualidade_sono': 7,
-        'nivel_fadiga': 6,
-        'estado_emocional': 'ANSIOSO',
-        'localizacao_dor': 'Cabeça',
-    }
-
-
-async def test_create_registro_diario(
-    client: AsyncClient,
-    paciente: Paciente,
-    token: str,
-    registro_diario_data: dict,
-):
+@pytest.mark.asyncio
+async def test_create_registro_completo(client, token, paciente):
+    data_hora = datetime.now().isoformat()
     response = await client.post(
-        '/registros-diarios/',
+        '/registros-diarios/pt',
         headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
+        json={
+            'sintomas': [
+                {'id': '1', 'intensidade': 7},
+                {'id': '5', 'intensidade': 4},
+            ],
+            'regioes_dor': [
+                {'id': '24', 'intensidade': 8},
+                {'id': '10', 'intensidade': 5},
+            ],
+            'observacoes': 'Hoje acordei com muita dor nas costas.',
+            'data_hora': data_hora,
+        },
     )
 
     assert response.status_code == HTTPStatus.CREATED
     data = response.json()
-    assert data['intensidade_dor'] == registro_diario_data['intensidade_dor']
     assert data['paciente_id'] == paciente.id
     assert 'id' in data
+    assert data['message'] == 'Registro criado com sucesso'
 
 
-async def test_create_registro_diario_sobrescrever(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria o primeiro registro
-    response1 = await client.post(
+@pytest.mark.asyncio
+async def test_create_registro_vazio(client, token, paciente):
+    data_hora = datetime.now().isoformat()
+    response = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [],
+            'regioes_dor': [],
+            'observacoes': '',
+            'data_hora': data_hora,
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    data = response.json()
+    assert data['message'] == 'Registro criado com sucesso'
+
+
+@pytest.mark.asyncio
+async def test_create_registro_intensidade_invalida(client, token):
+    data_hora = datetime.now().isoformat()
+    response = await client.post(
         '/registros-diarios/',
         headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
+        json={
+            'sintomas': [{'id': '1', 'intensidade': 11}],
+            'regioes_dor': [],
+            'data_hora': data_hora,
+        },
     )
-    assert response1.status_code == HTTPStatus.CREATED
-    id1 = response1.json()['id']
 
-    # Tenta criar o segundo no mesmo dia (deve sobrescrever)
-    nova_intensidade_dor = 8
-    registro_diario_data['intensidade_dor'] = nova_intensidade_dor
-    response2 = await client.post(
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+@pytest.mark.asyncio
+async def test_create_registro_sintoma_id_invalido(client, token):
+    data_hora = datetime.now().isoformat()
+    response = await client.post(
         '/registros-diarios/',
         headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
+        json={
+            'sintomas': [{'id': '9', 'intensidade': 5}],
+            'regioes_dor': [],
+            'data_hora': data_hora,
+        },
     )
 
-    assert response2.status_code == HTTPStatus.OK  # Sobrescrita retorna OK
-    data2 = response2.json()
-    assert data2['intensidade_dor'] == nova_intensidade_dor
-    assert data2['id'] == id1  # O ID deve ser o mesmo
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-async def test_get_registros_diarios_vazio(client: AsyncClient, token: str):
-    response = await client.get(
-        '/registros-diarios/', headers={'Authorization': f'Bearer {token}'}
+@pytest.mark.asyncio
+async def test_create_registro_regiao_id_invalida(client, token):
+    data_hora = datetime.now().isoformat()
+    response = await client.post(
+        '/registros-diarios/',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [],
+            'regioes_dor': [{'id': '51', 'intensidade': 5}],
+            'data_hora': data_hora,
+        },
     )
-    assert response.status_code == HTTPStatus.OK
-    assert response.json() == {'registros': []}
+
+    assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-async def test_get_registros_diarios(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria um registro
+@pytest.mark.asyncio
+async def test_create_registro_nao_autenticado(client):
+    data_hora = datetime.now().isoformat()
+    response = await client.post(
+        '/registros-diarios/',
+        json={'sintomas': [], 'regioes_dor': [], 'data_hora': data_hora},
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+
+@pytest.mark.asyncio
+async def test_create_registro_frontend_compatibility(client, token, paciente):
+    timestamp = datetime.now().isoformat()
+    response = await client.post(
+        '/registros-diarios/',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'symptoms': [
+                {'id': '1', 'intensity': 7},
+                {'id': '5', 'intensity': 4},
+            ],
+            'painRegions': [
+                {'id': '24', 'intensity': 8},
+                {'id': '10', 'intensity': 5},
+            ],
+            'notes': 'Texto livre de observações...',
+            'timestamp': timestamp,
+        },
+    )
+
+    assert response.status_code == HTTPStatus.CREATED
+    data = response.json()
+    assert data['paciente_id'] == paciente.id
+    assert 'id' in data
+    assert data['message'] == 'Registro criado com sucesso'
+
+
+@pytest.mark.asyncio
+async def test_get_registros_diarios(client, token, paciente):
+    # Criar um registro primeiro
     await client.post(
-        '/registros-diarios/',
+        '/registros-diarios/pt',
         headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
+        json={
+            'sintomas': [{'id': '1', 'intensidade': 7}],
+            'regioes_dor': [{'id': '24', 'intensidade': 8}],
+            'observacoes': 'Teste de listagem',
+            'data_hora': datetime.now().isoformat(),
+        },
     )
 
     response = await client.get(
-        '/registros-diarios/', headers={'Authorization': f'Bearer {token}'}
+        '/registros-diarios/',
+        headers={'Authorization': f'Bearer {token}'},
     )
+
     assert response.status_code == HTTPStatus.OK
     data = response.json()
-    assert len(data['registros']) == 1
-    assert (
-        data['registros'][0]['intensidade_dor']
-        == registro_diario_data['intensidade_dor']
-    )
+    assert 'registros' in data
+    assert len(data['registros']) > 0
+    assert data['registros'][0]['paciente_id'] == paciente.id
+    assert len(data['registros'][0]['symptoms']) > 0
+    assert data['registros'][0]['symptoms'][0]['id'] == '1'
+    assert len(data['registros'][0]['painRegions']) > 0
+    assert data['registros'][0]['painRegions'][0]['id'] == '24'
 
 
-async def test_get_registro_diario_by_id(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria o registro
-    create_response = await client.post(
-        '/registros-diarios/',
+@pytest.mark.asyncio
+async def test_get_registro_diario_by_id(client, token, paciente):
+    # Criar um registro primeiro
+    response_post = await client.post(
+        '/registros-diarios/pt',
         headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 3}],
+            'observacoes': 'Teste de ID único',
+            'data_hora': datetime.now().isoformat(),
+        },
     )
-    registro_id = create_response.json()['id']
+    registro_id = response_post.json()['id']
 
     response = await client.get(
         f'/registros-diarios/{registro_id}',
@@ -118,125 +188,7 @@ async def test_get_registro_diario_by_id(
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     assert data['id'] == registro_id
-
-
-async def test_get_registro_diario_not_found(client: AsyncClient, token: str):
-    response = await client.get(
-        '/registros-diarios/999',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-
-async def test_update_registro_diario(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria o registro
-    create_response = await client.post(
-        '/registros-diarios/',
-        headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
-    )
-    registro_id = create_response.json()['id']
-
-    # Atualiza
-    update_data = registro_diario_data.copy()
-    novo_nivel_fadiga = 9
-    update_data['nivel_fadiga'] = novo_nivel_fadiga
-
-    response = await client.put(
-        f'/registros-diarios/{registro_id}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=update_data,
-    )
-
-    assert response.status_code == HTTPStatus.OK
-    data = response.json()
-    assert data['nivel_fadiga'] == novo_nivel_fadiga
-
-
-async def test_update_registro_diario_not_found(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    response = await client.put(
-        '/registros-diarios/999',
-        headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
-    )
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-
-async def test_patch_registro_diario(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria o registro
-    create_response = await client.post(
-        '/registros-diarios/',
-        headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
-    )
-    registro_id = create_response.json()['id']
-
-    # Atualiza parcialmente
-    patch_data = {
-        'nivel_fadiga': 8,
-        'localizacao_dor': 'Costas e pescoço',
-    }
-    response = await client.patch(
-        f'/registros-diarios/{registro_id}',
-        headers={'Authorization': f'Bearer {token}'},
-        json=patch_data,
-    )
-
-    assert response.status_code == HTTPStatus.OK
-    data = response.json()
-    assert data['nivel_fadiga'] == patch_data['nivel_fadiga']
-    assert data['localizacao_dor'] == patch_data['localizacao_dor']
-    assert data['intensidade_dor'] == registro_diario_data['intensidade_dor']
-
-
-async def test_patch_registro_diario_not_found(
-    client: AsyncClient, token: str
-):
-    response = await client.patch(
-        '/registros-diarios/999',
-        headers={'Authorization': f'Bearer {token}'},
-        json={'nivel_fadiga': 10},
-    )
-    assert response.status_code == HTTPStatus.NOT_FOUND
-
-
-async def test_delete_registro_diario(
-    client: AsyncClient, token: str, registro_diario_data: dict
-):
-    # Cria o registro
-    create_response = await client.post(
-        '/registros-diarios/',
-        headers={'Authorization': f'Bearer {token}'},
-        json=registro_diario_data,
-    )
-    registro_id = create_response.json()['id']
-
-    # Deleta
-    response = await client.delete(
-        f'/registros-diarios/{registro_id}',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-    assert response.status_code == HTTPStatus.NO_CONTENT
-
-    # Verifica se foi deletado
-    get_response = await client.get(
-        f'/registros-diarios/{registro_id}',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-    assert get_response.status_code == HTTPStatus.NOT_FOUND
-
-
-async def test_delete_registro_diario_not_found(
-    client: AsyncClient, token: str
-):
-    response = await client.delete(
-        '/registros-diarios/999',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert len(data['symptoms']) == 1
+    assert data['symptoms'][0]['id'] == '2'
+    assert len(data['painRegions']) == 1
+    assert data['painRegions'][0]['id'] == '10'

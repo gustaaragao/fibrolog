@@ -1,6 +1,6 @@
-import React from 'react';
-import { TextInput, Text, View, KeyboardTypeOptions } from 'react-native';
-import { Controller, Control } from 'react-hook-form';
+import React from "react";
+import { Control, Controller } from "react-hook-form";
+import { KeyboardTypeOptions, Text, TextInput, View } from "react-native";
 
 interface InputProps {
   name: string;
@@ -9,7 +9,7 @@ interface InputProps {
   placeholder?: string;
   secureTextEntry?: boolean;
   keyboardType?: KeyboardTypeOptions;
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
   error?: string;
   value?: string;
   onChangeText?: (text: string) => void;
@@ -21,11 +21,11 @@ export default function Input({
   label,
   placeholder,
   secureTextEntry = false,
-  keyboardType = 'default',
-  autoCapitalize = 'sentences',
+  keyboardType = "default",
+  autoCapitalize = "sentences",
   error,
   value,
-  onChangeText
+  onChangeText,
 }: InputProps) {
   return (
     <View className="mb-4">
@@ -37,12 +37,11 @@ export default function Input({
         name={name}
         render={({ field: { onChange, onBlur, value: fieldValue } }) => (
           <TextInput
-            className={`
-              border-2 rounded-lg px-4 py-3 text-base
-              ${error ? 'border-red-500' : 'border-pink-200'}
-              ${error ? 'bg-red-50' : 'bg-white'}
-              focus:border-pink-500
-            `}
+            className={[
+              "border-2 rounded-lg px-4 py-3 text-base",
+              error ? "border-red-500 bg-red-50" : "border-pink-200 bg-white",
+              "focus:border-pink-500",
+            ].join(" ")}
             placeholder={placeholder}
             onBlur={onBlur}
             onChangeText={onChangeText || onChange}
@@ -54,11 +53,7 @@ export default function Input({
           />
         )}
       />
-      {error && (
-        <Text className="text-red-500 text-sm mt-1">
-          {error}
-        </Text>
-      )}
+      {error && <Text className="text-red-500 text-sm mt-1">{error}</Text>}
     </View>
   );
 }

@@ -1,6 +1,12 @@
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import { useAuth } from "@/contexts/auth-context";
+import type { LoginFormData } from "@/src/validation/schemas";
+import { loginSchema } from "@/src/validation/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,13 +14,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import Toast from "react-native-toast-message";
-import { loginSchema } from "@/validation/schemas";
-import type { LoginFormData } from "@/validation/schemas";
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -34,23 +34,33 @@ export default function LoginScreen() {
   });
 
   const handleLogin = async (data: LoginFormData) => {
+    console.log("🚀 Iniciando login com:", {
+      email: data.email,
+      password: "***",
+    });
     setCarregando(true);
     try {
       // Mapear campos do schema (inglês) para API (português)
+      console.log("📤 Chamando signIn...");
       await signIn({ email: data.email, senha: data.password });
+      console.log("✅ signIn completou, navegando para /home");
       router.replace("/home");
     } catch (error: any) {
-      console.error(error);
-      
+      console.error("❌ Erro capturado:", error);
+
       // Determinar tipo de erro e mostrar mensagem apropriada
       let errorMessage = "Erro ao fazer login. Tente novamente";
-      
+
       if (error?.response?.status === 401) {
         errorMessage = "Email ou senha incorretos";
       } else if (error?.message?.toLowerCase().includes("network")) {
         errorMessage = "Erro de conexão. Verifique sua internet";
+      } else if (error?.message) {
+        // Mostrar a mensagem de erro real da API
+        errorMessage = error.message;
       }
-      
+
+      console.log("💬 Mostrando toast:", errorMessage);
       Toast.show({
         type: "error",
         text1: "Erro no Login",
@@ -75,9 +85,9 @@ export default function LoginScreen() {
       >
         <View className="flex-1 justify-center px-10 pb-16">
           <View className="items-center mb-16">
-            <Text 
+            <Text
               className="text-7xl text-pink-800"
-              style={{ fontFamily: 'Carattere_400Regular' }}
+              style={{ fontFamily: "Carattere_400Regular" }}
             >
               FibroLog
             </Text>
