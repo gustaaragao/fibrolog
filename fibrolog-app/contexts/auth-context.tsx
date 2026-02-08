@@ -77,9 +77,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   async function signIn(credenciais: CredenciaisLogin): Promise<void> {
-    console.log("🔑 AuthContext signIn chamado");
+    if (__DEV__) console.log("🔑 AuthContext signIn chamado");
     const resultado = await authService.login(credenciais);
-    console.log("💾 Salvando token no storage...");
+    if (__DEV__) console.log("💾 Salvando token no storage...");
     await storage.setItemAsync("fibrolog_access_token", resultado.token);
     await storage.setItemAsync("fibrolog_user_email", credenciais.email);
     await storage.setItemAsync(
@@ -87,13 +87,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       credenciais.email.split("@")[0],
     );
 
-    console.log("👤 Definindo usuário no estado");
+    if (__DEV__) console.log("👤 Definindo usuário no estado");
     setUsuario({
       id: "user",
       nome: credenciais.email.split("@")[0],
       email: credenciais.email,
     });
-    console.log("✅ signIn completo");
+    if (__DEV__) console.log("✅ signIn completo");
   }
 
   async function signUp(_dados: DadosCadastro): Promise<void> {

@@ -54,16 +54,9 @@ export const DailyLogService = {
    */
   async create(data: DailyLogPayload): Promise<CreateDailyLogResponse> {
     try {
-      // Mapeia de volta para o que o backend espera se necessário, 
-      // ou envia conforme o payload definido.
-      const payload = {
-        ...data,
-        data_registro: data.timestamp,
-      };
-      
       const response = await api.post<CreateDailyLogResponse>(
         "/registros-diarios/",
-        payload,
+        data,
       );
       return response;
     } catch (error) {

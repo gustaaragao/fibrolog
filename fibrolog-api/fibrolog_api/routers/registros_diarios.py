@@ -31,6 +31,53 @@ Session = Annotated[AsyncSession, Depends(get_session)]
 CurrentPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 
+def _mapear_sintomas_para_resposta(sintomas):
+    """Helper para mapear sintomas do modelo para o schema de resposta."""
+    return [
+        {'id': s.sintoma_id, 'intensity': s.intensidade}
+        for s in sintomas
+    ]
+
+
+def _mapear_regioes_para_resposta(regioes_dor):
+    """Helper para mapear regiões de dor do modelo para o schema de resposta."""
+    return [
+        {'id': r.regiao_id, 'intensity': r.intensidade}
+        for r in regioes_dor
+    ]
+
+
+async def _buscar_registro_mesmo_dia(session, paciente_id, data_registro):
+    """
+    Helper para buscar registro existente do mesmo dia (RN006).
+    Retorna o registro se encontrado, None caso contrário.
+    """
+    stmt = (
+        select(RegistroDiario)
+        .where(RegistroDiario.paciente_id == paciente_id)
+        .where(RegistroDiario.tipo_registro == 'diario')
+        .options(selectinload(RegistroDiario.sintomas))
+        .options(selectinload(RegistroDiario.regioes_dor))
+    )
+    result = await session.execute(stmt)
+    registros_existentes = result.scalars().all()
+    
+    # Filtrar registros do mesmo dia
+    for reg in registros_existentes:
+        if reg.data_hora.date() == data_registro:
+            return reg
+    return None
+
+
+async def _limpar_itens_registro(session, registro):
+    """Helper para remover sintomas e regiões antigas de um registro."""
+    for sintoma in registro.sintomas:
+        await session.delete(sintoma)
+    for regiao in registro.regioes_dor:
+        await session.delete(regiao)
+    await session.flush()
+
+
 @router.post(
     '/',
     status_code=HTTPStatus.CREATED,
@@ -43,16 +90,27 @@ async def create_registro_diario(
     session: Session,
     paciente: CurrentPaciente,
 ):
-    # Criar o registro principal (cabeçalho)
-    db_registro = RegistroDiario(
-        paciente_id=paciente.id,
-        tipo_registro='diario',
-        observacoes=registro.notes,
+    # RN006: Verificar se já existe um registro para o mesmo dia
+    data_registro = registro.timestamp.date()
+    db_registro = await _buscar_registro_mesmo_dia(
+        session, paciente.id, data_registro
     )
-    db_registro.data_hora = registro.timestamp
-
-    session.add(db_registro)
-    await session.flush()  # Para obter o ID do registro
+    
+    if db_registro:
+        # Atualizar registro existente (RN006: sobrescrever)
+        db_registro.data_hora = registro.timestamp
+        db_registro.observacoes = registro.notes
+        await _limpar_itens_registro(session, db_registro)
+    else:
+        # Criar novo registro
+        db_registro = RegistroDiario(
+            paciente_id=paciente.id,
+            tipo_registro='diario',
+            observacoes=registro.notes,
+        )
+        db_registro.data_hora = registro.timestamp
+        session.add(db_registro)
+        await session.flush()
 
     # Adicionar sintomas
     for sintoma in registro.symptoms:
@@ -73,13 +131,16 @@ async def create_registro_diario(
         session.add(db_regiao)
 
     await session.commit()
-    await session.refresh(db_registro)
+    await session.refresh(db_registro, ['sintomas', 'regioes_dor'])
 
     return RegistroDiarioPublic(
         id=db_registro.id,
         paciente_id=db_registro.paciente_id,
         data_registro=db_registro.data_hora,
         message='Registro criado com sucesso',
+        symptoms=_mapear_sintomas_para_resposta(db_registro.sintomas),
+        painRegions=_mapear_regioes_para_resposta(db_registro.regioes_dor),
+        notes=db_registro.observacoes,
     )
 
 
@@ -95,16 +156,29 @@ async def create_registro_diario_pt(
     session: Session,
     paciente: CurrentPaciente,
 ):
-    db_registro = RegistroDiario(
-        paciente_id=paciente.id,
-        tipo_registro='diario',
-        observacoes=registro.observacoes,
+    # RN006: Verificar se já existe um registro para o mesmo dia
+    data_registro = registro.data_hora.date()
+    db_registro = await _buscar_registro_mesmo_dia(
+        session, paciente.id, data_registro
     )
-    db_registro.data_hora = registro.data_hora
+    
+    if db_registro:
+        # Atualizar registro existente (RN006: sobrescrever)
+        db_registro.data_hora = registro.data_hora
+        db_registro.observacoes = registro.observacoes
+        await _limpar_itens_registro(session, db_registro)
+    else:
+        # Criar novo registro
+        db_registro = RegistroDiario(
+            paciente_id=paciente.id,
+            tipo_registro='diario',
+            observacoes=registro.observacoes,
+        )
+        db_registro.data_hora = registro.data_hora
+        session.add(db_registro)
+        await session.flush()
 
-    session.add(db_registro)
-    await session.flush()
-
+    # Adicionar sintomas
     for sintoma in registro.sintomas:
         db_sintoma = RegistroSintoma(
             registro_id=db_registro.id,
@@ -113,6 +187,7 @@ async def create_registro_diario_pt(
         )
         session.add(db_sintoma)
 
+    # Adicionar regiões de dor
     for regiao in registro.regioes_dor:
         db_regiao = RegistroRegiaoDor(
             registro_id=db_registro.id,
@@ -122,13 +197,16 @@ async def create_registro_diario_pt(
         session.add(db_regiao)
 
     await session.commit()
-    await session.refresh(db_registro)
+    await session.refresh(db_registro, ['sintomas', 'regioes_dor'])
 
     return RegistroDiarioPublic(
         id=db_registro.id,
         paciente_id=db_registro.paciente_id,
         data_registro=db_registro.data_hora,
         message='Registro criado com sucesso',
+        symptoms=_mapear_sintomas_para_resposta(db_registro.sintomas),
+        painRegions=_mapear_regioes_para_resposta(db_registro.regioes_dor),
+        notes=db_registro.observacoes,
     )
 
 
@@ -158,14 +236,9 @@ async def get_registros_diarios(session: Session, paciente: CurrentPaciente):
                 paciente_id=r.paciente_id,
                 data_registro=r.data_hora,
                 message='Registro recuperado com sucesso',
-                symptoms=[
-                    {'id': s.sintoma_id, 'intensity': s.intensidade}
-                    for s in r.sintomas
-                ],
-                painRegions=[
-                    {'id': p.regiao_id, 'intensity': p.intensidade}
-                    for p in r.regioes_dor
-                ],
+                symptoms=_mapear_sintomas_para_resposta(r.sintomas),
+                painRegions=_mapear_regioes_para_resposta(r.regioes_dor),
+                notes=r.observacoes,
             )
         )
 
@@ -202,12 +275,7 @@ async def get_registro_diario(
         paciente_id=registro.paciente_id,
         data_registro=registro.data_hora,
         message='Registro recuperado com sucesso',
-        symptoms=[
-            {'id': s.sintoma_id, 'intensity': s.intensidade}
-            for s in registro.sintomas
-        ],
-        painRegions=[
-            {'id': p.regiao_id, 'intensity': p.intensidade}
-            for p in registro.regioes_dor
-        ],
+        symptoms=_mapear_sintomas_para_resposta(registro.sintomas),
+        painRegions=_mapear_regioes_para_resposta(registro.regioes_dor),
+        notes=registro.observacoes,
     )
