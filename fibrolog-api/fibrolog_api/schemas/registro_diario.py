@@ -10,12 +10,14 @@ from pydantic import BaseModel, Field
 
 class SymptomEntry(BaseModel):
     """Schema para entrada de um sintoma individual (Frontend compatibility)."""
+    # Padrão valida IDs de 1 a 8
     id: str = Field(..., pattern='^[1-8]$')
     intensity: int = Field(..., ge=0, le=10)
 
 
 class PainRegionEntry(BaseModel):
     """Schema para entrada de uma região de dor individual (Frontend compatibility)."""
+    # Padrão valida IDs de 1 a 50: [1-9] (1-9), [1-4][0-9] (10-49), 50
     id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
     intensity: int = Field(..., ge=0, le=10)
 
