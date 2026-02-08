@@ -1,8 +1,13 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 
-import { api } from '@/services/api';
-import { authService } from '@/services/auth-service';
-import { storage } from '@/utils/storage';
+import { authService } from "@/services/auth-service";
+import { storage } from "@/utils/storage";
 
 type Usuario = {
   id: string;
@@ -45,22 +50,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     async function restaurarSessao() {
       try {
-        const token = await storage.getItemAsync('fibrolog_access_token');
+        const token = await storage.getItemAsync("fibrolog_access_token");
+        const userEmail = await storage.getItemAsync("fibrolog_user_email");
+        const userName = await storage.getItemAsync("fibrolog_user_name");
 
         if (!token) {
           setUsuario(null);
           return;
         }
 
-        // Para simplificar, consideramos token valido e apenas restauramos email generico.
-        // Em uma versao futura, podemos decodificar o JWT ou chamar um endpoint /me.
+        // Restaura sessão com dados armazenados
         setUsuario({
-          id: 'restaurado',
-          nome: 'Usuario',
-          email: 'desconhecido@fibrolog',
+          id: "user",
+          nome: userName || "Usuário",
+          email: userEmail || "usuario@fibrolog.com",
         });
       } catch (erro) {
-        console.error('Erro ao restaurar sessao:', erro);
+        console.error("Erro ao restaurar sessao:", erro);
+        setUsuario(null);
       } finally {
         setCarregandoSessao(false);
       }
@@ -70,43 +77,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   async function signIn(credenciais: CredenciaisLogin): Promise<void> {
+    if (__DEV__) console.log("🔑 AuthContext signIn chamado");
     const resultado = await authService.login(credenciais);
-    await storage.setItemAsync('fibrolog_access_token', resultado.token);
+    if (__DEV__) console.log("💾 Salvando token no storage...");
+    await storage.setItemAsync("fibrolog_access_token", resultado.token);
+    await storage.setItemAsync("fibrolog_user_email", credenciais.email);
+    await storage.setItemAsync(
+      "fibrolog_user_name",
+      credenciais.email.split("@")[0],
+    );
 
-    try {
-      // Busca dados reais do paciente
-      const response = await api.get('/api/pacientes/me');
-      setUsuario({
-        id: response.data.id,
-        nome: response.data.nome,
-        email: response.data.email,
-      });
-    } catch (erro) {
-      console.error('Erro ao buscar dados do paciente:', erro);
-      // Fallback caso a API não responda
-      setUsuario({
-        id: 'temporario',
-        nome: credenciais.email.split('@')[0],
-        email: credenciais.email,
-      });
-    }
+    if (__DEV__) console.log("👤 Definindo usuário no estado");
+    setUsuario({
+      id: "user",
+      nome: credenciais.email.split("@")[0],
+      email: credenciais.email,
+    });
+    if (__DEV__) console.log("✅ signIn completo");
   }
 
   async function signUp(_dados: DadosCadastro): Promise<void> {
     const resultado = await authService.signup(_dados);
+    await storage.setItemAsync("fibrolog_access_token", resultado.token);
+    await storage.setItemAsync("fibrolog_user_email", _dados.email);
+    await storage.setItemAsync("fibrolog_user_name", _dados.nome);
 
     setUsuario({
-      id: 'temporario',
+      id: "user",
       nome: _dados.nome,
       email: _dados.email,
     });
-
-    console.log('Token recebido apos cadastro:', resultado.token, resultado.tipoToken);
   }
 
   async function signOut(): Promise<void> {
-    await storage.deleteItemAsync('fibrolog_access_token');
+    console.log("🚪 SignOut iniciado");
+    console.log("🗑️ Removendo tokens do storage...");
+    await storage.deleteItemAsync("fibrolog_access_token");
+    await storage.deleteItemAsync("fibrolog_user_email");
+    await storage.deleteItemAsync("fibrolog_user_name");
+    console.log("👤 Definindo usuário como null");
     setUsuario(null);
+    console.log("✅ SignOut completo");
   }
 
   return (
@@ -117,7 +128,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         signIn,
         signUp,
         signOut,
-      }}>
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -127,7 +139,7 @@ export function useAuth(): AuthContextValue {
   const contexto = useContext(AuthContext);
 
   if (!contexto) {
-    throw new Error('useAuth deve ser usado dentro de AuthProvider');
+    throw new Error("useAuth deve ser usado dentro de AuthProvider");
   }
 
   return contexto;
