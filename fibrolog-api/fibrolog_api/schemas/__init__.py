@@ -11,24 +11,26 @@ from .paciente import (
     PacienteUpdate,
 )
 from .registro_diario import (
+    EntradaRegiaoDor,
+    EntradaSintoma,
+    RegistroDiarioCreate,
     RegistroDiarioList,
     RegistroDiarioPublic,
-    RegistroDiarioSchema,
-    RegistroDiarioUpdate,
 )
 from .token import Token, TokenData
 
 __all__ = [
+    'EntradaRegiaoDor',
+    'EntradaSintoma',
     'FilterPage',
     'Message',
     'PacienteList',
     'PacientePublic',
     'PacienteSchema',
     'PacienteUpdate',
+    'RegistroDiarioCreate',
     'RegistroDiarioList',
     'RegistroDiarioPublic',
-    'RegistroDiarioSchema',
-    'RegistroDiarioUpdate',
     'Token',
     'TokenData',
 ]

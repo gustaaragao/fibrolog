@@ -3,39 +3,62 @@ Schemas para validação de dados de registros diários.
 """
 
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from fibrolog_api.models import EstadoEmocional
+
+class SymptomEntry(BaseModel):
+    """Schema para entrada de um sintoma individual (Frontend compatibility)."""
+    # Padrão valida IDs de 1 a 8
+    id: str = Field(..., pattern='^[1-8]$')
+    intensity: int = Field(..., ge=0, le=10)
 
 
-class RegistroDiarioSchema(BaseModel):
-    """Schema para criação e atualização de um registro diário."""
-
-    intensidade_dor: int = Field(..., ge=0, le=10)
-    qualidade_sono: int = Field(..., ge=0, le=10)
-    nivel_fadiga: int = Field(..., ge=0, le=10)
-    estado_emocional: EstadoEmocional
-    localizacao_dor: Optional[str] = None
+class PainRegionEntry(BaseModel):
+    """Schema para entrada de uma região de dor individual (Frontend compatibility)."""
+    # Padrão valida IDs de 1 a 50: [1-9] (1-9), [1-4][0-9] (10-49), 50
+    id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
+    intensity: int = Field(..., ge=0, le=10)
 
 
-class RegistroDiarioUpdate(BaseModel):
-    """Schema para atualização parcial de um registro diário."""
-
-    intensidade_dor: Optional[int] = Field(None, ge=0, le=10)
-    qualidade_sono: Optional[int] = Field(None, ge=0, le=10)
-    nivel_fadiga: Optional[int] = Field(None, ge=0, le=10)
-    estado_emocional: Optional[EstadoEmocional] = None
-    localizacao_dor: Optional[str] = None
+class DailyLogCreate(BaseModel):
+    """Schema para criação de um registro diário completo (Frontend compatibility)."""
+    symptoms: List[SymptomEntry]
+    painRegions: List[PainRegionEntry]
+    notes: Optional[str] = None
+    timestamp: datetime
 
 
-class RegistroDiarioPublic(RegistroDiarioSchema):
+class EntradaSintoma(BaseModel):
+    """Schema para entrada de um sintoma individual."""
+    id: str = Field(..., pattern='^[1-8]$')
+    intensidade: int = Field(..., ge=0, le=10)
+
+
+class EntradaRegiaoDor(BaseModel):
+    """Schema para entrada de uma região de dor individual."""
+    id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
+    intensidade: int = Field(..., ge=0, le=10)
+
+
+class RegistroDiarioCreate(BaseModel):
+    """Schema para criação de um registro diário completo."""
+    sintomas: List[EntradaSintoma]
+    regioes_dor: List[EntradaRegiaoDor]
+    observacoes: Optional[str] = None
+    data_hora: datetime
+
+
+class RegistroDiarioPublic(BaseModel):
     """Schema para retorno público de um registro diário."""
-
     id: int
     paciente_id: int
-    data_hora: datetime
+    data_registro: datetime
+    message: str = 'Registro recuperado com sucesso'
+    symptoms: List[SymptomEntry] = Field(default_factory=list)
+    painRegions: List[PainRegionEntry] = Field(default_factory=list)
+    notes: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -43,5 +66,10 @@ class RegistroDiarioPublic(RegistroDiarioSchema):
 
 class RegistroDiarioList(BaseModel):
     """Schema para listagem de registros diários."""
+    registros: List[RegistroDiarioPublic]
 
-    registros: list[RegistroDiarioPublic]
+
+class DailyLogResponse(BaseModel):
+    """Schema para resposta de criação de um registro diário (Frontend compatibility)."""
+    id: int
+    message: str = 'Registro criado com sucesso'

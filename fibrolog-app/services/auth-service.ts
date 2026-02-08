@@ -1,5 +1,5 @@
-import { API_BASE_URL } from '@/constants/api';
-import { api } from '@/services/api';
+import { API_BASE_URL } from "@/constants/api";
+import { api } from "@/services/api";
 
 type AuthTokenResponse = {
   access_token: string;
@@ -28,32 +28,55 @@ export type ResultadoAuth = {
 async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
   try {
     const body = new URLSearchParams();
-    body.append('username', credenciais.email);
-    body.append('password', credenciais.senha);
+    body.append("username", credenciais.email);
+    body.append("password", credenciais.senha);
+
+    if (__DEV__) {
+      console.log("🔐 Tentando login com:", {
+        email: credenciais.email,
+        url: `${API_BASE_URL}/auth/token`,
+      });
+    }
 
     const response = await fetch(`${API_BASE_URL}/auth/token`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: body.toString(),
     });
 
-    const data = (await response.json()) as AuthTokenResponse | { detail?: string };
-    const detalheErro = 'detail' in data ? data.detail : undefined;
+    if (__DEV__) {
+      console.log("📡 Resposta da API:", {
+        status: response.status,
+        ok: response.ok,
+      });
+    }
+
+    const data = (await response.json()) as
+      | AuthTokenResponse
+      | { detail?: string };
+    if (__DEV__) console.log("📦 Dados recebidos:", data);
+
+    const detalheErro = "detail" in data ? data.detail : undefined;
 
     if (!response.ok) {
-      const mensagem = detalheErro || 'Nao foi possivel realizar o login.';
+      const mensagem = detalheErro || "Nao foi possivel realizar o login.";
+      if (__DEV__) console.error("❌ Erro de autenticação:", mensagem);
       throw new Error(mensagem);
     }
 
+    if (__DEV__) console.log("✅ Login bem-sucedido!");
     return {
       token: (data as AuthTokenResponse).access_token,
       tipoToken: (data as AuthTokenResponse).token_type,
     };
   } catch (erro) {
+    if (__DEV__) console.error("💥 Erro no login:", erro);
     const mensagemBase =
-      erro instanceof Error && erro.message ? erro.message : 'Erro ao comunicar com o servidor de autenticacao.';
+      erro instanceof Error && erro.message
+        ? erro.message
+        : "Erro ao comunicar com o servidor de autenticacao.";
     throw new Error(mensagemBase);
   }
 }
@@ -75,17 +98,20 @@ async function signup(dados: DadosCadastro): Promise<ResultadoAuth> {
   };
 
   try {
-    const criado = await api.post<PacienteCriadoResponse>('/pacientes/', body);
+    const criado = await api.post<PacienteCriadoResponse>("/pacientes/", body);
 
     // Opcao simples: apos criar paciente, realizar login automatico
-    const resultadoLogin = await login({ email: dados.email, senha: dados.senha });
+    const resultadoLogin = await login({
+      email: dados.email,
+      senha: dados.senha,
+    });
 
     return resultadoLogin;
   } catch (erro) {
     const mensagemBase =
       erro instanceof Error && erro.message
         ? erro.message
-        : 'Nao foi possivel criar a conta. Verifique os dados informados.';
+        : "Nao foi possivel criar a conta. Verifique os dados informados.";
     throw new Error(mensagemBase);
   }
 }

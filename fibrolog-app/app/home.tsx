@@ -1,26 +1,29 @@
 import { useAuth } from "@/contexts/auth-context";
-import { useRouter, Stack } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View, Alert, ScrollView } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { Stack, useRouter } from "expo-router";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function HomeScreen() {
   const { usuario, signOut } = useAuth();
   const router = useRouter();
 
-  const handleLogoutPress = () => {
-    Alert.alert(
-      "Sair",
-      "Tem certeza que deseja sair?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Sair", style: "destructive", onPress: performLogout }
-      ]
-    );
-  };
-
-  const performLogout = async () => {
-    await signOut();
-    router.replace("/login");
+  const handleLogoutPress = async () => {
+    console.log("🚪 Botão de logout clicado");
+    console.log("🔓 Executando logout...");
+    try {
+      await signOut();
+      console.log("✅ SignOut completo, navegando para login...");
+      router.replace("/login");
+      console.log("✅ Navegação completa");
+    } catch (error) {
+      console.error("❌ Erro no logout:", error);
+    }
   };
 
   const menuItems = [
@@ -40,19 +43,22 @@ export default function HomeScreen() {
         options={{
           title: "FibroLog",
           headerRight: () => (
-            <TouchableOpacity onPress={handleLogoutPress} style={{ marginRight: 15 }}>
-              <MaterialIcons name="logout" size={24} color="#7d1e60" />
+            <TouchableOpacity
+              onPress={handleLogoutPress}
+              style={{ marginRight: 15 }}
+            >
+              <MaterialIcons name="logout" size={24} color="#ffffff" />
             </TouchableOpacity>
           ),
           headerShown: true,
-          headerTintColor: "#7d1e60",
-          headerTitleStyle: { fontWeight: "bold" },
           headerBackVisible: false, // Prevent going back to login if stack allows
         }}
       />
 
       <View style={styles.header}>
-        <Text style={styles.welcomeText}>Olá, {usuario?.email?.split('@')[0] || 'Usuário'}</Text>
+        <Text style={styles.welcomeText}>
+          Olá, {usuario?.email?.split("@")[0] || "Usuário"}
+        </Text>
         <Text style={styles.subText}>Como você está se sentindo hoje?</Text>
       </View>
 
@@ -64,7 +70,11 @@ export default function HomeScreen() {
             onPress={() => router.push(item.route as any)}
           >
             <View style={styles.iconContainer}>
-              <MaterialIcons name={item.icon as any} size={32} color="#7d1e60" />
+              <MaterialIcons
+                name={item.icon as any}
+                size={32}
+                color="#7d1e60"
+              />
             </View>
             <Text style={styles.cardText}>{item.name}</Text>
           </TouchableOpacity>
