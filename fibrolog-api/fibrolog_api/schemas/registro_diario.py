@@ -10,13 +10,13 @@ from pydantic import BaseModel, Field
 
 class SymptomEntry(BaseModel):
     """Schema para entrada de um sintoma individual (Frontend compatibility)."""
-    id: str
+    id: str = Field(..., pattern='^[1-8]$')
     intensity: int = Field(..., ge=0, le=10)
 
 
 class PainRegionEntry(BaseModel):
     """Schema para entrada de uma região de dor individual (Frontend compatibility)."""
-    id: str
+    id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
     intensity: int = Field(..., ge=0, le=10)
 
 
@@ -54,8 +54,9 @@ class RegistroDiarioPublic(BaseModel):
     paciente_id: int
     data_registro: datetime
     message: str = 'Registro recuperado com sucesso'
-    symptoms: List[SymptomEntry] = []
-    painRegions: List[PainRegionEntry] = []
+    symptoms: List[SymptomEntry] = Field(default_factory=list)
+    painRegions: List[PainRegionEntry] = Field(default_factory=list)
+    notes: Optional[str] = None
 
     class Config:
         from_attributes = True

@@ -34,19 +34,21 @@ export default function LoginScreen() {
   });
 
   const handleLogin = async (data: LoginFormData) => {
-    console.log("🚀 Iniciando login com:", {
-      email: data.email,
-      password: "***",
-    });
+    if (__DEV__) {
+      console.log("🚀 Iniciando login com:", {
+        email: data.email,
+        password: "***",
+      });
+    }
     setCarregando(true);
     try {
       // Mapear campos do schema (inglês) para API (português)
-      console.log("📤 Chamando signIn...");
+      if (__DEV__) console.log("📤 Chamando signIn...");
       await signIn({ email: data.email, senha: data.password });
-      console.log("✅ signIn completou, navegando para /home");
+      if (__DEV__) console.log("✅ signIn completou, navegando para /home");
       router.replace("/home");
     } catch (error: any) {
-      console.error("❌ Erro capturado:", error);
+      if (__DEV__) console.error("❌ Erro capturado:", error);
 
       // Determinar tipo de erro e mostrar mensagem apropriada
       let errorMessage = "Erro ao fazer login. Tente novamente";

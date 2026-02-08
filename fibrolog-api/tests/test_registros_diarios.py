@@ -57,9 +57,9 @@ async def test_create_registro_intensidade_invalida(client, token):
         '/registros-diarios/',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'sintomas': [{'id': '1', 'intensidade': 11}],
-            'regioes_dor': [],
-            'data_hora': data_hora,
+            'symptoms': [{'id': '1', 'intensity': 11}],
+            'painRegions': [],
+            'timestamp': data_hora,
         },
     )
 
@@ -73,9 +73,9 @@ async def test_create_registro_sintoma_id_invalido(client, token):
         '/registros-diarios/',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'sintomas': [{'id': '9', 'intensidade': 5}],
-            'regioes_dor': [],
-            'data_hora': data_hora,
+            'symptoms': [{'id': '9', 'intensity': 5}],
+            'painRegions': [],
+            'timestamp': data_hora,
         },
     )
 
@@ -89,9 +89,9 @@ async def test_create_registro_regiao_id_invalida(client, token):
         '/registros-diarios/',
         headers={'Authorization': f'Bearer {token}'},
         json={
-            'sintomas': [],
-            'regioes_dor': [{'id': '51', 'intensidade': 5}],
-            'data_hora': data_hora,
+            'symptoms': [],
+            'painRegions': [{'id': '51', 'intensity': 5}],
+            'timestamp': data_hora,
         },
     )
 
@@ -192,3 +192,65 @@ async def test_get_registro_diario_by_id(client, token, paciente):
     assert data['symptoms'][0]['id'] == '2'
     assert len(data['painRegions']) == 1
     assert data['painRegions'][0]['id'] == '10'
+
+
+@pytest.mark.asyncio
+async def test_rn006_upsert_registro_mesmo_dia(client, token, paciente):
+    """RN006: Apenas 1 registro por dia - deve sobrescrever o existente."""
+    # Criar o primeiro registro
+    data_hoje = datetime.now()
+    response1 = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '1', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 6}],
+            'observacoes': 'Primeira versão',
+            'data_hora': data_hoje.isoformat(),
+        },
+    )
+    assert response1.status_code == HTTPStatus.CREATED
+    primeiro_id = response1.json()['id']
+
+    # Criar segundo registro no mesmo dia (deve sobrescrever)
+    response2 = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 8}],
+            'regioes_dor': [{'id': '20', 'intensidade': 9}],
+            'observacoes': 'Segunda versão (sobrescrita)',
+            'data_hora': data_hoje.isoformat(),
+        },
+    )
+    assert response2.status_code == HTTPStatus.CREATED
+    segundo_id = response2.json()['id']
+
+    # O ID deve ser o mesmo (sobrescreveu)
+    assert primeiro_id == segundo_id
+
+    # Listar todos os registros do paciente
+    response_list = await client.get(
+        '/registros-diarios/',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response_list.status_code == HTTPStatus.OK
+    registros = response_list.json()['registros']
+
+    # Deve ter apenas 1 registro para hoje
+    registros_hoje = [
+        r for r in registros 
+        if datetime.fromisoformat(r['data_registro']).date() == data_hoje.date()
+    ]
+    assert len(registros_hoje) == 1
+
+    # E os dados devem ser da segunda versão
+    registro = registros_hoje[0]
+    assert registro['id'] == primeiro_id
+    assert len(registro['symptoms']) == 1
+    assert registro['symptoms'][0]['id'] == '2'
+    assert registro['symptoms'][0]['intensity'] == 8
+    assert len(registro['painRegions']) == 1
+    assert registro['painRegions'][0]['id'] == '20'
+    assert registro['painRegions'][0]['intensity'] == 9
+    assert registro['notes'] == 'Segunda versão (sobrescrita)'
