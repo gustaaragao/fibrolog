@@ -170,9 +170,7 @@ export default function SymptomsScreen() {
           intensity: regionIntensities[id] || 4,
         })),
         notes: data.notes,
-        timestamp: isEditing && originalTimestamp 
-          ? originalTimestamp 
-          : new Date().toISOString(),
+        timestamp: originalTimestamp ?? new Date().toISOString(),
       };
 
       if (isEditing) {
