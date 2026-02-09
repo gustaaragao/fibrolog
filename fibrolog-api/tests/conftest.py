@@ -96,3 +96,8 @@ async def other_paciente(session):
 @pytest_asyncio.fixture
 async def token(paciente):
     return create_access_token(data={'sub': paciente.email})
+
+
+@pytest_asyncio.fixture
+async def other_token(other_paciente):
+    return create_access_token(data={'sub': other_paciente.email})

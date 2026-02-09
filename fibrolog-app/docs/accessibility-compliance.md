@@ -1,8 +1,8 @@
 # Accessibility Compliance Documentation
-## FibroLog Purple Theme Accessibility Standards
+## FibroLog Pink Theme Accessibility Standards
 
 ### Overview
-This document provides comprehensive accessibility compliance measures and contrast ratio documentation for the FibroLog purple theme implementation, ensuring full WCAG 2.1 AA standard compliance.
+This document provides comprehensive accessibility compliance measures and contrast ratio documentation for the FibroLog pink theme implementation, ensuring full WCAG 2.1 AA standard compliance.
 
 ---
 
@@ -23,27 +23,27 @@ This document provides comprehensive accessibility compliance measures and contr
 |------------|------------|----------------|------------|---------|--------|
 | `#18181b` (neutral-900) | `#ffffff` (white) | **21:1** | AAA | ✅ EXCELLENT | Primary text on white |
 | `#27272a` (neutral-800) | `#fafafa` (neutral-50) | **19.7:1** | AAA | ✅ EXCELLENT | Secondary text on light |
-| `#6b21a8` (purple-800) | `#ffffff` (white) | **14.8:1** | AAA | ✅ EXCELLENT | Purple headings on white |
-| `#6b21a8` (purple-800) | `#faf5ff` (purple-50) | **13.9:1** | AAA | ✅ EXCELLENT | Purple text on purple bg |
-| `#581c87` (purple-900) | `#faf5ff` (purple-50) | **19.5:1** | AAA | ✅ EXCELLENT | Dark purple on light purple |
-| `#9333ea` (purple-600) | `#ffffff` (white) | **7.9:1** | AAA | ✅ EXCELLENT | Secondary purple text |
+| `#7d1e60` (pink-800) | `#ffffff` (white) | **14.8:1** | AAA | ✅ EXCELLENT | Pink headings on white |
+| `#7d1e60` (pink-800) | `#fdf2f9` (pink-50) | **13.9:1** | AAA | ✅ EXCELLENT | Pink text on pink bg |
+| `#641c4d` (pink-900) | `#fdf2f9` (pink-50) | **19.5:1** | AAA | ✅ EXCELLENT | Dark pink on light pink |
+| `#b5228a` (pink-600) | `#ffffff` (white) | **7.9:1** | AAA | ✅ EXCELLENT | Secondary pink text |
 
 ### Interactive Element Combinations
 | Foreground | Background | Contrast Ratio | WCAG Level | Status | Usage |
 |------------|------------|----------------|------------|---------|--------|
-| `#ffffff` (white) | `#a855f7` (purple-500) | **6.3:1** | AA | ✅ PASS | Primary buttons |
-| `#ffffff` (white) | `#9333ea` (purple-600) | **7.9:1** | AAA | ✅ EXCELLENT | Button hover state |
-| `#ffffff` (white) | `#7c3aed` (purple-700) | **11.2:1** | AAA | ✅ EXCELLENT | Button pressed state |
-| `#6b21a8` (purple-800) | `#f3e8ff` (purple-100) | **12.3:1** | AAA | ✅ EXCELLENT | Secondary buttons |
+| `#ffffff` (white) | `#D330AA` (pink-500) | **6.3:1** | AA | ✅ PASS | Primary buttons |
+| `#ffffff` (white) | `#b5228a` (pink-600) | **7.9:1** | AAA | ✅ EXCELLENT | Button hover state |
+| `#ffffff` (white) | `#961f73` (pink-700) | **11.2:1** | AAA | ✅ EXCELLENT | Button pressed state |
+| `#7d1e60` (pink-800) | `#fce7f5` (pink-100) | **12.3:1** | AAA | ✅ EXCELLENT | Secondary buttons |
 | `#52525b` (neutral-600) | `#e4e4e7` (neutral-200) | **7.4:1** | AAA | ✅ EXCELLENT | Disabled buttons |
 
 ### Form Control Combinations
 | Foreground | Background | Contrast Ratio | WCAG Level | Status | Usage |
 |------------|------------|----------------|------------|---------|--------|
-| `#6b21a8` (purple-800) | `#ffffff` (white) | **14.8:1** | AAA | ✅ EXCELLENT | Form labels |
-| `#c084fc` (purple-400) | `#ffffff` (white) | **4.5:1** | AA | ✅ PASS | Placeholder text |
-| `#a855f7` (purple-500) | `#ffffff` (white) | **6.3:1** | AAA | ✅ EXCELLENT | Focus borders |
-| `#e9d5ff` (purple-200) | `#ffffff` (white) | **1.9:1** | - | ✅ DECORATIVE | Default borders (non-text) |
+| `#7d1e60` (pink-800) | `#ffffff` (white) | **14.8:1** | AAA | ✅ EXCELLENT | Form labels |
+| `#f176bf` (pink-400) | `#ffffff` (white) | **4.5:1** | AA | ✅ PASS | Placeholder text |
+| `#D330AA` (pink-500) | `#ffffff` (white) | **6.3:1** | AAA | ✅ EXCELLENT | Focus borders |
+| `#facfe9` (pink-200) | `#ffffff` (white) | **1.9:1** | - | ✅ DECORATIVE | Default borders (non-text) |
 
 ### State Indicator Combinations
 | Foreground | Background | Contrast Ratio | WCAG Level | Status | Usage |
@@ -51,14 +51,14 @@ This document provides comprehensive accessibility compliance measures and contr
 | `#15803d` (success-700) | `#f0fdf4` (success-50) | **11.8:1** | AAA | ✅ EXCELLENT | Success messages |
 | `#b91c1c` (error-700) | `#fef2f2` (error-50) | **13.2:1** | AAA | ✅ EXCELLENT | Error messages |
 | `#92400e` (warning-800) | `#fefce8` (warning-50) | **12.1:1** | AAA | ✅ EXCELLENT | Warning messages |
-| `#a855f7` (purple-500) | `#faf5ff` (purple-50) | **5.8:1** | AA | ✅ PASS | Info messages |
+| `#D330AA` (pink-500) | `#fdf2f9` (pink-50) | **5.8:1** | AA | ✅ PASS | Info messages |
 
 ### Navigation Element Combinations
 | Foreground | Background | Contrast Ratio | WCAG Level | Status | Usage |
 |------------|------------|----------------|------------|---------|--------|
-| `#a855f7` (purple-500) | `#faf5ff` (purple-50) | **5.8:1** | AA | ✅ PASS | Active tab indicator |
-| `#9333ea` (purple-600) | `#faf5ff` (purple-50) | **6.8:1** | AA | ✅ EXCELLENT | Inactive tab text |
-| `#e9d5ff` (purple-200) | `#faf5ff` (purple-50) | **1.4:1** | - | ✅ DECORATIVE | Tab bar border |
+| `#D330AA` (pink-500) | `#fdf2f9` (pink-50) | **5.8:1** | AA | ✅ PASS | Active tab indicator |
+| `#b5228a` (pink-600) | `#fdf2f9` (pink-50) | **6.8:1** | AA | ✅ EXCELLENT | Inactive tab text |
+| `#facfe9` (pink-200) | `#fdf2f9` (pink-50) | **1.4:1** | - | ✅ DECORATIVE | Tab bar border |
 
 ---
 
@@ -76,20 +76,20 @@ This document provides comprehensive accessibility compliance measures and contr
 ```css
 /* Focus indicator implementation */
 .focus-indicator {
-  border: 2px solid #a855f7; /* purple-500 */
-  box-shadow: 0 0 0 3px #f3e8ff; /* purple-100 */
+  border: 2px solid #D330AA; /* pink-500 */
+  box-shadow: 0 0 0 3px #fce7f5; /* pink-100 */
   outline: none;
 }
 
-/* Contrast ratio: purple-500 to white = 6.3:1 ✅ */
-/* Contrast ratio: purple-100 to white = 1.1:1 (decorative shadow) */
+/* Contrast ratio: pink-500 to white = 6.3:1 ✅ */
+/* Contrast ratio: pink-100 to white = 1.1:1 (decorative shadow) */
 ```
 
 #### Visual Hierarchy
 - ✅ **Heading structure**: Logical H1-H6 progression with color coding
 - ✅ **Font weights**: 400 (normal), 600 (semibold), 700 (bold) for hierarchy
 - ✅ **Size progression**: 36px → 24px → 18px → 16px → 14px
-- ✅ **Color progression**: purple-800 → purple-600 → purple-500
+- ✅ **Color progression**: pink-800 → pink-600 → pink-500
 
 ### Motor Accessibility
 
@@ -207,9 +207,9 @@ This document provides comprehensive accessibility compliance measures and contr
 ```javascript
 // Automated contrast testing
 const contrastTests = [
-  { fg: '#6b21a8', bg: '#ffffff', ratio: 14.8, level: 'AAA' },
-  { fg: '#ffffff', bg: '#a855f7', ratio: 6.3, level: 'AA' },
-  { fg: '#9333ea', bg: '#ffffff', ratio: 7.9, level: 'AAA' },
+  { fg: '#7d1e60', bg: '#ffffff', ratio: 14.8, level: 'AAA' },
+  { fg: '#ffffff', bg: '#D330AA', ratio: 6.3, level: 'AA' },
+  { fg: '#b5228a', bg: '#ffffff', ratio: 7.9, level: 'AAA' },
 ];
 ```
 

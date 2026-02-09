@@ -252,7 +252,7 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#faf5ff', // purple-50
+    backgroundColor: '#fdf2f9', // pink-50
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -271,13 +271,13 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#9333ea', // purple-600
+    color: '#b5228a', // pink-600
     marginBottom: 48,
   },
   errorContainer: {
@@ -312,18 +312,18 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     marginBottom: 8,
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#e9d5ff', // purple-200
+    borderColor: '#facfe9', // pink-200
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
   },
   inputError: {
     borderColor: '#ef4444', // error-500
@@ -334,14 +334,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   registerButton: {
-    backgroundColor: '#a855f7', // purple-500
+    backgroundColor: '#D330AA', // pink-500
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 16,
   },
   registerButtonDisabled: {
-    backgroundColor: '#d8b4fe', // purple-300 for disabled state
+    backgroundColor: '#f7a9d7', // pink-300 for disabled state
   },
   registerButtonText: {
     color: '#fff',
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loginButtonText: {
-    color: '#9333ea', // purple-600
+    color: '#b5228a', // pink-600
     fontSize: 16,
     fontWeight: '500',
   },

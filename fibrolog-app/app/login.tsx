@@ -1,38 +1,64 @@
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import { useAuth } from "@/contexts/auth-context";
+import type { LoginFormData } from "@/src/validation/schemas";
+import { loginSchema } from "@/src/validation/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Alert,
     KeyboardAvoidingView,
     Platform,
     SafeAreaView,
-    StyleSheet,
     Text,
-    TextInput,
-    TouchableOpacity,
     View,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [carregando, setCarregando] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
+  const [carregando, setCarregando] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !senha) {
-      Alert.alert("Erro", "Por favor, preencha todos os campos");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const handleLogin = async (data: LoginFormData) => {
     setCarregando(true);
     try {
-      await signIn({ email, senha });
+      // Mapear campos do schema (inglês) para API (português)
+      await signIn({ email: data.email, senha: data.password });
       router.replace("/home");
-    } catch (error) {
-      Alert.alert("Erro", "Email ou senha incorretos");
+    } catch (error: any) {
+      // Determinar tipo de erro e mostrar mensagem apropriada
+      let errorMessage = "Erro ao fazer login. Tente novamente";
+
+      if (error?.response?.status === 401) {
+        errorMessage = "Email ou senha incorretos";
+      } else if (error?.message?.toLowerCase().includes("network")) {
+        errorMessage = "Erro de conexão. Verifique sua internet";
+      } else if (error?.message) {
+        // Mostrar a mensagem de erro real da API
+        errorMessage = error.message;
+      }
+
+      Toast.show({
+        type: "error",
+        text1: "Erro no Login",
+        text2: errorMessage,
+        position: "top",
+        visibilityTime: 4000,
+      });
     } finally {
       setCarregando(false);
     }
@@ -43,143 +69,62 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-pink-50">
       <KeyboardAvoidingView
-        style={styles.keyboardAvoidingView}
+        className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>FibroLog</Text>
-          <Text style={styles.subtitle}>Entre na sua conta</Text>
+        <View className="flex-1 justify-center px-10 pb-16">
+          <View className="items-center mb-16">
+            <Text
+              className="text-7xl text-pink-800"
+              style={{ fontFamily: "Carattere_400Regular" }}
+            >
+              FibroLog
+            </Text>
+            <Text className="text-xl text-pink-600 mt-2 font-medium">
+              Entre na sua conta
+            </Text>
+          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
+          <View className="space-y-6">
+            <Input
+              name="email"
+              control={control}
+              label="Email"
               placeholder="Digite seu email"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              autoCorrect={false}
-              editable={!carregando}
+              error={errors.email?.message}
             />
-          </View>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              style={styles.input}
+            <Input
+              name="password"
+              control={control}
+              label="Senha"
               placeholder="Digite sua senha"
-              placeholderTextColor="#999"
-              value={senha}
-              onChangeText={setSenha}
               secureTextEntry
               autoCapitalize="none"
-              autoCorrect={false}
-              editable={!carregando}
+              error={errors.password?.message}
             />
+
+            <View className="mt-8 space-y-4">
+              <Button
+                title="Entrar"
+                onPress={handleSubmit(handleLogin)}
+                loading={carregando}
+                size="lg"
+              />
+
+              <Button
+                title="Não tem uma conta? Cadastre-se"
+                onPress={handleGoToRegister}
+                variant="text"
+              />
+            </View>
           </View>
-
-          <TouchableOpacity
-            style={[
-              styles.loginButton,
-              carregando && styles.loginButtonDisabled,
-            ]}
-            onPress={handleLogin}
-            disabled={carregando}
-          >
-            {carregando ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.loginButtonText}>Entrar</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.registerButton}
-            onPress={handleGoToRegister}
-            disabled={carregando}
-          >
-            <Text style={styles.registerButtonText}>
-              Não tem uma conta? Cadastre-se
-            </Text>
-          </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#faf5ff", // purple-50
-  },
-  keyboardAvoidingView: {
-    flex: 1,
-  },
-  formContainer: {
-    flex: 1,
-    justifyContent: "center",
-    paddingHorizontal: 32,
-    paddingBottom: 50,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    textAlign: "center",
-    color: "#6b21a8", // purple-800
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: "center",
-    color: "#9333ea", // purple-600
-    marginBottom: 48,
-  },
-  inputContainer: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#6b21a8", // purple-800
-    marginBottom: 8,
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e9d5ff", // purple-200
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: "#6b21a8", // purple-800
-  },
-  loginButton: {
-    backgroundColor: "#a855f7", // purple-500
-    borderRadius: 8,
-    paddingVertical: 16,
-    alignItems: "center",
-    marginTop: 16,
-  },
-  loginButtonDisabled: {
-    backgroundColor: "#d8b4fe", // purple-300 for disabled state
-  },
-  loginButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  registerButton: {
-    marginTop: 24,
-    alignItems: "center",
-  },
-  registerButtonText: {
-    color: "#9333ea", // purple-600
-    fontSize: 16,
-    fontWeight: "500",
-  },
-});

@@ -119,6 +119,11 @@ class Registro:
         back_populates='registros', init=False
     )
 
+    __mapper_args__ = {
+        'polymorphic_on': 'tipo_registro',
+        'polymorphic_identity': 'registro',
+    }
+
 
 @table_registry.mapped_as_dataclass
 class RegistroDiario(Registro):
@@ -127,12 +132,53 @@ class RegistroDiario(Registro):
     id: Mapped[int] = mapped_column(
         ForeignKey('registros.id'), primary_key=True, init=False
     )
-    # Escala NRS 0-10
-    intensidade_dor: Mapped[int]
-    qualidade_sono: Mapped[int]
-    nivel_fadiga: Mapped[int]
-    estado_emocional: Mapped[EstadoEmocional]
-    localizacao_dor: Mapped[Optional[str]] = mapped_column(default=None)
+    observacoes: Mapped[Optional[str]] = mapped_column(
+        Text, default=None, init=True
+    )
+
+    # Relacionamentos
+    sintomas: Mapped[List['RegistroSintoma']] = relationship(
+        back_populates='registro', cascade='all, delete-orphan', init=False
+    )
+    regioes_dor: Mapped[List['RegistroRegiaoDor']] = relationship(
+        back_populates='registro', cascade='all, delete-orphan', init=False
+    )
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'diario',
+    }
+
+
+@table_registry.mapped_as_dataclass
+class RegistroSintoma:
+    __tablename__ = 'registro_sintomas'
+
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    registro_id: Mapped[int] = mapped_column(
+        ForeignKey('registros_diarios.id')
+    )
+    sintoma_id: Mapped[str] = mapped_column(String(10))
+    intensidade: Mapped[int]
+
+    registro: Mapped['RegistroDiario'] = relationship(
+        back_populates='sintomas', init=False
+    )
+
+
+@table_registry.mapped_as_dataclass
+class RegistroRegiaoDor:
+    __tablename__ = 'registro_regioes_dor'
+
+    id: Mapped[int] = mapped_column(primary_key=True, init=False)
+    registro_id: Mapped[int] = mapped_column(
+        ForeignKey('registros_diarios.id')
+    )
+    regiao_id: Mapped[str] = mapped_column(String(10))
+    intensidade: Mapped[int]
+
+    registro: Mapped['RegistroDiario'] = relationship(
+        back_populates='regioes_dor', init=False
+    )
 
 
 @table_registry.mapped_as_dataclass
@@ -144,3 +190,12 @@ class RegistroCrise(Registro):
     )
     intensidade_dor: Mapped[int]
     contexto: Mapped[str] = mapped_column(Text)
+    duracao: Mapped[Optional[str]] = mapped_column(String, default=None)
+    sintomas_relatados: Mapped[Optional[str]] = mapped_column(
+        Text, default=None
+    )
+    observacoes: Mapped[Optional[str]] = mapped_column(Text, default=None)
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'crise',
+    }

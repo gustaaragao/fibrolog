@@ -1,25 +1,38 @@
 import React from 'react';
-import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 export const LoadingScreen: React.FC = () => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#a855f7" />
-      <Text style={styles.loadingText}>Carregando...</Text>
+      <View style={styles.brandContainer}>
+        <Text style={styles.brandF}>Fibrolog</Text>
+      </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#faf5ff', // purple-50
+    backgroundColor: '#ffffff',
   },
-  loadingText: {
-    marginTop: 16,
-    fontSize: 16,
-    color: '#9333ea', // purple-600
+  brandContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  brandF: {
+    fontFamily: 'Carattere_400Regular',
+    fontSize: 120,
+    color: '#B1278E',
+    lineHeight: 140,
+  },
+  brandText: {
+    fontFamily: 'Carattere_400Regular',
+    fontSize: 48,
+    color: '#B1278E',
+    marginTop: -20,
   },
 });

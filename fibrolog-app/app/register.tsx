@@ -2,106 +2,92 @@ import { useAuth } from "@/contexts/auth-context";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
+  SafeAreaView,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import Toast from "react-native-toast-message";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+
+const registrationSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("Email inválido"),
+  dataNascimento: z.string().length(10, "Formato DD/MM/AAAA"),
+  sexo: z.enum(["M", "F", "O"]),
+  dataDiagnostico: z.string().length(10, "Formato DD/MM/AAAA"),
+  senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+  confirmarSenha: z.string().min(6, "Confirme sua senha"),
+}).refine((data) => data.senha === data.confirmarSenha, {
+  message: "As senhas não coincidem",
+  path: ["confirmarSenha"],
+});
+
+type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
 export default function RegisterScreen() {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [sexo, setSexo] = useState("");
-  const [dataDiagnostico, setDataDiagnostico] = useState("");
-  const [carregando, setCarregando] = useState(false);
   const { signUp } = useAuth();
   const router = useRouter();
+  const [carregando, setCarregando] = useState(false);
 
-  // Função para formatar data enquanto digita (DD/MM/AAAA)
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<RegistrationFormValues>({
+    resolver: zodResolver(registrationSchema),
+    defaultValues: {
+      nome: "",
+      email: "",
+      dataNascimento: "",
+      sexo: "F",
+      dataDiagnostico: "",
+      senha: "",
+      confirmarSenha: "",
+    },
+  });
+
+  const sexoValue = watch("sexo");
+
   const formatarData = (texto: string) => {
-    // Remove tudo que não é número
     const numeros = texto.replace(/\D/g, "");
-    
-    // Aplica a máscara
-    if (numeros.length <= 2) {
-      return numeros;
-    } else if (numeros.length <= 4) {
-      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
-    } else {
-      return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4, 8)}`;
-    }
+    if (numeros.length <= 2) return numeros;
+    if (numeros.length <= 4) return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+    return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4, 8)}`;
   };
 
-  // Converter DD/MM/AAAA para ISO
   const converterParaISO = (dataFormatada: string): string => {
     const [dia, mes, ano] = dataFormatada.split("/");
     return new Date(`${ano}-${mes}-${dia}`).toISOString();
   };
 
-  const handleRegister = async () => {
-    if (!nome || !email || !senha || !confirmarSenha || !dataNascimento || !sexo || !dataDiagnostico) {
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: "Por favor, preencha todos os campos",
-      });
-      return;
-    }
-
-    if (dataNascimento.length !== 10 || dataDiagnostico.length !== 10) {
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: "As datas devem estar no formato DD/MM/AAAA",
-      });
-      return;
-    }
-
-    if (senha !== confirmarSenha) {
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: "As senhas não coincidem",
-      });
-      return;
-    }
-
-    if (senha.length < 6) {
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: "A senha deve ter pelo menos 6 caracteres",
-      });
-      return;
-    }
-
+  const handleRegister = async (data: RegistrationFormValues) => {
     setCarregando(true);
     try {
-      await signUp({ 
-        nome, 
-        email, 
-        senha,
-        data_nascimento: converterParaISO(dataNascimento),
-        sexo,
-        data_diagnostico: converterParaISO(dataDiagnostico)
+      await signUp({
+        nome: data.nome,
+        email: data.email,
+        senha: data.senha,
+        data_nascimento: converterParaISO(data.dataNascimento),
+        sexo: data.sexo,
+        data_diagnostico: converterParaISO(data.dataDiagnostico),
       });
-      
+
       Toast.show({
         type: "success",
         text1: "Sucesso!",
         text2: "Cadastro realizado com sucesso",
       });
-      
-      // Redirecionar após pequeno delay para mostrar o toast
+
       setTimeout(() => {
         router.replace("/home");
       }, 1000);
@@ -117,275 +103,142 @@ export default function RegisterScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.content}>
-          <Text style={styles.titulo}>Criar Conta</Text>
-          <Text style={styles.subtitulo}>Cadastre-se no FibroLog</Text>
-
-          <View style={styles.formContainer}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Nome completo</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nome completo"
-                placeholderTextColor="#999"
-                value={nome}
-                onChangeText={setNome}
-                autoCapitalize="words"
-                editable={!carregando}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                editable={!carregando}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Data de nascimento</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#999"
-                value={dataNascimento}
-                onChangeText={(texto) => setDataNascimento(formatarData(texto))}
-                keyboardType="numeric"
-                maxLength={10}
-                editable={!carregando}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Sexo</Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity
-                  style={styles.radioButton}
-                  onPress={() => setSexo("M")}
-                  disabled={carregando}
-                >
-                  <View style={styles.radioCircle}>
-                    {sexo === "M" && <View style={styles.radioChecked} />}
-                  </View>
-                  <Text style={styles.radioLabel}>Masculino</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.radioButton}
-                  onPress={() => setSexo("F")}
-                  disabled={carregando}
-                >
-                  <View style={styles.radioCircle}>
-                    {sexo === "F" && <View style={styles.radioChecked} />}
-                  </View>
-                  <Text style={styles.radioLabel}>Feminino</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.radioButton}
-                  onPress={() => setSexo("O")}
-                  disabled={carregando}
-                >
-                  <View style={styles.radioCircle}>
-                    {sexo === "O" && <View style={styles.radioChecked} />}
-                  </View>
-                  <Text style={styles.radioLabel}>Outro</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Data do diagnóstico</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="DD/MM/AAAA"
-                placeholderTextColor="#999"
-                value={dataDiagnostico}
-                onChangeText={(texto) => setDataDiagnostico(formatarData(texto))}
-                keyboardType="numeric"
-                maxLength={10}
-                editable={!carregando}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Senha</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Senha"
-                placeholderTextColor="#999"
-                value={senha}
-                onChangeText={setSenha}
-                secureTextEntry
-                editable={!carregando}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Confirmar senha</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Confirmar senha"
-                placeholderTextColor="#999"
-                value={confirmarSenha}
-                onChangeText={setConfirmarSenha}
-                secureTextEntry
-                editable={!carregando}
-              />
-            </View>
-
-            <TouchableOpacity
-              style={[styles.botao, carregando && styles.botaoDesabilitado]}
-              onPress={handleRegister}
-              disabled={carregando}
+    <SafeAreaView className="flex-1 bg-pink-50">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-10 py-16">
+          <View className="items-center mb-10">
+            <Text 
+              className="text-7xl text-pink-800"
+              style={{ fontFamily: 'Carattere_400Regular' }}
             >
-              {carregando ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.textoBotao}>Cadastrar</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.botaoVoltar}
-              onPress={() => router.back()}
-              disabled={carregando}
-            >
-              <Text style={styles.textoVoltar}>
-                Já tem uma conta? Faça login
-              </Text>
-            </TouchableOpacity>
+              FibroLog
+            </Text>
+            <Text className="text-xl text-pink-600 mt-2 font-medium">
+              Crie sua nova conta
+            </Text>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+
+          <View className="space-y-4">
+            <Input
+              name="nome"
+              control={control}
+              label="Nome completo"
+              placeholder="Digite seu nome completo"
+              autoCapitalize="words"
+              error={errors.nome?.message}
+            />
+
+            <Input
+              name="email"
+              control={control}
+              label="Email"
+              placeholder="Digite seu email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              error={errors.email?.message}
+            />
+
+            <Controller
+              control={control}
+              name="dataNascimento"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  name="dataNascimento"
+                  control={control}
+                  label="Data de nascimento"
+                  placeholder="DD/MM/AAAA"
+                  keyboardType="numeric"
+                  value={value}
+                  onChangeText={(text) => onChange(formatarData(text))}
+                  error={errors.dataNascimento?.message}
+                />
+              )}
+            />
+
+            <View className="mb-4">
+              <Text className="text-pink-800 font-semibold mb-3 text-base">
+                Sexo
+              </Text>
+              <View className="flex-row space-x-3">
+                {["M", "F", "O"].map((option) => (
+                  <TouchableOpacity
+                    key={option}
+                    onPress={() => setValue("sexo", option as any)}
+                    className={`flex-1 flex-row items-center justify-center p-4 rounded-xl border-2 ${
+                      sexoValue === option ? "bg-white border-pink-500" : "bg-white border-pink-200"
+                    }`}
+                  >
+                    <View className={`w-5 h-5 rounded-full border-2 border-pink-500 items-center justify-center mr-2`}>
+                      {sexoValue === option && <View className="w-2.5 h-2.5 rounded-full bg-pink-500" />}
+                    </View>
+                    <Text className="text-pink-800 font-medium">
+                      {option === "M" ? "Masc" : option === "F" ? "Fem" : "Outro"}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {errors.sexo && (
+                <Text className="text-red-500 text-sm mt-1">{errors.sexo.message}</Text>
+              )}
+            </View>
+
+            <Controller
+              control={control}
+              name="dataDiagnostico"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  name="dataDiagnostico"
+                  control={control}
+                  label="Data do diagnóstico"
+                  placeholder="DD/MM/AAAA"
+                  keyboardType="numeric"
+                  value={value}
+                  onChangeText={(text) => onChange(formatarData(text))}
+                  error={errors.dataDiagnostico?.message}
+                />
+              )}
+            />
+
+            <Input
+              name="senha"
+              control={control}
+              label="Senha"
+              placeholder="Digite sua senha"
+              secureTextEntry
+              autoCapitalize="none"
+              error={errors.senha?.message}
+            />
+
+            <Input
+              name="confirmarSenha"
+              control={control}
+              label="Confirmar senha"
+              placeholder="Confirme sua senha"
+              secureTextEntry
+              autoCapitalize="none"
+              error={errors.confirmarSenha?.message}
+            />
+
+            <View className="mt-8 space-y-4">
+              <Button
+                title="Criar conta"
+                onPress={handleSubmit(handleRegister)}
+                loading={carregando}
+                size="lg"
+              />
+
+              <Button
+                title="Já tem uma conta? Fazer login"
+                onPress={() => router.back()}
+                variant="text"
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  // Container e layout
-  container: {
-    flex: 1,
-    backgroundColor: "#faf5ff", // purple-50
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 32,
-  },
-  formContainer: {
-    width: "100%",
-    maxWidth: 400,
-    paddingBottom: 50,
-  },
-  // Texto
-  titulo: {
-    fontSize: 36,
-    fontWeight: "bold",
-    color: "#6b21a8", // purple-800
-    marginBottom: 8,
-  },
-  subtitulo: {
-    fontSize: 16,
-    color: "#9333ea", // purple-600
-    marginBottom: 48,
-    textAlign: "center",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#6b21a8", // purple-800
-    marginBottom: 8,
-  },
-  // Inputs
-  inputContainer: {
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: "#fff",
-    padding: 16,
-    borderRadius: 8,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#e9d5ff", // purple-200
-    color: "#6b21a8", // purple-800
-  },
-  // Radio buttons
-  radioGroup: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  radioButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e9d5ff", // purple-200
-  },
-  radioCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#a855f7", // purple-500
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 8,
-  },
-  radioChecked: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#a855f7", // purple-500
-  },
-  radioLabel: {
-    fontSize: 14,
-    color: "#6b21a8", // purple-800
-    fontWeight: "500",
-  },
-  // Botões
-  botao: {
-    backgroundColor: "#a855f7", // purple-500
-    padding: 16,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 16,
-  },
-  botaoDesabilitado: {
-    backgroundColor: "#d8b4fe", // purple-300
-  },
-  textoBotao: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  botaoVoltar: {
-    marginTop: 24,
-    alignItems: "center",
-  },
-  textoVoltar: {
-    color: "#9333ea", // purple-600
-    fontSize: 16,
-    fontWeight: "500",
-  },
-});

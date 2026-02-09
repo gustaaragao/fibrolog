@@ -108,7 +108,7 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#faf5ff', // purple-50
+    backgroundColor: '#fdf2f9', // pink-50
   },
   scrollView: {
     flex: 1,
@@ -123,21 +123,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9333ea', // purple-600
+    color: '#b5228a', // pink-600
   },
   userCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e9d5ff', // purple-200
+    borderColor: '#facfe9', // pink-200
     padding: 20,
     marginBottom: 24,
-    shadowColor: '#9333ea', // purple-600 shadow
+    shadowColor: '#b5228a', // pink-600 shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -147,10 +147,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e9d5ff', // purple-200
+    borderColor: '#facfe9', // pink-200
     padding: 20,
     marginBottom: 32,
-    shadowColor: '#9333ea', // purple-600 shadow
+    shadowColor: '#b5228a', // pink-600 shadow
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     marginBottom: 16,
   },
   userInfo: {
@@ -173,19 +173,19 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 14,
-    color: '#9333ea', // purple-600
+    color: '#b5228a', // pink-600
     fontWeight: '500',
     flex: 1,
   },
   infoValue: {
     fontSize: 14,
-    color: '#6b21a8', // purple-800
+    color: '#7d1e60', // pink-800
     fontWeight: '400',
     flex: 2,
     textAlign: 'right',
   },
   actionButton: {
-    backgroundColor: '#a855f7', // purple-500
+    backgroundColor: '#D330AA', // pink-500
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoutButtonDisabled: {
-    backgroundColor: '#d8b4fe', // purple-300
+    backgroundColor: '#f7a9d7', // pink-300
   },
   logoutButtonText: {
     color: '#fff',

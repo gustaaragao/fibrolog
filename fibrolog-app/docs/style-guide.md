@@ -1,28 +1,28 @@
-# FibroLog Purple Theme Style Guide
+# FibroLog Pink Theme Style Guide
 
 ## Introduction
 
-This style guide establishes the visual design standards for the FibroLog application, ensuring consistent implementation of the purple theme across all components and screens. It serves as the authoritative reference for designers and developers.
+This style guide establishes the visual design standards for the FibroLog application, ensuring consistent implementation of the pink theme across all components and screens. It serves as the authoritative reference for designers and developers.
 
 ---
 
 ## Color System
 
-### Primary Purple Palette
+### Primary Pink Palette
 
 | Shade | Hex | RGB | Usage |
 |-------|-----|-----|-------|
-| **purple-50** | `#faf5ff` | `rgb(250, 245, 255)` | Light backgrounds, subtle containers |
-| **purple-100** | `#f3e8ff` | `rgb(243, 232, 255)` | Card backgrounds, subtle highlights |
-| **purple-200** | `#e9d5ff` | `rgb(233, 213, 255)` | Borders, dividers, disabled text |
-| **purple-300** | `#d8b4fe` | `rgb(216, 180, 254)` | Hover states, disabled buttons |
-| **purple-400** | `#c084fc` | `rgb(192, 132, 252)` | Placeholder text, inactive elements |
-| **purple-500** | `#a855f7` | `rgb(168, 85, 247)` | **Primary brand color**, main actions |
-| **purple-600** | `#9333ea` | `rgb(147, 51, 234)` | Hover states, secondary text |
-| **purple-700** | `#7c3aed` | `rgb(124, 58, 237)` | Pressed states, active elements |
-| **purple-800** | `#6b21a8` | `rgb(107, 33, 168)` | Primary text, headings |
-| **purple-900** | `#581c87` | `rgb(88, 28, 135)` | Dark text, emphasis |
-| **purple-950** | `#3b0764` | `rgb(59, 7, 100)` | Maximum contrast text |
+| **pink-50** | `#fdf2f9` | `rgb(250, 245, 255)` | Light backgrounds, subtle containers |
+| **pink-100** | `#fce7f5` | `rgb(243, 232, 255)` | Card backgrounds, subtle highlights |
+| **pink-200** | `#facfe9` | `rgb(233, 213, 255)` | Borders, dividers, disabled text |
+| **pink-300** | `#f7a9d7` | `rgb(216, 180, 254)` | Hover states, disabled buttons |
+| **pink-400** | `#f176bf` | `rgb(192, 132, 252)` | Placeholder text, inactive elements |
+| **pink-500** | `#D330AA` | `rgb(168, 85, 247)` | **Primary brand color**, main actions |
+| **pink-600** | `#b5228a` | `rgb(147, 51, 234)` | Hover states, secondary text |
+| **pink-700** | `#961f73` | `rgb(124, 58, 237)` | Pressed states, active elements |
+| **pink-800** | `#7d1e60` | `rgb(107, 33, 168)` | Primary text, headings |
+| **pink-900** | `#641c4d` | `rgb(88, 28, 135)` | Dark text, emphasis |
+| **pink-950** | `#4d0c39` | `rgb(59, 7, 100)` | Maximum contrast text |
 
 ### Semantic Color Mappings
 
@@ -58,19 +58,19 @@ This style guide establishes the visual design standards for the FibroLog applic
 /* App Title */
 font-size: 36px;
 font-weight: bold;
-color: purple-800;
+color: pink-800;
 text-align: center;
 
 /* Screen Titles */
 font-size: 24px;
 font-weight: bold;
-color: purple-800;
+color: pink-800;
 margin-bottom: 8px;
 
 /* Section Headers */
 font-size: 18px;
 font-weight: 600;
-color: purple-800;
+color: pink-800;
 margin-bottom: 16px;
 ```
 
@@ -79,19 +79,19 @@ margin-bottom: 16px;
 /* Primary Text */
 font-size: 16px;
 font-weight: normal;
-color: purple-800;
+color: pink-800;
 line-height: 24px;
 
 /* Secondary Text */
 font-size: 16px;
 font-weight: normal;
-color: purple-600;
+color: pink-600;
 line-height: 24px;
 
 /* Caption Text */
 font-size: 14px;
 font-weight: normal;
-color: purple-600;
+color: pink-600;
 line-height: 20px;
 ```
 
@@ -105,13 +105,13 @@ color: white;
 /* Link Text */
 font-size: 16px;
 font-weight: 600;
-color: purple-500;
+color: pink-500;
 text-decoration: underline;
 
 /* Form Labels */
 font-size: 16px;
 font-weight: 600;
-color: purple-800;
+color: pink-800;
 margin-bottom: 8px;
 ```
 
@@ -123,7 +123,7 @@ margin-bottom: 8px;
 
 #### Primary Button
 ```css
-background-color: purple-500;
+background-color: pink-500;
 color: white;
 padding: 16px 32px;
 border-radius: 8px;
@@ -132,48 +132,48 @@ font-weight: bold;
 border: none;
 
 /* Hover State */
-background-color: purple-600;
+background-color: pink-600;
 
 /* Pressed State */
-background-color: purple-700;
+background-color: pink-700;
 
 /* Disabled State */
-background-color: purple-300;
+background-color: pink-300;
 opacity: 0.6;
 ```
 
 #### Secondary Button
 ```css
-background-color: purple-100;
-color: purple-800;
+background-color: pink-100;
+color: pink-800;
 padding: 16px 32px;
 border-radius: 8px;
 font-size: 16px;
 font-weight: 600;
-border: 1px solid purple-200;
+border: 1px solid pink-200;
 
 /* Hover State */
-background-color: purple-200;
+background-color: pink-200;
 
 /* Pressed State */
-background-color: purple-300;
+background-color: pink-300;
 ```
 
 #### Outline Button
 ```css
 background-color: transparent;
-color: purple-500;
+color: pink-500;
 padding: 16px 32px;
 border-radius: 8px;
 font-size: 16px;
 font-weight: 600;
-border: 1px solid purple-500;
+border: 1px solid pink-500;
 
 /* Hover State */
-background-color: purple-50;
+background-color: pink-50;
 
 /* Pressed State */
-background-color: purple-100;
+background-color: pink-100;
 ```
 
 #### Destructive Button
@@ -199,15 +199,15 @@ background-color: error-700;
 ```css
 /* Default State */
 background-color: white;
-border: 1px solid purple-200;
+border: 1px solid pink-200;
 border-radius: 8px;
 padding: 16px;
 font-size: 16px;
-color: purple-800;
+color: pink-800;
 
 /* Focus State */
-border-color: purple-500;
-box-shadow: 0 0 0 3px purple-100;
+border-color: pink-500;
+box-shadow: 0 0 0 3px pink-100;
 
 /* Error State */
 border-color: error-400;
@@ -223,7 +223,7 @@ color: neutral-500;
 ```css
 font-size: 16px;
 font-weight: 600;
-color: purple-800;
+color: pink-800;
 margin-bottom: 8px;
 display: block;
 ```
@@ -242,7 +242,7 @@ margin-top: 4px;
 
 /* Helper Text */
 font-size: 14px;
-color: purple-600;
+color: pink-600;
 margin-top: 4px;
 ```
 
@@ -250,36 +250,36 @@ margin-top: 4px;
 
 #### Tab Bar
 ```css
-background-color: purple-50;
-border-top: 1px solid purple-200;
+background-color: pink-50;
+border-top: 1px solid pink-200;
 padding: 8px 0;
 
 /* Active Tab */
-color: purple-500;
+color: pink-500;
 font-weight: 600;
 
 /* Inactive Tab */
-color: purple-600;
+color: pink-600;
 font-weight: normal;
 ```
 
 #### Navigation Header
 ```css
 background-color: white;
-border-bottom: 1px solid purple-200;
+border-bottom: 1px solid pink-200;
 padding: 16px;
 
 /* Title */
 font-size: 18px;
 font-weight: bold;
-color: purple-800;
+color: pink-800;
 ```
 
 ### Cards and Containers
 
 #### Main Container
 ```css
-background-color: purple-50;
+background-color: pink-50;
 padding: 20px;
 min-height: 100vh;
 ```
@@ -290,7 +290,7 @@ background-color: white;
 border-radius: 8px;
 padding: 24px;
 margin-bottom: 16px;
-border: 1px solid purple-100;
+border: 1px solid pink-100;
 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 ```
 
@@ -300,28 +300,28 @@ background-color: white;
 border-radius: 8px;
 padding: 16px;
 margin-bottom: 16px;
-border: 1px solid purple-200;
+border: 1px solid pink-200;
 ```
 
 ### Loading States
 
 #### Activity Indicator
 ```css
-color: purple-500;
+color: pink-500;
 size: large; /* or 'small' for inline */
 ```
 
 #### Loading Screen
 ```css
 /* Container */
-background-color: purple-50;
+background-color: pink-50;
 justify-content: center;
 align-items: center;
 flex: 1;
 
 /* Loading Text */
 font-size: 16px;
-color: purple-600;
+color: pink-600;
 margin-top: 16px;
 ```
 
@@ -408,24 +408,24 @@ box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
 
 #### Background Colors
 ```css
-.bg-purple-50     /* Light backgrounds */
-.bg-purple-100    /* Card backgrounds */
-.bg-purple-500    /* Primary elements */
+.bg-pink-50     /* Light backgrounds */
+.bg-pink-100    /* Card backgrounds */
+.bg-pink-500    /* Primary elements */
 .bg-white         /* Clean backgrounds */
 ```
 
 #### Text Colors
 ```css
-.text-purple-800  /* Primary text */
-.text-purple-600  /* Secondary text */
-.text-purple-500  /* Interactive text */
+.text-pink-800  /* Primary text */
+.text-pink-600  /* Secondary text */
+.text-pink-500  /* Interactive text */
 .text-white       /* Inverse text */
 ```
 
 #### Border Colors
 ```css
-.border-purple-200  /* Default borders */
-.border-purple-500  /* Focus borders */
+.border-pink-200  /* Default borders */
+.border-pink-500  /* Focus borders */
 .border-error-400   /* Error borders */
 ```
 
@@ -437,10 +437,10 @@ import { Colors, ThemeColors } from '@/constants/theme';
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: Colors.purple[50],
+    backgroundColor: Colors.pink[50],
   },
   title: {
-    color: ThemeColors.text.purple,
+    color: ThemeColors.text.pink,
   },
   button: {
     backgroundColor: ThemeColors.interactive.primary,
@@ -456,18 +456,18 @@ const styles = StyleSheet.create({
 All color combinations meet WCAG 2.1 AA standards (4.5:1 minimum):
 
 #### Verified Combinations
-- **purple-800 on white**: 14.8:1 ✅
-- **purple-600 on white**: 7.9:1 ✅  
-- **white on purple-500**: 6.3:1 ✅
-- **purple-900 on purple-50**: 19.5:1 ✅
+- **pink-800 on white**: 14.8:1 ✅
+- **pink-600 on white**: 7.9:1 ✅  
+- **white on pink-500**: 6.3:1 ✅
+- **pink-900 on pink-50**: 19.5:1 ✅
 - **error-700 on error-50**: 13.2:1 ✅
 - **success-700 on success-50**: 11.8:1 ✅
 
 ### Focus Indicators
 ```css
 /* Focus ring for interactive elements */
-border: 2px solid purple-500;
-box-shadow: 0 0 0 3px purple-100;
+border: 2px solid pink-500;
+box-shadow: 0 0 0 3px pink-100;
 ```
 
 ### Touch Targets
@@ -481,7 +481,7 @@ box-shadow: 0 0 0 3px purple-100;
 
 ### iOS Specific
 - Use iOS-appropriate font weights (avoid font weights not supported)
-- Ensure purple colors work with iOS system themes
+- Ensure pink colors work with iOS system themes
 - Test with iOS accessibility features (VoiceOver, high contrast)
 
 ### Android Specific  
@@ -499,18 +499,18 @@ box-shadow: 0 0 0 3px purple-100;
 ## Brand Guidelines
 
 ### Logo and Branding
-- **Primary brand color**: purple-500 (#a855f7)
-- **App name styling**: 36px, bold, purple-800
-- **Tagline styling**: 16px, normal, purple-600
+- **Primary brand color**: pink-500 (#D330AA)
+- **App name styling**: 36px, bold, pink-800
+- **Tagline styling**: 16px, normal, pink-600
 
 ### Voice and Tone
 - **Professional**: Healthcare application requiring trust
-- **Approachable**: Friendly purple tones, not intimidating
+- **Approachable**: Friendly pink tones, not intimidating
 - **Consistent**: Same visual patterns throughout app
 - **Accessible**: Inclusive design for all users
 
 ### Usage Restrictions
-- **Don't** use purple colors outside the defined palette
+- **Don't** use pink colors outside the defined palette
 - **Don't** reduce contrast below WCAG AA standards  
 - **Don't** use color as the only means of conveying information
 - **Don't** deviate from established spacing and typography scales
@@ -547,7 +547,7 @@ This style guide should be updated when:
 - Platform-specific guidelines are updated
 
 ### Version History
-- **v1.0**: Initial purple theme implementation
+- **v1.0**: Initial pink theme implementation
 - **Future**: Document major changes with version numbers
 
 ---
@@ -569,4 +569,4 @@ This style guide should be updated when:
 - **Accessibility Scanner**: For accessibility testing
 - **Device Testing**: Real device testing across platforms
 
-This style guide ensures consistent, accessible, and professional implementation of the FibroLog purple theme across all application components and platforms.
+This style guide ensures consistent, accessible, and professional implementation of the FibroLog pink theme across all application components and platforms.

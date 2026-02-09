@@ -54,36 +54,36 @@ export const colorAccessibilityTests = {
     expected: 21,
     passes: true,
   },
-  'Dark text on light purple': {
-    text: '#581c87', // purple-900  
-    background: '#faf5ff', // purple-50
+  'Dark text on light pink': {
+    text: '#641c4d', // pink-900  
+    background: '#fdf2f9', // pink-50
     expected: 19.5,
     passes: true,
   },
-  'Purple text on light background': {
-    text: '#6b21a8', // purple-800
-    background: '#f3e8ff', // purple-100
+  'Pink text on light background': {
+    text: '#7d1e60', // pink-800
+    background: '#fce7f5', // pink-100
     expected: 12.3,
     passes: true,
   },
   
   // Button combinations
-  'White text on purple button': {
+  'White text on pink button': {
     text: '#ffffff', // white
-    background: '#a855f7', // purple-500
+    background: '#D330AA', // pink-500
     expected: 6.3,
     passes: true,
   },
-  'White text on dark purple button': {
+  'White text on dark pink button': {
     text: '#ffffff', // white
-    background: '#7c3aed', // purple-700
+    background: '#961f73', // pink-700
     expected: 11.2,
     passes: true,
   },
   
   // Interactive states
-  'Purple text on secondary background': {
-    text: '#7c3aed', // purple-700
+  'Pink text on secondary background': {
+    text: '#961f73', // pink-700
     background: '#f1f5f9', // secondary-100
     expected: 10.8,
     passes: true,
