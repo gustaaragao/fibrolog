@@ -65,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           nome: userName || "Usuário",
           email: userEmail || "usuario@fibrolog.com",
         });
-      } catch (erro) {
+      } catch {
         setUsuario(null);
       } finally {
         setCarregandoSessao(false);

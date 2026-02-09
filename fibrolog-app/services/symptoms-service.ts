@@ -111,12 +111,20 @@ export const DailyLogService = {
   /**
    * Atualiza um registro diário existente.
    */
-  async update(id: number, data: Partial<DailyLogPayload>): Promise<void> {
+  async update(id: number, data: DailyLogPayload): Promise<DailyLog> {
     try {
-      await api.put(
+      const response = await api.put<DailyLogBackend>(
         `/registros-diarios/${id}`,
         data as unknown as Record<string, unknown>,
       );
+      return {
+        id: response.data.id,
+        paciente_id: response.data.paciente_id,
+        timestamp: response.data.data_registro,
+        notes: response.data.notes,
+        symptoms: response.data.symptoms,
+        painRegions: response.data.painRegions,
+      };
     } catch (error) {
       throw error;
     }

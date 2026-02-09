@@ -25,6 +25,7 @@ export default function HistoryScreen() {
   const router = useRouter();
   const [items, setItems] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedLog, setSelectedLog] = useState<DailyLog | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -32,9 +33,13 @@ export default function HistoryScreen() {
     fetchHistory();
   }, []);
 
-  const fetchHistory = async () => {
+  const fetchHistory = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       const [logsData, crisesData] = await Promise.all([
         DailyLogService.getAll(),
         crisesService.list(),
@@ -63,7 +68,11 @@ export default function HistoryScreen() {
     } catch (_error) {
       // Erro ao buscar histórico
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -279,10 +288,10 @@ export default function HistoryScreen() {
       <FlatList
         data={items}
         renderItem={renderItem}
-        keyExtractor={(item, index) => `${item.type}-${index}`}
+        keyExtractor={(item) => `${item.type}-${item.data.id}`}
         contentContainerStyle={{ padding: 16 }}
-        refreshing={loading}
-        onRefresh={fetchHistory}
+        refreshing={refreshing}
+        onRefresh={() => fetchHistory(true)}
         ListEmptyComponent={
           <View className="items-center justify-center mt-20">
             <MaterialCommunityIcons

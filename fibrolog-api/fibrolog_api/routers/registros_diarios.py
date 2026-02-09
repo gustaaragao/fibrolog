@@ -3,6 +3,7 @@ Rotas para o CRUD de registros diários de sintomas.
 """
 
 from http import HTTPStatus
+from types import SimpleNamespace
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -187,11 +188,11 @@ async def create_registro_diario_pt(
 
     # Mapear para schema interno do helper
     symptoms = [
-        type('Symptom', (), {'id': s.id, 'intensity': s.intensidade})
+        SimpleNamespace(id=s.id, intensity=s.intensidade)
         for s in registro.sintomas
     ]
     pain_regions = [
-        type('PainRegion', (), {'id': r.id, 'intensity': r.intensidade})
+        SimpleNamespace(id=r.id, intensity=r.intensidade)
         for r in registro.regioes_dor
     ]
 
