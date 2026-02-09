@@ -8,18 +8,10 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("🏠 Index: Estado da autenticação:", {
-      carregandoSessao,
-      temUsuario: !!usuario,
-      usuario: usuario?.email,
-    });
-
     if (!carregandoSessao) {
       if (usuario) {
-        console.log("➡️ Index: Redirecionando para /home");
         router.replace("/home");
       } else {
-        console.log("➡️ Index: Redirecionando para /login");
         router.replace("/login");
       }
     }

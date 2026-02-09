@@ -2,17 +2,17 @@ import Input from "@/components/ui/Input";
 import TextArea from "@/components/ui/TextArea";
 import { crisesService } from "@/services/crises-service";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface CrisisFormData {
@@ -23,16 +23,18 @@ interface CrisisFormData {
   observacoes: string;
 }
 
-export default function CrisisScreen() {
-  const [loading, setLoading] = useState(false);
+export default function CrisisFormScreen() {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditing = !!id;
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditing);
 
   const {
     control,
     handleSubmit,
     setValue,
     watch,
-    reset,
     formState: { errors },
   } = useForm<CrisisFormData>({
     defaultValues: {
@@ -46,13 +48,39 @@ export default function CrisisScreen() {
 
   const selectedIntensity = watch("intensidade_dor");
 
+  useEffect(() => {
+    if (isEditing) {
+      const fetchCrisis = async () => {
+        try {
+          const data = await crisesService.getById(parseInt(id));
+          setValue("intensidade_dor", data.intensidade_dor);
+          setValue("contexto", data.contexto);
+          setValue("duracao", data.duracao || "");
+          setValue("sintomas_relatados", data.sintomas_relatados || "");
+          setValue("observacoes", data.observacoes || "");
+        } catch (error) {
+          Alert.alert("Erro", "Não foi possível carregar os dados da crise.");
+          router.back();
+        } finally {
+          setInitialLoading(false);
+        }
+      };
+      fetchCrisis();
+    }
+  }, [id]);
+
   const onSubmit = async (data: CrisisFormData) => {
     try {
       setLoading(true);
-      await crisesService.create(data);
-      Alert.alert("Sucesso", "Crise registrada com sucesso!");
-      reset();
-      router.push("/home");
+      if (isEditing) {
+        await crisesService.update(parseInt(id), data);
+        Alert.alert("Sucesso", "Crise atualizada com sucesso!");
+        router.replace("/history");
+      } else {
+        await crisesService.create(data);
+        Alert.alert("Sucesso", "Crise registrada com sucesso!");
+        router.replace("/home");
+      }
     } catch (error: any) {
       Alert.alert("Erro", error.message || "Erro ao salvar crise.");
     } finally {
@@ -76,8 +104,9 @@ export default function CrisisScreen() {
             >
               <Text
                 style={[
-                  styles.intensityNumber,
-                  selectedIntensity === num && styles.intensityNumberSelected,
+                  styles.intensityCircleText,
+                  selectedIntensity === num &&
+                    styles.intensityCircleTextSelected,
                 ]}
               >
                 {num}
@@ -85,13 +114,33 @@ export default function CrisisScreen() {
             </TouchableOpacity>
           ))}
         </View>
+        <Text style={styles.intensityLabel}>
+          {selectedIntensity <= 2
+            ? "Leve"
+            : selectedIntensity <= 6
+              ? "Moderada"
+              : "Intensa"}
+        </Text>
       </View>
     );
   };
 
+  if (initialLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#7d1e60" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen options={{ title: "Registrar Crise", headerShown: true }} />
+      <Stack.Screen
+        options={{
+          title: isEditing ? "Editar Crise" : "Registrar Crise",
+          headerShown: true,
+        }}
+      />
 
       <View style={styles.form}>
         {renderIntensitySelector()}
@@ -99,36 +148,34 @@ export default function CrisisScreen() {
         <Input
           name="contexto"
           control={control}
-          label="Contexto da Crise"
-          placeholder="Ex: Estresse no trabalho, mudança de clima..."
+          label="Contexto"
+          placeholder="O que estava fazendo? Gatilhos?"
           error={errors.contexto?.message}
         />
 
         <Input
           name="duracao"
           control={control}
-          label="Duração Estimada"
-          placeholder="Ex: 2 horas, 30 minutos..."
+          label="Duração"
+          placeholder="Ex: 2 horas, o dia todo"
         />
 
         <TextArea
           name="sintomas_relatados"
           control={control}
           label="Sintomas Relatados"
-          placeholder="Descreva os sintomas que você está sentindo..."
-          numberOfLines={4}
+          placeholder="Além da dor, o que sentiu? (ex: fadiga, névoa mental)"
         />
 
         <TextArea
           name="observacoes"
           control={control}
           label="Observações Adicionais"
-          placeholder="Outras informações relevantes..."
-          numberOfLines={4}
+          placeholder="Algo mais que queira registrar?"
         />
 
         <TouchableOpacity
-          style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+          style={styles.submitButton}
           onPress={handleSubmit(onSubmit)}
           disabled={loading}
         >
@@ -137,7 +184,9 @@ export default function CrisisScreen() {
           ) : (
             <>
               <MaterialIcons name="save" size={24} color="white" />
-              <Text style={styles.submitButtonText}>Registrar Crise</Text>
+              <Text style={styles.submitButtonText}>
+                {isEditing ? "Atualizar Registro" : "Salvar Registro"}
+              </Text>
             </>
           )}
         </TouchableOpacity>
@@ -151,17 +200,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fdf2f9",
   },
-  form: {
-    padding: 15,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fdf2f9",
   },
-  intensityContainer: {
-    marginBottom: 25,
+  form: {
+    padding: 20,
   },
   label: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
     color: "#641c4d",
-    marginBottom: 12,
+    marginBottom: 10,
+  },
+  intensityContainer: {
+    marginBottom: 20,
   },
   intensityGrid: {
     flexDirection: "row",
@@ -169,50 +224,48 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   intensityCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: "#fce7f5",
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    backgroundColor: "white",
+    borderWidth: 2,
+    borderColor: "#f9a8d4", // pink-300
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 10,
-    borderWidth: 2,
-    borderColor: "transparent",
   },
   intensityCircleSelected: {
     backgroundColor: "#7d1e60",
-    borderColor: "#d81b60",
+    borderColor: "#7d1e60",
   },
-  intensityNumber: {
-    fontSize: 18,
-    fontWeight: "bold",
+  intensityCircleText: {
+    fontSize: 14,
     color: "#7d1e60",
   },
-  intensityNumberSelected: {
+  intensityCircleTextSelected: {
     color: "white",
+    fontWeight: "bold",
+  },
+  intensityLabel: {
+    textAlign: "right",
+    marginTop: 5,
+    fontWeight: "bold",
+    color: "#7d1e60",
   },
   submitButton: {
     backgroundColor: "#7d1e60",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
-    borderRadius: 12,
+    padding: 15,
+    borderRadius: 10,
     marginTop: 20,
-    marginBottom: 40,
     elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  submitButtonDisabled: {
-    backgroundColor: "#b88ba4",
   },
   submitButtonText: {
     color: "white",
+    fontSize: 18,
     fontWeight: "bold",
-    marginLeft: 8,
-    fontSize: 16,
+    marginLeft: 10,
   },
 });

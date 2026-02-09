@@ -14,15 +14,11 @@ export default function HomeScreen() {
   const router = useRouter();
 
   const handleLogoutPress = async () => {
-    console.log("🚪 Botão de logout clicado");
-    console.log("🔓 Executando logout...");
     try {
       await signOut();
-      console.log("✅ SignOut completo, navegando para login...");
       router.replace("/login");
-      console.log("✅ Navegação completa");
-    } catch (error) {
-      console.error("❌ Erro no logout:", error);
+    } catch {
+      // Erro no logout
     }
   };
 

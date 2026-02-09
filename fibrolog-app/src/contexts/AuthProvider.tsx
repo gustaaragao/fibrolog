@@ -4,31 +4,31 @@
  * This file exists for backward compatibility only.
  */
 
-import React, { useState, useEffect } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { Platform } from 'react-native';
-import { AuthContext, AuthContextType, User } from './AuthContext';
-import { authService } from '../services/authService';
+import * as SecureStore from "expo-secure-store";
+import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
+import { authService } from "../services/authService";
+import { AuthContext, AuthContextType, User } from "./AuthContext";
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-const TOKEN_STORAGE_KEY = 'auth_token';
-const USER_STORAGE_KEY = 'auth_user';
+const TOKEN_STORAGE_KEY = "auth_token";
+const USER_STORAGE_KEY = "auth_user";
 
 // Storage abstraction for secure token storage
 // Note: Web platform uses localStorage (unencrypted). Consider using httpOnly cookies for production.
 const secureStorage = {
   async getItem(key: string): Promise<string | null> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       return localStorage.getItem(key);
     }
     return await SecureStore.getItemAsync(key);
   },
 
   async setItem(key: string, value: string): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       localStorage.setItem(key, value);
     } else {
       await SecureStore.setItemAsync(key, value);
@@ -36,7 +36,7 @@ const secureStorage = {
   },
 
   async removeItem(key: string): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === "web") {
       localStorage.removeItem(key);
     } else {
       await SecureStore.deleteItemAsync(key);
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setAuthData = async (authToken: string, userData: User) => {
     setToken(authToken);
     setUser(userData);
-    
+
     await Promise.all([
       secureStorage.setItem(TOKEN_STORAGE_KEY, authToken),
       secureStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData)),
@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const clearAuthData = async () => {
     setToken(null);
     setUser(null);
-    
+
     await Promise.all([
       secureStorage.removeItem(TOKEN_STORAGE_KEY),
       secureStorage.removeItem(USER_STORAGE_KEY),
@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Check if token is expired (basic JWT parsing)
   const isTokenExpired = (token: string): boolean => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const currentTime = Date.now() / 1000;
       return payload.exp < currentTime;
     } catch {
@@ -87,25 +87,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Handle token expiration automatically
   const handleTokenExpiration = async () => {
     await clearAuthData();
-    // You can show a toast message here if needed
-    console.log('Session expired, user logged out automatically');
   };
 
   // Login function
   const login = async (email: string, password: string) => {
     try {
       const response = await authService.login(email, password);
-      
+
       // For now, we'll create a mock user object since the login endpoint
       // only returns token. In a real app, you'd make another request to get user data
       const userData: User = {
         id: 1, // Mock data - in real app, get from user endpoint
-        nome: 'User', // Mock data
+        nome: "User", // Mock data
         email: email,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      
+
       await setAuthData(response.access_token, userData);
     } catch (error) {
       throw error; // Re-throw to let the UI handle the error
@@ -116,7 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (name: string, email: string, password: string) => {
     try {
       const response = await authService.register(name, email, password);
-      
+
       // Create user object from registration data
       const userData: User = {
         id: 1, // Mock data - in real app, get from registration response
@@ -125,7 +123,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
-      
+
       await setAuthData(response.access_token, userData);
     } catch (error) {
       throw error; // Re-throw to let the UI handle the error
@@ -155,8 +153,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error checking existing token:', error);
-        // Clear any corrupted data
+        // Erro ao verificar token existente
         await clearAuthData();
       } finally {
         setIsLoading(false);
@@ -178,7 +175,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Check every minute
     const interval = setInterval(checkTokenExpiration, 60000);
-    
+
     return () => clearInterval(interval);
   }, [token, isAuthenticated]);
 
@@ -195,8 +192,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
