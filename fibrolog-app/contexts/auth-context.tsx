@@ -1,9 +1,9 @@
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    type ReactNode,
 } from "react";
 
 import { authService } from "@/services/auth-service";
@@ -66,7 +66,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
           email: userEmail || "usuario@fibrolog.com",
         });
       } catch (erro) {
-        console.error("Erro ao restaurar sessao:", erro);
         setUsuario(null);
       } finally {
         setCarregandoSessao(false);
@@ -77,9 +76,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   async function signIn(credenciais: CredenciaisLogin): Promise<void> {
-    if (__DEV__) console.log("🔑 AuthContext signIn chamado");
     const resultado = await authService.login(credenciais);
-    if (__DEV__) console.log("💾 Salvando token no storage...");
     await storage.setItemAsync("fibrolog_access_token", resultado.token);
     await storage.setItemAsync("fibrolog_user_email", credenciais.email);
     await storage.setItemAsync(
@@ -87,13 +84,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       credenciais.email.split("@")[0],
     );
 
-    if (__DEV__) console.log("👤 Definindo usuário no estado");
     setUsuario({
       id: "user",
       nome: credenciais.email.split("@")[0],
       email: credenciais.email,
     });
-    if (__DEV__) console.log("✅ signIn completo");
   }
 
   async function signUp(_dados: DadosCadastro): Promise<void> {
@@ -110,14 +105,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function signOut(): Promise<void> {
-    console.log("🚪 SignOut iniciado");
-    console.log("🗑️ Removendo tokens do storage...");
     await storage.deleteItemAsync("fibrolog_access_token");
     await storage.deleteItemAsync("fibrolog_user_email");
     await storage.deleteItemAsync("fibrolog_user_name");
-    console.log("👤 Definindo usuário como null");
     setUsuario(null);
-    console.log("✅ SignOut completo");
   }
 
   return (

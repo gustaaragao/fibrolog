@@ -56,11 +56,10 @@ export const DailyLogService = {
     try {
       const response = await api.post<CreateDailyLogResponse>(
         "/registros-diarios/",
-        data,
+        data as unknown as Record<string, unknown>,
       );
       return response;
     } catch (error) {
-      console.error("Erro ao salvar registro diário:", error);
       throw error;
     }
   },
@@ -70,8 +69,10 @@ export const DailyLogService = {
    */
   async getAll(): Promise<DailyLog[]> {
     try {
-      const response = await api.get<DailyLogListResponse>("/registros-diarios/");
-      
+      const response = await api.get<DailyLogListResponse>(
+        "/registros-diarios/",
+      );
+
       const logs = response.registros || [];
 
       // Mapeia do formato do backend (snake_case) para o frontend (camelCase)
@@ -84,7 +85,50 @@ export const DailyLogService = {
         painRegions: log.painRegions || [],
       }));
     } catch (error) {
-      console.error("Erro ao buscar histórico de registros:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Busca um registro diário específico por ID.
+   */
+  async getById(id: number): Promise<DailyLog> {
+    try {
+      const log = await api.get<DailyLogBackend>(`/registros-diarios/${id}`);
+      return {
+        id: log.id,
+        paciente_id: log.paciente_id,
+        timestamp: log.data_registro,
+        notes: log.notes,
+        symptoms: log.symptoms || [],
+        painRegions: log.painRegions || [],
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Atualiza um registro diário existente.
+   */
+  async update(id: number, data: Partial<DailyLogPayload>): Promise<void> {
+    try {
+      await api.put(
+        `/registros-diarios/${id}`,
+        data as unknown as Record<string, unknown>,
+      );
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Deleta um registro diário existente.
+   */
+  async delete(id: number): Promise<void> {
+    try {
+      await api.delete(`/registros-diarios/${id}`);
+    } catch (error) {
       throw error;
     }
   },

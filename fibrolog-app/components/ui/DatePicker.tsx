@@ -30,7 +30,7 @@ export default function DatePicker({
 
   return (
     <View className="mb-4">
-      <Text className="text-gray-700 font-medium mb-2 text-base">
+      <Text className="text-pink-800 font-semibold mb-2 text-base">
         {label}
       </Text>
       <Controller
@@ -41,14 +41,14 @@ export default function DatePicker({
             <TouchableOpacity
               className={`
                 border-2 rounded-lg px-4 py-3
-                ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}
-                focus:border-pink-600
+                ${error ? 'border-red-500 bg-red-50' : 'border-pink-200 bg-white'}
+                focus:border-pink-500
               `}
               onPress={() => setShowPicker(true)}
             >
               <Text 
                 className={`text-base ${
-                  value ? 'text-gray-900' : 'text-gray-400'
+                  value ? 'text-pink-900' : 'text-gray-400'
                 }`}
               >
                 {value ? formatDate(new Date(value)) : placeholder}

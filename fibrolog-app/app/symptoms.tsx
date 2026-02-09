@@ -1,6 +1,6 @@
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Alert,
@@ -15,14 +15,13 @@ import BodyMap from "../components/ui/BodyMap";
 import Button from "../components/ui/Button";
 import TextArea from "../components/ui/TextArea";
 import { Symptom, SYMPTOMS } from "../constants/symptoms";
-import {
-  DailyLogPayload,
-  DailyLogService,
-} from "../services/symptoms-service";
+import { DailyLogPayload, DailyLogService } from "../services/symptoms-service";
 import { Colors } from "../src/constants/theme";
 
 export default function SymptomsScreen() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const isEditing = !!id;
   const [step, setStep] = useState(1);
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
@@ -33,12 +32,56 @@ export default function SymptomsScreen() {
     Record<string, number>
   >({});
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditing);
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
       notes: "",
     },
   });
+
+  // Carregar dados existentes se estiver editando
+  useEffect(() => {
+    if (isEditing) {
+      const loadExistingData = async () => {
+        try {
+          const data = await DailyLogService.getById(parseInt(id));
+
+          // Carregar sintomas selecionados e suas intensidades
+          const symptomIds = data.symptoms.map((s) => s.id);
+          setSelectedSymptoms(symptomIds);
+          const sympIntensities: Record<string, number> = {};
+          data.symptoms.forEach((s) => {
+            sympIntensities[s.id] = s.intensity;
+          });
+          setSymptomIntensities(sympIntensities);
+
+          // Carregar regiões selecionadas e suas intensidades
+          const regionIds = data.painRegions.map((r) => r.id);
+          setSelectedRegions(regionIds);
+          const regIntensities: Record<string, number> = {};
+          data.painRegions.forEach((r) => {
+            regIntensities[r.id] = r.intensity;
+          });
+          setRegionIntensities(regIntensities);
+
+          // Carregar observações
+          if (data.notes) {
+            setValue("notes", data.notes);
+          }
+        } catch (error) {
+          Alert.alert(
+            "Erro",
+            "Não foi possível carregar os dados do registro.",
+          );
+          router.back();
+        } finally {
+          setInitialLoading(false);
+        }
+      };
+      loadExistingData();
+    }
+  }, [id]);
 
   const toggleSymptom = (id: string) => {
     setSelectedSymptoms((prev) =>
@@ -58,8 +101,8 @@ export default function SymptomsScreen() {
         });
         return newRegions;
       } else {
-        // Adiciona região com intensidade padrão 5
-        setRegionIntensities((prevInt) => ({ ...prevInt, [id]: 5 }));
+        // Adiciona região com intensidade padrão 4
+        setRegionIntensities((prevInt) => ({ ...prevInt, [id]: 4 }));
         return [...prev, id];
       }
     });
@@ -105,21 +148,29 @@ export default function SymptomsScreen() {
         })),
         painRegions: selectedRegions.map((id) => ({
           id,
-          intensity: regionIntensities[id] || 5,
+          intensity: regionIntensities[id] || 4,
         })),
         notes: data.notes,
         timestamp: new Date().toISOString(),
       };
 
-      await DailyLogService.create(payload);
-
-      Toast.show({
-        type: "success",
-        text1: "Sucesso!",
-        text2: "Seus sintomas foram registrados.",
-      });
-
-      router.replace("/home");
+      if (isEditing) {
+        await DailyLogService.update(parseInt(id), payload);
+        Toast.show({
+          type: "success",
+          text1: "Sucesso!",
+          text2: "Seus sintomas foram atualizados.",
+        });
+        router.replace("/history");
+      } else {
+        await DailyLogService.create(payload);
+        Toast.show({
+          type: "success",
+          text1: "Sucesso!",
+          text2: "Seus sintomas foram registrados.",
+        });
+        router.replace("/home");
+      }
     } catch (error) {
       Alert.alert(
         "Erro",

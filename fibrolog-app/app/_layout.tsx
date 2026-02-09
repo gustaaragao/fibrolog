@@ -4,6 +4,7 @@ import { Carattere_400Regular, useFonts } from "@expo-google-fonts/carattere";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
+import { Text } from "react-native";
 import Toast from "react-native-toast-message";
 import "../global.css";
 
@@ -24,7 +25,7 @@ export default function RootLayout() {
         // We simulate a delay to show the brand loading screen
         await new Promise((resolve) => setTimeout(resolve, 2000));
       } catch (e) {
-        console.warn(e);
+        // Erro na preparação
       } finally {
         // Tell the application to render
         setIsAppReady(true);
@@ -62,6 +63,18 @@ export default function RootLayout() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
+          headerRight: () => (
+            <Text
+              style={{
+                fontFamily: "Carattere_400Regular",
+                fontSize: 32,
+                color: "white",
+                marginRight: 15,
+              }}
+            >
+              F
+            </Text>
+          ),
         }}
       >
         <Stack.Screen name="index" />
