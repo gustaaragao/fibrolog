@@ -78,6 +78,27 @@ async def _limpar_itens_registro(session, registro):
     await session.flush()
 
 
+async def _adicionar_itens_registro(session, registro, symptoms, pain_regions):
+    """Helper para adicionar sintomas e regiões a um registro."""
+    # Adicionar sintomas
+    for sintoma in symptoms:
+        db_sintoma = RegistroSintoma(
+            registro_id=registro.id,
+            sintoma_id=sintoma.id,
+            intensidade=sintoma.intensity,
+        )
+        session.add(db_sintoma)
+
+    # Adicionar regiões de dor
+    for regiao in pain_regions:
+        db_regiao = RegistroRegiaoDor(
+            registro_id=registro.id,
+            regiao_id=regiao.id,
+            intensidade=regiao.intensity,
+        )
+        session.add(db_regiao)
+
+
 @router.post(
     '/',
     status_code=HTTPStatus.CREATED,
@@ -112,23 +133,9 @@ async def create_registro_diario(
         session.add(db_registro)
         await session.flush()
 
-    # Adicionar sintomas
-    for sintoma in registro.symptoms:
-        db_sintoma = RegistroSintoma(
-            registro_id=db_registro.id,
-            sintoma_id=sintoma.id,
-            intensidade=sintoma.intensity,
-        )
-        session.add(db_sintoma)
-
-    # Adicionar regiões de dor
-    for regiao in registro.painRegions:
-        db_regiao = RegistroRegiaoDor(
-            registro_id=db_registro.id,
-            regiao_id=regiao.id,
-            intensidade=regiao.intensity,
-        )
-        session.add(db_regiao)
+    await _adicionar_itens_registro(
+        session, db_registro, registro.symptoms, registro.painRegions
+    )
 
     await session.commit()
     await session.refresh(db_registro, ['sintomas', 'regioes_dor'])
@@ -178,23 +185,19 @@ async def create_registro_diario_pt(
         session.add(db_registro)
         await session.flush()
 
-    # Adicionar sintomas
-    for sintoma in registro.sintomas:
-        db_sintoma = RegistroSintoma(
-            registro_id=db_registro.id,
-            sintoma_id=sintoma.id,
-            intensidade=sintoma.intensidade,
-        )
-        session.add(db_sintoma)
+    # Mapear para schema interno do helper
+    symptoms = [
+        type('Symptom', (), {'id': s.id, 'intensity': s.intensidade})
+        for s in registro.sintomas
+    ]
+    pain_regions = [
+        type('PainRegion', (), {'id': r.id, 'intensity': r.intensidade})
+        for r in registro.regioes_dor
+    ]
 
-    # Adicionar regiões de dor
-    for regiao in registro.regioes_dor:
-        db_regiao = RegistroRegiaoDor(
-            registro_id=db_registro.id,
-            regiao_id=regiao.id,
-            intensidade=regiao.intensidade,
-        )
-        session.add(db_regiao)
+    await _adicionar_itens_registro(
+        session, db_registro, symptoms, pain_regions
+    )
 
     await session.commit()
     await session.refresh(db_registro, ['sintomas', 'regioes_dor'])
@@ -279,3 +282,81 @@ async def get_registro_diario(
         painRegions=_mapear_regioes_para_resposta(registro.regioes_dor),
         notes=registro.observacoes,
     )
+
+
+@router.put(
+    '/{registro_id}',
+    response_model=RegistroDiarioPublic,
+    summary='Atualizar registro diário',
+)
+async def update_registro_diario(
+    registro_id: int,
+    registro_data: DailyLogCreate,
+    session: Session,
+    paciente: CurrentPaciente,
+):
+    db_registro = await session.scalar(
+        select(RegistroDiario)
+        .where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
+        .options(
+            selectinload(RegistroDiario.sintomas),
+            selectinload(RegistroDiario.regioes_dor),
+        )
+    )
+    
+    if not db_registro:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Registro diário não encontrado.',
+        )
+
+    db_registro.data_hora = registro_data.timestamp
+    db_registro.observacoes = registro_data.notes
+    
+    await _limpar_itens_registro(session, db_registro)
+    await _adicionar_itens_registro(
+        session, db_registro, registro_data.symptoms, registro_data.painRegions
+    )
+
+    await session.commit()
+    await session.refresh(db_registro, ['sintomas', 'regioes_dor'])
+
+    return RegistroDiarioPublic(
+        id=db_registro.id,
+        paciente_id=db_registro.paciente_id,
+        data_registro=db_registro.data_hora,
+        message='Registro atualizado com sucesso',
+        symptoms=_mapear_sintomas_para_resposta(db_registro.sintomas),
+        painRegions=_mapear_regioes_para_resposta(db_registro.regioes_dor),
+        notes=db_registro.observacoes,
+    )
+
+
+@router.delete(
+    '/{registro_id}',
+    status_code=HTTPStatus.NO_CONTENT,
+    summary='Excluir registro diário',
+)
+async def delete_registro_diario(
+    registro_id: int,
+    session: Session,
+    paciente: CurrentPaciente,
+):
+    db_registro = await session.scalar(
+        select(RegistroDiario).where(
+            RegistroDiario.id == registro_id,
+            RegistroDiario.paciente_id == paciente.id,
+        )
+    )
+
+    if not db_registro:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND,
+            detail='Registro diário não encontrado.',
+        )
+
+    await session.delete(db_registro)
+    await session.commit()

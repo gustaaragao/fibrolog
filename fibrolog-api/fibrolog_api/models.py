@@ -190,6 +190,11 @@ class RegistroCrise(Registro):
     )
     intensidade_dor: Mapped[int]
     contexto: Mapped[str] = mapped_column(Text)
+    duracao: Mapped[Optional[str]] = mapped_column(String, default=None)
+    sintomas_relatados: Mapped[Optional[str]] = mapped_column(
+        Text, default=None
+    )
+    observacoes: Mapped[Optional[str]] = mapped_column(Text, default=None)
 
     __mapper_args__ = {
         'polymorphic_identity': 'crise',
