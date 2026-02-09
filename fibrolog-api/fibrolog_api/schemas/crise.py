@@ -1,7 +1,3 @@
-"""
-Schemas para validação de dados de crises.
-"""
-
 from datetime import datetime
 
 from pydantic import BaseModel, Field
@@ -12,6 +8,9 @@ class CriseCreate(BaseModel):
 
     intensidade_dor: int = Field(..., ge=0, le=10)
     contexto: str
+    duracao: str | None = None
+    sintomas_relatados: str | None = None
+    observacoes: str | None = None
 
 
 class CriseUpdate(BaseModel):
@@ -19,6 +18,9 @@ class CriseUpdate(BaseModel):
 
     intensidade_dor: int | None = Field(None, ge=0, le=10)
     contexto: str | None = None
+    duracao: str | None = None
+    sintomas_relatados: str | None = None
+    observacoes: str | None = None
 
 
 class CrisePublic(CriseCreate):

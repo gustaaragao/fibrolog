@@ -22,7 +22,7 @@ export default function Select({
 }: SelectProps) {
   return (
     <View className="mb-4">
-      <Text className="text-gray-700 font-medium mb-2 text-base">
+      <Text className="text-pink-800 font-semibold mb-2 text-base">
         {label}
       </Text>
       <Controller
@@ -32,7 +32,7 @@ export default function Select({
           <View 
             className={`
               border-2 rounded-lg
-              ${error ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}
+              ${error ? 'border-red-500 bg-red-50' : 'border-pink-200 bg-white'}
               ${Platform.OS === 'ios' ? 'h-12' : 'h-12'}
             `}
           >

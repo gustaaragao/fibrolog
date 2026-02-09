@@ -45,6 +45,20 @@ async function request<TResponse>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
+  // Para respostas sem conteúdo (204 ou 200 sem body), retornar imediatamente
+  if (response.status === 204 || response.status === 200) {
+    // Tenta verificar se há conteúdo
+    const contentType = response.headers.get("content-type");
+    const hasContent = contentType && contentType.includes("application/json");
+
+    if (response.status === 204 || !hasContent) {
+      if (!response.ok) {
+        throw new Error("Erro ao processar requisição.");
+      }
+      return {} as TResponse;
+    }
+  }
+
   const data = await parseJsonSafe<ApiErrorResponse>(response);
 
   if (!response.ok) {
@@ -60,6 +74,17 @@ export const api = {
   get: <TResponse>(path: string) => request<TResponse>(path, { method: "GET" }),
   post: <TResponse>(path: string, body?: Record<string, unknown>) =>
     request<TResponse>(path, { method: "POST", body }),
+  put: <TResponse>(path: string, body?: Record<string, unknown>) =>
+    request<TResponse>(path, { method: "PUT", body }),
+  patch: <TResponse>(path: string, body?: Record<string, unknown>) =>
+    request<TResponse>(path, { method: "PATCH", body }),
+  delete: <TResponse>(path: string) => {
+    return request<TResponse>(path, { method: "DELETE" });
+  },
+  setAuthToken: (_token: string) => {
+    // No atual design, setAuthToken nao e necessario porque o token e recuperado
+    // do storage em cada request. Esta funcao existe para compatibilidade.
+  },
 };
 
 export type ApiError = Error;

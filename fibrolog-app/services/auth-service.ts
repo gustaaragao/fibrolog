@@ -31,13 +31,6 @@ async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
     body.append("username", credenciais.email);
     body.append("password", credenciais.senha);
 
-    if (__DEV__) {
-      console.log("🔐 Tentando login com:", {
-        email: credenciais.email,
-        url: `${API_BASE_URL}/auth/token`,
-      });
-    }
-
     const response = await fetch(`${API_BASE_URL}/auth/token`, {
       method: "POST",
       headers: {
@@ -46,33 +39,22 @@ async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
       body: body.toString(),
     });
 
-    if (__DEV__) {
-      console.log("📡 Resposta da API:", {
-        status: response.status,
-        ok: response.ok,
-      });
-    }
-
     const data = (await response.json()) as
       | AuthTokenResponse
       | { detail?: string };
-    if (__DEV__) console.log("📦 Dados recebidos:", data);
 
     const detalheErro = "detail" in data ? data.detail : undefined;
 
     if (!response.ok) {
       const mensagem = detalheErro || "Nao foi possivel realizar o login.";
-      if (__DEV__) console.error("❌ Erro de autenticação:", mensagem);
       throw new Error(mensagem);
     }
 
-    if (__DEV__) console.log("✅ Login bem-sucedido!");
     return {
       token: (data as AuthTokenResponse).access_token,
       tipoToken: (data as AuthTokenResponse).token_type,
     };
   } catch (erro) {
-    if (__DEV__) console.error("💥 Erro no login:", erro);
     const mensagemBase =
       erro instanceof Error && erro.message
         ? erro.message

@@ -17,6 +17,9 @@ def crise_data():
     return {
         'intensidade_dor': 8,
         'contexto': 'Crise forte após um dia estressante de trabalho.',
+        'duracao': '2 horas',
+        'sintomas_relatados': 'Dor de cabeça, náuseas.',
+        'observacoes': 'Tomei medicação extra.',
     }
 
 
@@ -36,6 +39,9 @@ async def test_create_crise(
     data = response.json()
     assert data['intensidade_dor'] == crise_data['intensidade_dor']
     assert data['contexto'] == crise_data['contexto']
+    assert data['duracao'] == crise_data['duracao']
+    assert data['sintomas_relatados'] == crise_data['sintomas_relatados']
+    assert data['observacoes'] == crise_data['observacoes']
     assert data['paciente_id'] == paciente.id
     assert 'id' in data
     assert 'data_hora' in data

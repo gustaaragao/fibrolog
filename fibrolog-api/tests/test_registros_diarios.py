@@ -254,3 +254,123 @@ async def test_rn006_upsert_registro_mesmo_dia(client, token, paciente):
     assert registro['painRegions'][0]['id'] == '20'
     assert registro['painRegions'][0]['intensity'] == 9
     assert registro['notes'] == 'Segunda versão (sobrescrita)'
+
+
+@pytest.mark.asyncio
+async def test_update_registro_diario(client, token, paciente):
+    # Criar um registro primeiro
+    response_post = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 3}],
+            'observacoes': 'Antes do update',
+            'data_hora': datetime.now().isoformat(),
+        },
+    )
+    registro_id = response_post.json()['id']
+
+    # Atualizar o registro
+    response_put = await client.put(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'symptoms': [{'id': '3', 'intensity': 9}],
+            'painRegions': [{'id': '15', 'intensity': 4}],
+            'notes': 'Depois do update',
+            'timestamp': datetime.now().isoformat(),
+        },
+    )
+
+    assert response_put.status_code == HTTPStatus.OK
+    data = response_put.json()
+    assert data['id'] == registro_id
+    assert data['notes'] == 'Depois do update'
+    assert data['symptoms'][0]['id'] == '3'
+    assert data['symptoms'][0]['intensity'] == 9
+
+
+@pytest.mark.asyncio
+async def test_update_registro_diario_outro_usuario(client, other_token, token):
+    # Criar um registro com o primeiro usuário
+    response_post = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 3}],
+            'observacoes': 'Dono original',
+            'data_hora': datetime.now().isoformat(),
+        },
+    )
+    registro_id = response_post.json()['id']
+
+    # Tentar atualizar com outro usuário
+    response_put = await client.put(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {other_token}'},
+        json={
+            'symptoms': [{'id': '3', 'intensity': 9}],
+            'painRegions': [{'id': '15', 'intensity': 4}],
+            'notes': 'Tentativa de roubo',
+            'timestamp': datetime.now().isoformat(),
+        },
+    )
+
+    assert response_put.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_delete_registro_diario(client, token, paciente):
+    # Criar um registro primeiro
+    response_post = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 3}],
+            'observacoes': 'Para deletar',
+            'data_hora': datetime.now().isoformat(),
+        },
+    )
+    registro_id = response_post.json()['id']
+
+    # Deletar o registro
+    response_delete = await client.delete(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+
+    assert response_delete.status_code == HTTPStatus.NO_CONTENT
+
+    # Tentar buscar o registro deletado
+    response_get = await client.get(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    assert response_get.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_delete_registro_diario_outro_usuario(client, other_token, token):
+    # Criar um registro com o primeiro usuário
+    response_post = await client.post(
+        '/registros-diarios/pt',
+        headers={'Authorization': f'Bearer {token}'},
+        json={
+            'sintomas': [{'id': '2', 'intensidade': 5}],
+            'regioes_dor': [{'id': '10', 'intensidade': 3}],
+            'observacoes': 'Dono original',
+            'data_hora': datetime.now().isoformat(),
+        },
+    )
+    registro_id = response_post.json()['id']
+
+    # Tentar deletar com outro usuário
+    response_delete = await client.delete(
+        f'/registros-diarios/{registro_id}',
+        headers={'Authorization': f'Bearer {other_token}'},
+    )
+
+    assert response_delete.status_code == HTTPStatus.NOT_FOUND

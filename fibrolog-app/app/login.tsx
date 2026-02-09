@@ -8,11 +8,11 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  Text,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    Text,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 
@@ -34,22 +34,12 @@ export default function LoginScreen() {
   });
 
   const handleLogin = async (data: LoginFormData) => {
-    if (__DEV__) {
-      console.log("🚀 Iniciando login com:", {
-        email: data.email,
-        password: "***",
-      });
-    }
     setCarregando(true);
     try {
       // Mapear campos do schema (inglês) para API (português)
-      if (__DEV__) console.log("📤 Chamando signIn...");
       await signIn({ email: data.email, senha: data.password });
-      if (__DEV__) console.log("✅ signIn completou, navegando para /home");
       router.replace("/home");
     } catch (error: any) {
-      if (__DEV__) console.error("❌ Erro capturado:", error);
-
       // Determinar tipo de erro e mostrar mensagem apropriada
       let errorMessage = "Erro ao fazer login. Tente novamente";
 
@@ -62,7 +52,6 @@ export default function LoginScreen() {
         errorMessage = error.message;
       }
 
-      console.log("💬 Mostrando toast:", errorMessage);
       Toast.show({
         type: "error",
         text1: "Erro no Login",
