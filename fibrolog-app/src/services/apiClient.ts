@@ -39,9 +39,6 @@ const secureStorage = {
   },
 };
 
-// Check if we're in development mode
-const isDevelopment = __DEV__;
-
 // Create axios instance with base configuration
 export const apiClient: AxiosInstance = axios.create({
   baseURL: getApiUrl(),
@@ -59,7 +56,7 @@ apiClient.interceptors.request.use(
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } catch (error) {
+    } catch {
       // Erro ao recuperar token
     }
     return config;
@@ -82,7 +79,7 @@ apiClient.interceptors.response.use(
           secureStorage.removeItem(TOKEN_STORAGE_KEY),
           secureStorage.removeItem(USER_STORAGE_KEY),
         ]);
-      } catch (storageError) {
+      } catch {
         // Erro ao limpar dados de autenticação
       }
     }

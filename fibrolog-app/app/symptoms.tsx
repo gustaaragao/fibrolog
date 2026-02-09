@@ -3,6 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
+  ActivityIndicator,
   Alert,
   FlatList,
   ScrollView,
@@ -33,6 +34,9 @@ export default function SymptomsScreen() {
   >({});
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(isEditing);
+  const [originalTimestamp, setOriginalTimestamp] = useState<string | null>(
+    null,
+  );
 
   const { control, handleSubmit, setValue } = useForm({
     defaultValues: {
@@ -43,9 +47,24 @@ export default function SymptomsScreen() {
   // Carregar dados existentes se estiver editando
   useEffect(() => {
     if (isEditing) {
+      // Validar ID numérico
+      const numericId = parseInt(id, 10);
+      if (!Number.isFinite(numericId) || numericId <= 0) {
+        Toast.show({
+          type: "error",
+          text1: "Erro",
+          text2: "ID de registro inválido.",
+        });
+        router.back();
+        return;
+      }
+
       const loadExistingData = async () => {
         try {
-          const data = await DailyLogService.getById(parseInt(id));
+          const data = await DailyLogService.getById(numericId);
+
+          // Preservar timestamp original
+          setOriginalTimestamp(data.timestamp);
 
           // Carregar sintomas selecionados e suas intensidades
           const symptomIds = data.symptoms.map((s) => s.id);
@@ -151,11 +170,11 @@ export default function SymptomsScreen() {
           intensity: regionIntensities[id] || 4,
         })),
         notes: data.notes,
-        timestamp: new Date().toISOString(),
+        timestamp: originalTimestamp ?? new Date().toISOString(),
       };
 
       if (isEditing) {
-        await DailyLogService.update(parseInt(id), payload);
+        await DailyLogService.update(parseInt(id, 10), payload);
         Toast.show({
           type: "success",
           text1: "Sucesso!",
@@ -230,7 +249,14 @@ export default function SymptomsScreen() {
         }}
       />
 
-      {step === 1 && (
+      {initialLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={Colors.pink[500]} />
+          <Text className="mt-4 text-pink-600">Carregando dados...</Text>
+        </View>
+      ) : (
+        <>
+          {step === 1 && (
         <ScrollView className="flex-1">
           <View className="p-4">
             <Text className="text-pink-800 text-lg font-bold mb-2 text-center">
@@ -405,6 +431,8 @@ export default function SymptomsScreen() {
             </View>
           </View>
         </ScrollView>
+      )}
+        </>
       )}
     </View>
   );

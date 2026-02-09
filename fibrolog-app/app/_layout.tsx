@@ -24,7 +24,7 @@ export default function RootLayout() {
         // Pre-load fonts, make any API calls you need to do here
         // We simulate a delay to show the brand loading screen
         await new Promise((resolve) => setTimeout(resolve, 2000));
-      } catch (e) {
+      } catch {
         // Erro na preparação
       } finally {
         // Tell the application to render
