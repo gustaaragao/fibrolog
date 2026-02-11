@@ -28,7 +28,7 @@ export default function HomeScreen() {
     { name: "Lembrete", icon: "notifications", route: "/reminder" },
     { name: "Histórico", icon: "history", route: "/history" },
     { name: "Áudio Descrição", icon: "mic", route: "/audio-desc" },
-    { name: "Gerar PDF", icon: "picture-as-pdf", route: "/pdf" },
+    { name: "Gerar PDF", icon: "picture-as-pdf", route: "/relatorio" },
     { name: "Informações", icon: "info", route: "/info" },
     { name: "Rede de Apoio", icon: "group", route: "/support" },
   ];
