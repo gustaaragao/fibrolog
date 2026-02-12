@@ -34,17 +34,15 @@ CurrentPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 def _mapear_sintomas_para_resposta(sintomas):
     """Helper para mapear sintomas do modelo para o schema de resposta."""
-    return [
-        {'id': s.sintoma_id, 'intensity': s.intensidade}
-        for s in sintomas
-    ]
+    return [{'id': s.sintoma_id, 'intensity': s.intensidade} for s in sintomas]
 
 
 def _mapear_regioes_para_resposta(regioes_dor):
-    """Helper para mapear regiões de dor do modelo para o schema de resposta."""
+    """
+    Helper para mapear regiões de dor do modelo para o schema de resposta.
+    """
     return [
-        {'id': r.regiao_id, 'intensity': r.intensidade}
-        for r in regioes_dor
+        {'id': r.regiao_id, 'intensity': r.intensidade} for r in regioes_dor
     ]
 
 
@@ -105,7 +103,10 @@ async def _adicionar_itens_registro(session, registro, symptoms, pain_regions):
     status_code=HTTPStatus.CREATED,
     response_model=RegistroDiarioPublic,
     summary='Criar registro diário',
-    description='Cria um novo registro diário de sintomas e dor (Suporta nomes em inglês do frontend)',
+    description=(
+        'Cria um novo registro diário de sintomas e dor '
+        '(Suporta nomes em inglês do frontend)'
+    ),
 )
 async def create_registro_diario(
     registro: DailyLogCreate,

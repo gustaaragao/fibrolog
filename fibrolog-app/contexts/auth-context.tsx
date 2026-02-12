@@ -1,9 +1,9 @@
 import {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-    type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
 } from "react";
 
 import { authService } from "@/services/auth-service";
@@ -50,14 +50,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     async function restaurarSessao() {
       try {
+        console.log("🔄 [Auth] Restaurando sessão...");
         const token = await storage.getItemAsync("fibrolog_access_token");
         const userEmail = await storage.getItemAsync("fibrolog_user_email");
         const userName = await storage.getItemAsync("fibrolog_user_name");
 
         if (!token) {
+          console.log("⚠️ [Auth] Nenhum token encontrado no storage");
           setUsuario(null);
           return;
         }
+
+        console.log(`✅ [Auth] Token encontrado: ${token.substring(0, 20)}...`);
+        console.log(`👤 [Auth] Usuário: ${userName} (${userEmail})`);
 
         // Restaura sessão com dados armazenados
         setUsuario({
@@ -65,7 +70,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           nome: userName || "Usuário",
           email: userEmail || "usuario@fibrolog.com",
         });
-      } catch {
+      } catch (error) {
+        console.error("❌ [Auth] Erro ao restaurar sessão:", error);
         setUsuario(null);
       } finally {
         setCarregandoSessao(false);
@@ -78,15 +84,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     // Escuta evento de não autorizado disparado pela API
     const handleUnauthorized = () => {
+      console.warn(
+        "🚫 [Auth] Evento 'unauthorized' recebido - fazendo logout automático",
+      );
       signOut();
     };
 
-    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.addEventListener === "function"
+    ) {
       window.addEventListener("fibrolog_unauthorized", handleUnauthorized);
     }
 
     return () => {
-      if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
+      if (
+        typeof window !== "undefined" &&
+        typeof window.removeEventListener === "function"
+      ) {
         window.removeEventListener("fibrolog_unauthorized", handleUnauthorized);
       }
     };
@@ -96,11 +111,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const resultado = await authService.login(credenciais);
 
+      console.log("✅ [Auth] Login bem-sucedido, salvando token...");
       await storage.setItemAsync("fibrolog_access_token", resultado.token);
       await storage.setItemAsync("fibrolog_user_email", credenciais.email);
       await storage.setItemAsync(
         "fibrolog_user_name",
         credenciais.email.split("@")[0],
+      );
+
+      // Verifica se o token foi salvo corretamente
+      const tokenSalvo = await storage.getItemAsync("fibrolog_access_token");
+      console.log(
+        `🔐 [Auth] Token salvo: ${tokenSalvo ? `Sim (${tokenSalvo.substring(0, 20)}...)` : "❌ NÃO"}`,
       );
 
       setUsuario({
@@ -109,15 +131,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
         email: credenciais.email,
       });
     } catch (error) {
+      console.error("❌ [Auth] Erro no login:", error);
       throw error;
     }
   }
 
   async function signUp(_dados: DadosCadastro): Promise<void> {
+    console.log("✅ [Auth] Cadastro bem-sucedido, salvando token...");
     const resultado = await authService.signup(_dados);
     await storage.setItemAsync("fibrolog_access_token", resultado.token);
     await storage.setItemAsync("fibrolog_user_email", _dados.email);
     await storage.setItemAsync("fibrolog_user_name", _dados.nome);
+
+    // Verifica se o token foi salvo corretamente
+    const tokenSalvo = await storage.getItemAsync("fibrolog_access_token");
+    console.log(
+      `🔐 [Auth] Token salvo após cadastro: ${tokenSalvo ? `Sim (${tokenSalvo.substring(0, 20)}...)` : "❌ NÃO"}`,
+    );
 
     setUsuario({
       id: "user",
@@ -127,10 +157,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function signOut(): Promise<void> {
+    console.log("🚪 [Auth] Fazendo logout...");
     await storage.deleteItemAsync("fibrolog_access_token");
     await storage.deleteItemAsync("fibrolog_user_email");
     await storage.deleteItemAsync("fibrolog_user_name");
     setUsuario(null);
+    console.log("✅ [Auth] Logout concluído");
   }
 
   return (

@@ -4,7 +4,6 @@ from http import HTTPStatus
 import pytest
 
 from fibrolog_api.models import (
-    Registro,
     RegistroCrise,
     RegistroDiario,
     RegistroRegiaoDor,
@@ -32,7 +31,8 @@ async def test_get_progresso_sem_dados(client, token):
     assert data['media_dor_semana']['valor'] == 0.0
     assert data['dias_registrados_mes']['valor'] == 0
     assert data['crises_mes']['valor'] == 0
-    assert len(data['grafico_dor_semanal']) == 7
+    dias_esperados = 7
+    assert len(data['grafico_dor_semanal']) == dias_esperados
 
 
 async def test_get_progresso_com_dados(client, token, paciente, session):
@@ -43,20 +43,13 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
     for i in range(7):
         dia = hoje - timedelta(days=i)
 
-        # Criar registro base
-        registro = Registro(
-            tipo_registro='diario',
-            paciente_id=paciente.id,
-            data_hora=dia,
-        )
-        session.add(registro)
-        await session.flush()
-
         # Criar registro diário
         registro_diario = RegistroDiario(
-            id=registro.id,
+            paciente_id=paciente.id,
+            tipo_registro='diario',
             observacoes=f'Registro dia {i}',
         )
+        registro_diario.data_hora = dia
         session.add(registro_diario)
         await session.flush()
 
@@ -71,19 +64,13 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
     # Criar crises no mês atual
     for i in range(3):
         dia_crise = hoje - timedelta(days=i * 5)
-        registro_crise_base = Registro(
-            tipo_registro='crise',
-            paciente_id=paciente.id,
-            data_hora=dia_crise,
-        )
-        session.add(registro_crise_base)
-        await session.flush()
-
         crise = RegistroCrise(
-            id=registro_crise_base.id,
+            paciente_id=paciente.id,
+            tipo_registro='crise',
             intensidade_dor=8,
             contexto='Contexto da crise',
         )
+        crise.data_hora = dia_crise
         session.add(crise)
 
     await session.commit()
@@ -105,11 +92,14 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
 
     # Verificar métricas
     assert data['media_dor_semana']['valor'] > 0
-    assert data['dias_registrados_mes']['valor'] >= 7
-    assert data['crises_mes']['valor'] == 3
+    dias_minimos = 7
+    crises_esperadas = 3
+    assert data['dias_registrados_mes']['valor'] >= dias_minimos
+    assert data['crises_mes']['valor'] == crises_esperadas
 
     # Verificar gráfico
-    assert len(data['grafico_dor_semanal']) == 7
+    dias_semana = 7
+    assert len(data['grafico_dor_semanal']) == dias_semana
     for dia in data['grafico_dor_semanal']:
         assert 'dia' in dia
         assert 'data' in dia
@@ -117,30 +107,28 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
 
     # Verificar insights
     assert len(data['insights']) > 0
+    tipos_validos = {'info', 'warning', 'success', 'danger'}
     for insight in data['insights']:
         assert 'tipo' in insight
         assert 'mensagem' in insight
-        assert insight['tipo'] in ['info', 'warning', 'success', 'danger']
+        assert insight['tipo'] in tipos_validos
 
 
-async def test_get_progresso_compara_periodos(client, token, paciente, session):
+async def test_get_progresso_compara_periodos(
+    client, token, paciente, session
+):
     """Testa se o endpoint compara corretamente os períodos."""
     hoje = datetime.now()
 
     # Criar registros na semana atual (últimos 7 dias) com dor média de 4
     for i in range(7):
         dia = hoje - timedelta(days=i)
-        registro = Registro(
-            tipo_registro='diario',
-            paciente_id=paciente.id,
-            data_hora=dia,
-        )
-        session.add(registro)
-        await session.flush()
-
         registro_diario = RegistroDiario(
-            id=registro.id, observacoes=f'Semana atual {i}'
+            paciente_id=paciente.id,
+            tipo_registro='diario',
+            observacoes=f'Semana atual {i}',
         )
+        registro_diario.data_hora = dia
         session.add(registro_diario)
         await session.flush()
 
@@ -152,17 +140,12 @@ async def test_get_progresso_compara_periodos(client, token, paciente, session):
     # Criar registros na semana anterior (8-14 dias atrás) com dor média de 6
     for i in range(7, 14):
         dia = hoje - timedelta(days=i)
-        registro = Registro(
-            tipo_registro='diario',
-            paciente_id=paciente.id,
-            data_hora=dia,
-        )
-        session.add(registro)
-        await session.flush()
-
         registro_diario = RegistroDiario(
-            id=registro.id, observacoes=f'Semana anterior {i}'
+            paciente_id=paciente.id,
+            tipo_registro='diario',
+            observacoes=f'Semana anterior {i}',
         )
+        registro_diario.data_hora = dia
         session.add(registro_diario)
         await session.flush()
 
@@ -182,11 +165,11 @@ async def test_get_progresso_compara_periodos(client, token, paciente, session):
     data = response.json()
 
     # Verificar que houve melhora (dor diminuiu)
-    assert data['media_dor_semana']['valor'] == 4.0
+    media_dor_esperada = 4.0
+    assert data['media_dor_semana']['valor'] == media_dor_esperada
     assert data['media_dor_semana']['variacao_percentual'] is not None
-    assert (
-        data['media_dor_semana']['variacao_percentual'] < 0
-    )  # Diminuiu (negativo)
+    # Diminuiu (negativo)
+    assert data['media_dor_semana']['variacao_percentual'] < 0
     assert data['media_dor_semana']['tendencia'] == 'baixa'
 
 

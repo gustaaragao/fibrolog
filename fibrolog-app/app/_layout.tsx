@@ -5,11 +5,61 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
 import { Text } from "react-native";
-import Toast from "react-native-toast-message";
+import Toast, {
+    BaseToast,
+    ErrorToast,
+    InfoToast,
+} from "react-native-toast-message";
 import "../global.css";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+// Configuração customizada dos toasts
+const toastConfig = {
+  success: (props: any) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: "#7d1e60", backgroundColor: "#fff" }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "700",
+        color: "#1f2937",
+      }}
+      text2Style={{
+        fontSize: 14,
+        color: "#6b7280",
+      }}
+    />
+  ),
+  error: (props: any) => (
+    <ErrorToast
+      {...props}
+      style={{ borderLeftColor: "#dc2626" }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "700",
+      }}
+      text2Style={{
+        fontSize: 14,
+      }}
+    />
+  ),
+  info: (props: any) => (
+    <InfoToast
+      {...props}
+      style={{ borderLeftColor: "#3b82f6" }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: "700",
+      }}
+      text2Style={{
+        fontSize: 14,
+      }}
+    />
+  ),
+};
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -90,7 +140,12 @@ export default function RootLayout() {
         <Stack.Screen name="support" />
         <Stack.Screen name="relatorio" />
       </Stack>
-      <Toast />
+      <Toast
+        config={toastConfig}
+        position="top"
+        topOffset={60}
+        visibilityTime={4000}
+      />
     </AuthProvider>
   );
 }

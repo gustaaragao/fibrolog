@@ -31,12 +31,25 @@ S_EMOTION = '5'
 
 # Regiões de dor comuns
 PAIN_REGIONS = [
-    '1', '2', '3', '4', '5',  # Cabeça, pescoço, ombros, costas, braços
-    '6', '7', '8', '9', '10',  # Mãos, tórax, abdômen, quadril, pernas
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',  # Cabeça, pescoço, ombros, costas, braços
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',  # Mãos, tórax, abdômen, quadril, pernas
 ]
 
 # Emoções (índices para o sintoma de emoção)
 EMOTIONS = [0, 1, 2, 3]  # FELIZ, ANSIOSO, IRRITADO, TRISTE
+
+# Probabilidades para sintomas (0.0 a 1.0)
+PROB_FATIGUE = 0.8  # 80% dos dias
+PROB_SLEEP = 0.9  # 90% dos dias
+PROB_EMOTION = 0.7  # 70% dos dias
 
 # Observações variadas
 OBSERVACOES = [
@@ -136,8 +149,13 @@ async def create_medicacoes(session: AsyncSession, paciente: Paciente):
     print(f'✓ {len(medicacoes)} medicações criadas')
 
 
-async def create_registros_diarios(session: AsyncSession, paciente: Paciente, num_days: int = 60):
-    """Cria registros diários para os últimos N dias."""
+async def create_registros_diarios(  # noqa: PLR0914
+    session: AsyncSession, paciente: Paciente, num_days: int = 60
+):
+    """Cria registros diários para os últimos N dias.
+
+    Note: Multiple variables needed to generate realistic medical data.
+    """
     data_atual = datetime.now()
     registros_criados = 0
 
@@ -156,7 +174,18 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
         # Adiciona sintoma de dor (sempre presente)
         dor_intensidade = random.choices(
             range(1, 11),
-            weights=[2, 3, 5, 8, 10, 12, 10, 8, 4, 2],  # Gaussiana centrada em 5-6
+            weights=[
+                2,
+                3,
+                5,
+                8,
+                10,
+                12,
+                10,
+                8,
+                4,
+                2,
+            ],  # Gaussiana centrada em 5-6
         )[0]
 
         sintoma_dor = RegistroSintoma(
@@ -167,7 +196,7 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
         session.add(sintoma_dor)
 
         # Adiciona fadiga (80% dos dias)
-        if random.random() < 0.8:
+        if random.random() < PROB_FATIGUE:
             fadiga = random.randint(3, 9)
             sintoma_fadiga = RegistroSintoma(
                 registro_id=registro.id,
@@ -177,7 +206,7 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
             session.add(sintoma_fadiga)
 
         # Adiciona sono (90% dos dias)
-        if random.random() < 0.9:
+        if random.random() < PROB_SLEEP:
             sono = random.randint(1, 5)
             sintoma_sono = RegistroSintoma(
                 registro_id=registro.id,
@@ -187,7 +216,7 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
             session.add(sintoma_sono)
 
         # Adiciona emoção (70% dos dias)
-        if random.random() < 0.7:
+        if random.random() < PROB_EMOTION:
             emocao = random.choice(EMOTIONS)
             sintoma_emocao = RegistroSintoma(
                 registro_id=registro.id,
@@ -218,7 +247,9 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
     print(f'✓ {registros_criados} registros diários criados')
 
 
-async def create_crises(session: AsyncSession, paciente: Paciente, num_crises: int = 15):
+async def create_crises(
+    session: AsyncSession, paciente: Paciente, num_crises: int = 15
+):
     """Cria registros de crises aleatórias nos últimos 60 dias."""
     data_atual = datetime.now()
     crises_criadas = 0
@@ -229,15 +260,25 @@ async def create_crises(session: AsyncSession, paciente: Paciente, num_crises: i
         horas = random.randint(0, 23)
         minutos = random.randint(0, 59)
 
-        data_crise = data_atual - timedelta(days=dias_atras, hours=horas, minutes=minutos)
+        data_crise = data_atual - timedelta(
+            days=dias_atras, hours=horas, minutes=minutos
+        )
 
         # Cria registro de crise
         crise = RegistroCrise(
             tipo_registro='crise',
             paciente_id=paciente.id,
-            intensidade_dor=random.randint(7, 10),  # Crises são sempre intensas
+            intensidade_dor=random.randint(
+                7, 10
+            ),  # Crises são sempre intensas
             contexto=random.choice(CONTEXTOS_CRISE),
-            duracao=random.choice(['30 min', '1-2h', '2-4h', '4-6h', 'Mais de 6h']),
+            duracao=random.choice([
+                '30 min',
+                '1-2h',
+                '2-4h',
+                '4-6h',
+                'Mais de 6h',
+            ]),
             sintomas_relatados=random.choice(SINTOMAS_CRISE),
             observacoes=random.choice([
                 'Precisei me deitar imediatamente',

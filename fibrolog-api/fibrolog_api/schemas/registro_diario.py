@@ -9,21 +9,32 @@ from pydantic import BaseModel, Field
 
 
 class SymptomEntry(BaseModel):
-    """Schema para entrada de um sintoma individual (Frontend compatibility)."""
+    """
+    Schema para entrada de um sintoma individual (Frontend compatibility).
+    """
+
     # Padrão valida IDs de 1 a 8
     id: str = Field(..., pattern='^[1-8]$')
     intensity: int = Field(..., ge=0, le=10)
 
 
 class PainRegionEntry(BaseModel):
-    """Schema para entrada de uma região de dor individual (Frontend compatibility)."""
+    """
+    Schema para entrada de uma região de dor individual
+    (Frontend compatibility).
+    """
+
     # Padrão valida IDs de 1 a 50: [1-9] (1-9), [1-4][0-9] (10-49), 50
     id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
     intensity: int = Field(..., ge=0, le=10)
 
 
 class DailyLogCreate(BaseModel):
-    """Schema para criação de um registro diário completo (Frontend compatibility)."""
+    """
+    Schema para criação de um registro diário completo
+    (Frontend compatibility).
+    """
+
     symptoms: List[SymptomEntry]
     painRegions: List[PainRegionEntry]
     notes: Optional[str] = None
@@ -32,18 +43,21 @@ class DailyLogCreate(BaseModel):
 
 class EntradaSintoma(BaseModel):
     """Schema para entrada de um sintoma individual."""
+
     id: str = Field(..., pattern='^[1-8]$')
     intensidade: int = Field(..., ge=0, le=10)
 
 
 class EntradaRegiaoDor(BaseModel):
     """Schema para entrada de uma região de dor individual."""
+
     id: str = Field(..., pattern='^([1-9]|[1-4][0-9]|50)$')
     intensidade: int = Field(..., ge=0, le=10)
 
 
 class RegistroDiarioCreate(BaseModel):
     """Schema para criação de um registro diário completo."""
+
     sintomas: List[EntradaSintoma]
     regioes_dor: List[EntradaRegiaoDor]
     observacoes: Optional[str] = None
@@ -52,6 +66,7 @@ class RegistroDiarioCreate(BaseModel):
 
 class RegistroDiarioPublic(BaseModel):
     """Schema para retorno público de um registro diário."""
+
     id: int
     paciente_id: int
     data_registro: datetime
@@ -66,10 +81,15 @@ class RegistroDiarioPublic(BaseModel):
 
 class RegistroDiarioList(BaseModel):
     """Schema para listagem de registros diários."""
+
     registros: List[RegistroDiarioPublic]
 
 
 class DailyLogResponse(BaseModel):
-    """Schema para resposta de criação de um registro diário (Frontend compatibility)."""
+    """
+    Schema para resposta de criação de um registro diário
+    (Frontend compatibility).
+    """
+
     id: int
     message: str = 'Registro criado com sucesso'

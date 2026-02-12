@@ -6,4 +6,6 @@ export const supportService = {
   create: (data: Omit<SupportContact, "id">) =>
     api.post<SupportContact>("/rede-apoio", data as unknown as Record<string, unknown>),
   delete: (id: number) => api.delete<void>(`/rede-apoio/${id}`),
+  notify: (contactIds?: number[]) =>
+    api.post<void>("/rede-apoio/notificar", { contact_ids: contactIds }),
 };
