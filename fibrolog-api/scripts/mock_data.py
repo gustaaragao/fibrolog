@@ -6,23 +6,22 @@ para geração de relatórios completos.
 """
 
 import asyncio
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from fibrolog_api.database import async_session
 from fibrolog_api.models import (
-    Paciente,
-    RegistroDiario,
-    RegistroCrise,
-    RegistroSintoma,
-    RegistroRegiaoDor,
     Medicacao,
+    Paciente,
+    RegistroCrise,
+    RegistroDiario,
+    RegistroRegiaoDor,
+    RegistroSintoma,
 )
 from fibrolog_api.security import get_password_hash
-
 
 # Constantes de sintomas
 S_PAIN = '1'
@@ -84,11 +83,11 @@ async def create_test_user(session: AsyncSession) -> Paciente:
     stmt = select(Paciente).where(Paciente.email == 'teste@gmail.com')
     result = await session.execute(stmt)
     existing = result.scalar_one_or_none()
-    
+
     if existing:
         print(f'✓ Usuário teste@gmail.com já existe (ID: {existing.id})')
         return existing
-    
+
     # Cria novo usuário
     paciente = Paciente(
         nome='Maria Silva Santos',
@@ -98,11 +97,11 @@ async def create_test_user(session: AsyncSession) -> Paciente:
         sexo='Feminino',
         data_diagnostico=datetime(2020, 6, 10),
     )
-    
+
     session.add(paciente)
     await session.commit()
     await session.refresh(paciente)
-    
+
     print(f'✓ Usuário criado: {paciente.nome} ({paciente.email})')
     return paciente
 
@@ -129,10 +128,10 @@ async def create_medicacoes(session: AsyncSession, paciente: Paciente):
             paciente_id=paciente.id,
         ),
     ]
-    
+
     for med in medicacoes:
         session.add(med)
-    
+
     await session.commit()
     print(f'✓ {len(medicacoes)} medicações criadas')
 
@@ -141,10 +140,10 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
     """Cria registros diários para os últimos N dias."""
     data_atual = datetime.now()
     registros_criados = 0
-    
+
     for i in range(num_days):
         data = data_atual - timedelta(days=i)
-        
+
         # Cria registro diário
         registro = RegistroDiario(
             tipo_registro='diario',
@@ -153,20 +152,20 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
         )
         session.add(registro)
         await session.flush()  # Para obter o ID
-        
+
         # Adiciona sintoma de dor (sempre presente)
         dor_intensidade = random.choices(
             range(1, 11),
             weights=[2, 3, 5, 8, 10, 12, 10, 8, 4, 2],  # Gaussiana centrada em 5-6
         )[0]
-        
+
         sintoma_dor = RegistroSintoma(
             registro_id=registro.id,
             sintoma_id=S_PAIN,
             intensidade=dor_intensidade,
         )
         session.add(sintoma_dor)
-        
+
         # Adiciona fadiga (80% dos dias)
         if random.random() < 0.8:
             fadiga = random.randint(3, 9)
@@ -176,7 +175,7 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
                 intensidade=fadiga,
             )
             session.add(sintoma_fadiga)
-        
+
         # Adiciona sono (90% dos dias)
         if random.random() < 0.9:
             sono = random.randint(1, 5)
@@ -186,7 +185,7 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
                 intensidade=sono,
             )
             session.add(sintoma_sono)
-        
+
         # Adiciona emoção (70% dos dias)
         if random.random() < 0.7:
             emocao = random.choice(EMOTIONS)
@@ -196,11 +195,11 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
                 intensidade=emocao,
             )
             session.add(sintoma_emocao)
-        
+
         # Adiciona regiões de dor (2-5 regiões por dia)
         num_regioes = random.randint(2, 5)
         regioes_escolhidas = random.sample(PAIN_REGIONS, num_regioes)
-        
+
         for regiao in regioes_escolhidas:
             intensidade = random.randint(3, 9)
             regiao_dor = RegistroRegiaoDor(
@@ -209,12 +208,12 @@ async def create_registros_diarios(session: AsyncSession, paciente: Paciente, nu
                 intensidade=intensidade,
             )
             session.add(regiao_dor)
-        
+
         # Atualiza data_hora do registro para o dia correto
         registro.data_hora = data
-        
+
         registros_criados += 1
-    
+
     await session.commit()
     print(f'✓ {registros_criados} registros diários criados')
 
@@ -223,15 +222,15 @@ async def create_crises(session: AsyncSession, paciente: Paciente, num_crises: i
     """Cria registros de crises aleatórias nos últimos 60 dias."""
     data_atual = datetime.now()
     crises_criadas = 0
-    
+
     for _ in range(num_crises):
         # Data aleatória nos últimos 60 dias
         dias_atras = random.randint(0, 60)
         horas = random.randint(0, 23)
         minutos = random.randint(0, 59)
-        
+
         data_crise = data_atual - timedelta(days=dias_atras, hours=horas, minutes=minutos)
-        
+
         # Cria registro de crise
         crise = RegistroCrise(
             tipo_registro='crise',
@@ -250,12 +249,12 @@ async def create_crises(session: AsyncSession, paciente: Paciente, num_crises: i
         )
         session.add(crise)
         await session.flush()
-        
+
         # Atualiza data_hora
         crise.data_hora = data_crise
-        
+
         crises_criadas += 1
-    
+
     await session.commit()
     print(f'✓ {crises_criadas} registros de crises criados')
 
@@ -263,25 +262,25 @@ async def create_crises(session: AsyncSession, paciente: Paciente, num_crises: i
 async def main():
     """Função principal para popular o banco de dados."""
     print('\n🚀 Iniciando população do banco de dados...\n')
-    
+
     async with async_session() as session:
         # 1. Criar usuário de teste
         paciente = await create_test_user(session)
-        
+
         # 2. Criar medicações
         await create_medicacoes(session, paciente)
-        
+
         # 3. Criar registros diários (últimos 60 dias)
         await create_registros_diarios(session, paciente, num_days=60)
-        
+
         # 4. Criar registros de crises
         await create_crises(session, paciente, num_crises=15)
-    
+
     print('\n✅ Dados mockados com sucesso!\n')
     print('📋 Resumo:')
-    print(f'   Email: teste@gmail.com')
-    print(f'   Senha: Senha@123')
-    print(f'   Registros: 60 dias de sintomas + 15 crises')
+    print('   Email: teste@gmail.com')
+    print('   Senha: Senha@123')
+    print('   Registros: 60 dias de sintomas + 15 crises')
     print('\n💡 Use estes dados para gerar relatórios completos!\n')
 
 

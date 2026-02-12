@@ -6,13 +6,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 
 interface CrisisFormData {
@@ -79,7 +79,7 @@ export default function CrisisFormScreen() {
       } else {
         await crisesService.create(data);
         Alert.alert("Sucesso", "Crise registrada com sucesso!");
-        router.replace("/home");
+        router.replace("/(tabs)/home");
       }
     } catch (error: any) {
       Alert.alert("Erro", error.message || "Erro ao salvar crise.");

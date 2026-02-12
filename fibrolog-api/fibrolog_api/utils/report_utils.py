@@ -1,7 +1,8 @@
 import xml.etree.ElementTree as ET
 from io import BytesIO
+
 from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPDF
+
 
 def get_highlighted_body_map(frequent_region_ids: list[str], svg_path: str = 'assets/Body-Map.svg'):
     """
@@ -15,12 +16,12 @@ def get_highlighted_body_map(frequent_region_ids: list[str], svg_path: str = 'as
     ET.register_namespace('', "http://www.w3.org/2000/svg")
     tree = ET.parse(svg_path)
     root = tree.getroot()
-    
+
     # SVG paths are children of the first group <g>
     # We identified 50 paths, mapping 1-to-1 with regiao_id
     namespace = {'svg': 'http://www.w3.org/2000/svg'}
     group = root.find('svg:g', namespace)
-    
+
     if group is not None:
         paths = group.findall('svg:path', namespace)
         for rid in frequent_region_ids:
@@ -35,7 +36,7 @@ def get_highlighted_body_map(frequent_region_ids: list[str], svg_path: str = 'as
 
     # Convert modified XML back to a string/bytes
     svg_data = ET.tostring(root, encoding='utf-8', method='xml')
-    
+
     # Use svglib to convert to ReportLab drawing
     drawing = svg2rlg(BytesIO(svg_data))
     return drawing

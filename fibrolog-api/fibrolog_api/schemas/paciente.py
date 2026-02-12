@@ -37,10 +37,23 @@ def validate_password_strength(password: str) -> str:
     return password
 
 
+def validate_phone_number(v: str | None) -> str | None:
+    if v is None:
+        return None
+    # Permite (XX) 9XXXX-XXXX ou apenas números (11 dígitos para celular com 9, ou 10 para fixo/antigo)
+    pattern = r'^(\(?\d{2}\)?\s?9?\d{4}-?\d{4})|(\d{10,11})$'
+    if not re.match(pattern, v):
+        raise ValueError(
+            'Número de celular inválido. Formatos aceitos: (XX) 9XXXX-XXXX ou apenas números.'
+        )
+    return v
+
+
 class PacienteSchema(BaseModel):
     nome: str
     email: EmailStr
     senha: str
+    celular: Optional[str] = None
     data_nascimento: datetime
     sexo: str
     data_diagnostico: datetime
@@ -50,11 +63,17 @@ class PacienteSchema(BaseModel):
     def validate_senha(cls, v: str) -> str:
         return validate_password_strength(v)
 
+    @field_validator('celular')
+    @classmethod
+    def validate_celular(cls, v: str | None) -> str | None:
+        return validate_phone_number(v)
+
 
 class PacienteUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
     senha: Optional[str] = None
+    celular: Optional[str] = None
     data_nascimento: Optional[datetime] = None
     sexo: Optional[str] = None
     data_diagnostico: Optional[datetime] = None
@@ -66,11 +85,17 @@ class PacienteUpdate(BaseModel):
             return None
         return validate_password_strength(v)
 
+    @field_validator('celular')
+    @classmethod
+    def validate_celular(cls, v: str | None) -> str | None:
+        return validate_phone_number(v)
+
 
 class PacientePublic(BaseModel):
     id: int
     nome: str
     email: EmailStr
+    celular: Optional[str] = None
     data_nascimento: Optional[datetime]
     sexo: Optional[str]
     data_diagnostico: Optional[datetime]

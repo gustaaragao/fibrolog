@@ -36,15 +36,16 @@ export default function LoginScreen() {
   const handleLogin = async (data: LoginFormData) => {
     setCarregando(true);
     try {
-      // Mapear campos do schema (inglês) para API (português)
       await signIn({ email: data.email, senha: data.password });
-      router.replace("/home");
+      router.replace("/(tabs)/home");
     } catch (error: any) {
-      // Determinar tipo de erro e mostrar mensagem apropriada
       let errorMessage = "Erro ao fazer login. Tente novamente";
 
       if (error?.response?.status === 401) {
         errorMessage = "Email ou senha incorretos";
+      } else if (error?.message?.includes("conectar ao servidor")) {
+        errorMessage =
+          "Não foi possível conectar à API. Verifique se o servidor está rodando.";
       } else if (error?.message?.toLowerCase().includes("network")) {
         errorMessage = "Erro de conexão. Verifique sua internet";
       } else if (error?.message) {
@@ -57,7 +58,7 @@ export default function LoginScreen() {
         text1: "Erro no Login",
         text2: errorMessage,
         position: "top",
-        visibilityTime: 4000,
+        visibilityTime: 5000,
       });
     } finally {
       setCarregando(false);

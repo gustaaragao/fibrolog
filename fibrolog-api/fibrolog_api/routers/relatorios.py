@@ -1,5 +1,4 @@
 from datetime import datetime
-from http import HTTPStatus
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Response
@@ -12,8 +11,6 @@ from fibrolog_api.models import (
     Paciente,
     RegistroCrise,
     RegistroDiario,
-    RegistroRegiaoDor,
-    RegistroSintoma,
 )
 from fibrolog_api.schemas.relatorio import (
     CrisisReportEntry,
@@ -95,21 +92,20 @@ async def gerar_relatorio(
     total_sleep = 0
     emotion_counts = {e: 0 for e in EMOTIONS.values()}
     pain_region_counts = {}
-    
+
     timeline = []
-    
+
     for d in diarios:
         entry = SymptomTimelineEntry(
             date=d.data_hora,
             notes=d.observacoes
         )
-        
+
         for s in d.sintomas:
             if s.sintoma_id == S_PAIN:
                 entry.pain = s.intensidade
                 total_pain += s.intensidade
-                if s.intensidade > peak_pain:
-                    peak_pain = s.intensidade
+                peak_pain = max(peak_pain, s.intensidade)
                 if s.intensidade > 7:
                     intense_pain_days += 1
             elif s.sintoma_id == S_SLEEP:
@@ -123,10 +119,10 @@ async def gerar_relatorio(
                 entry.emotion = emotion_name
                 if emotion_name in emotion_counts:
                     emotion_counts[emotion_name] += 1
-        
+
         for r in d.regioes_dor:
             pain_region_counts[r.regiao_id] = pain_region_counts.get(r.regiao_id, 0) + 1
-            
+
         timeline.append(entry)
 
     num_days = len(diarios)
@@ -180,7 +176,7 @@ async def gerar_relatorio_pdf(
     data_fim: datetime = Query(...),
 ):
     report_public = await gerar_relatorio(session, paciente, data_inicio, data_fim)
-    
+
     report_data = {
         'patientName': report_public.patientName,
         'period': report_public.period,
@@ -190,11 +186,11 @@ async def gerar_relatorio_pdf(
         'symptomTimeline': [e.model_dump() for e in report_public.symptomTimeline],
         'crisisHistory': [c.model_dump() for c in report_public.crisisHistory],
     }
-    
+
     pdf_content = generate_report_pdf(report_data)
-    
+
     filename = f"relatorio_{slugify(paciente.nome)}_{datetime.now().strftime('%Y%m%d')}.pdf"
-    
+
     return Response(
         content=pdf_content,
         media_type='application/pdf',

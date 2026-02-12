@@ -52,7 +52,7 @@ export default function CrisisScreen() {
       await crisesService.create(data);
       Alert.alert("Sucesso", "Crise registrada com sucesso!");
       reset();
-      router.push("/home");
+      router.push("/(tabs)/home");
     } catch (error: any) {
       Alert.alert("Erro", error.message || "Erro ao salvar crise.");
     } finally {

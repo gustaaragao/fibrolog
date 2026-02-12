@@ -39,26 +39,43 @@ async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
       body: body.toString(),
     });
 
-    const data = (await response.json()) as
-      | AuthTokenResponse
-      | { detail?: string };
-
-    const detalheErro = "detail" in data ? data.detail : undefined;
-
     if (!response.ok) {
-      const mensagem = detalheErro || "Nao foi possivel realizar o login.";
+      let mensagem = "Não foi possível realizar o login.";
+
+      try {
+        const data = await response.json();
+        if (data.detail) {
+          mensagem = data.detail;
+        }
+      } catch {
+        // Se não conseguir fazer parse do JSON, usar mensagem genérica
+      }
+
       throw new Error(mensagem);
     }
 
+    const data = (await response.json()) as AuthTokenResponse;
+
+    if (!data.access_token) {
+      throw new Error("Token de acesso não recebido");
+    }
+
     return {
-      token: (data as AuthTokenResponse).access_token,
-      tipoToken: (data as AuthTokenResponse).token_type,
+      token: data.access_token,
+      tipoToken: data.token_type,
     };
   } catch (erro) {
+    // Tratar erros de rede/fetch
+    if (erro instanceof TypeError) {
+      throw new Error(
+        `Não foi possível conectar ao servidor. Verifique se a API está rodando em ${API_BASE_URL}`,
+      );
+    }
+
     const mensagemBase =
       erro instanceof Error && erro.message
         ? erro.message
-        : "Erro ao comunicar com o servidor de autenticacao.";
+        : "Erro ao comunicar com o servidor de autenticação.";
     throw new Error(mensagemBase);
   }
 }

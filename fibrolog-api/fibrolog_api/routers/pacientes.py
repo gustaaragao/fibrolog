@@ -24,6 +24,16 @@ Session = Annotated[AsyncSession, Depends(get_session)]
 DBPaciente = Annotated[Paciente, Depends(get_current_paciente)]
 
 
+@router.get(
+    '/me',
+    response_model=PacientePublic,
+    summary='Obter dados do paciente logado',
+    description='Retorna os dados do paciente atualmente autenticado',
+)
+async def get_me(current_paciente: DBPaciente):
+    return current_paciente
+
+
 @router.post(
     '/',
     status_code=HTTPStatus.CREATED,

@@ -75,20 +75,42 @@ export function AuthProvider({ children }: AuthProviderProps) {
     restaurarSessao();
   }, []);
 
-  async function signIn(credenciais: CredenciaisLogin): Promise<void> {
-    const resultado = await authService.login(credenciais);
-    await storage.setItemAsync("fibrolog_access_token", resultado.token);
-    await storage.setItemAsync("fibrolog_user_email", credenciais.email);
-    await storage.setItemAsync(
-      "fibrolog_user_name",
-      credenciais.email.split("@")[0],
-    );
+  useEffect(() => {
+    // Escuta evento de não autorizado disparado pela API
+    const handleUnauthorized = () => {
+      signOut();
+    };
 
-    setUsuario({
-      id: "user",
-      nome: credenciais.email.split("@")[0],
-      email: credenciais.email,
-    });
+    if (typeof window !== "undefined") {
+      window.addEventListener("fibrolog_unauthorized", handleUnauthorized);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("fibrolog_unauthorized", handleUnauthorized);
+      }
+    };
+  }, []);
+
+  async function signIn(credenciais: CredenciaisLogin): Promise<void> {
+    try {
+      const resultado = await authService.login(credenciais);
+
+      await storage.setItemAsync("fibrolog_access_token", resultado.token);
+      await storage.setItemAsync("fibrolog_user_email", credenciais.email);
+      await storage.setItemAsync(
+        "fibrolog_user_name",
+        credenciais.email.split("@")[0],
+      );
+
+      setUsuario({
+        id: "user",
+        nome: credenciais.email.split("@")[0],
+        email: credenciais.email,
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async function signUp(_dados: DadosCadastro): Promise<void> {

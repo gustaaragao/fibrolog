@@ -1,53 +1,48 @@
 import { useAuth } from "@/contexts/auth-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { Stack, useRouter } from "expo-router";
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function HomeScreen() {
-  const { usuario, signOut } = useAuth();
+  const { usuario } = useAuth();
   const router = useRouter();
-
-  const handleLogoutPress = async () => {
-    try {
-      await signOut();
-      router.replace("/login");
-    } catch {
-      // Erro no logout
-    }
-  };
 
   const menuItems = [
     { name: "Registrar Sintoma", icon: "edit", route: "/symptoms" },
     { name: "Registrar Crise", icon: "warning", route: "/crisis" },
     { name: "Lembrete", icon: "notifications", route: "/reminder" },
     { name: "Histórico", icon: "history", route: "/history" },
-    { name: "Áudio Descrição", icon: "mic", route: "/audio-desc" },
-    { name: "Gerar PDF", icon: "picture-as-pdf", route: "/relatorio" },
-    { name: "Informações", icon: "info", route: "/info" },
     { name: "Rede de Apoio", icon: "group", route: "/support" },
+    { name: "Gerar Relatório", icon: "description", route: "/relatorio" },
   ];
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: "FibroLog",
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={handleLogoutPress}
-              style={{ marginRight: 15 }}
-            >
-              <MaterialIcons name="logout" size={24} color="#ffffff" />
-            </TouchableOpacity>
-          ),
+          title: "Menu Principal",
           headerShown: true,
-          headerBackVisible: false, // Prevent going back to login if stack allows
+          headerBackVisible: false,
+          headerStyle: {
+            backgroundColor: "#D330AA",
+          },
+          headerTintColor: "#ffffff",
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 20,
+          },
+          headerRight: () => (
+            <Text
+              style={{
+                fontFamily: "Carattere_400Regular",
+                fontSize: 32,
+                color: "white",
+                marginRight: 15,
+              }}
+            >
+              F
+            </Text>
+          ),
         }}
       />
 
@@ -68,70 +63,72 @@ export default function HomeScreen() {
             <View style={styles.iconContainer}>
               <MaterialIcons
                 name={item.icon as any}
-                size={32}
-                color="#7d1e60"
+                size={48}
+                color="#D330AA"
               />
             </View>
             <Text style={styles.cardText}>{item.name}</Text>
           </TouchableOpacity>
         ))}
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fdf2f9", // pink-50
+    backgroundColor: "#f3d9ed", // pink-200
   },
   header: {
-    padding: 20,
-    marginBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
   },
   welcomeText: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#641c4d", // pink-900
+    color: "#641c4d",
+    marginBottom: 5,
   },
   subText: {
     fontSize: 16,
-    color: "#7d1e60", // pink-800
-    marginTop: 5,
+    color: "#7d1e60",
   },
   grid: {
+    flex: 1,
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    padding: 10,
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   card: {
-    width: "48%",
+    width: "45%",
+    aspectRatio: 1,
     backgroundColor: "white",
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    borderRadius: 20,
+    marginBottom: 20,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 4.65,
+    elevation: 6,
   },
   iconContainer: {
-    marginBottom: 10,
-    backgroundColor: "#fce7f5", // pink-100
-    padding: 10,
-    borderRadius: 50,
+    marginBottom: 15,
   },
   cardText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "600",
-    color: "#641c4d", // pink-900
+    color: "#7d1e60",
     textAlign: "center",
+    paddingHorizontal: 5,
   },
 });

@@ -45,6 +45,14 @@ async function request<TResponse>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
+  // Trata erro 401 (Não autorizado) de forma global
+  if (response.status === 401) {
+    // Dispara um evento customizado que pode ser ouvido pelo AuthProvider
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("fibrolog_unauthorized"));
+    }
+  }
+
   // Para respostas sem conteúdo (204 ou 200 sem body), retornar imediatamente
   if (response.status === 204 || response.status === 200) {
     // Tenta verificar se há conteúdo
