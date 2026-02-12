@@ -4,14 +4,17 @@ import unicodedata
 
 def slugify(text: str | None) -> str:
     """
-    Converts a string to a slug format: lowercase, no accents, spaces replaced by underscores.
-    Example: 'Gustavo Henrique Aragão Silva' -> 'gustavo_henrique_aragao_silva'
+    Converts a string to a slug format: lowercase, no accents,
+    spaces replaced by underscores.
+    Example: 'Gustavo Henrique Aragão Silva' ->
+    'gustavo_henrique_aragao_silva'
     Returns empty string if text is None or empty.
     """
     if not text:
-        return ""
+        return ''
 
-    # Normalize unicode characters to decompose combined characters (like 'ã' to 'a' + '~')
+    # Normalize unicode characters to decompose combined characters
+    # (like 'ã' to 'a' + '~')
     text = unicodedata.normalize('NFKD', text)
 
     # Encode to ASCII, ignoring errors (removes the accents), then decode back

@@ -12,28 +12,56 @@ from fibrolog_api.models import (
 
 
 @pytest.mark.asyncio
-async def test_get_dashboard_statistics_sucesso(client, token, paciente, session):
+async def test_get_dashboard_statistics_sucesso(
+    client, token, paciente, session
+):
     # 1. Criar dados de teste
     hoje = datetime.now()
     ontem = hoje - timedelta(days=1)
 
     # Registro de Hoje
-    r_hoje = RegistroDiario(paciente_id=paciente.id, tipo_registro='diario', observacoes='Hoje')
+    r_hoje = RegistroDiario(
+        paciente_id=paciente.id,
+        tipo_registro='diario',
+        observacoes='Hoje',
+    )
     r_hoje.data_hora = hoje
     session.add(r_hoje)
     await session.flush()
-    session.add(RegistroSintoma(registro_id=r_hoje.id, sintoma_id='1', intensidade=8))  # Dor
-    session.add(RegistroSintoma(registro_id=r_hoje.id, sintoma_id='4', intensidade=6))  # Fadiga
-    session.add(RegistroRegiaoDor(registro_id=r_hoje.id, regiao_id='10', intensidade=5))
+    # Dor
+    session.add(
+        RegistroSintoma(registro_id=r_hoje.id, sintoma_id='1', intensidade=8)
+    )
+    # Fadiga
+    session.add(
+        RegistroSintoma(registro_id=r_hoje.id, sintoma_id='4', intensidade=6)
+    )
+    session.add(
+        RegistroRegiaoDor(registro_id=r_hoje.id, regiao_id='10', intensidade=5)
+    )
 
     # Registro de Ontem
-    r_ontem = RegistroDiario(paciente_id=paciente.id, tipo_registro='diario', observacoes='Ontem')
+    r_ontem = RegistroDiario(
+        paciente_id=paciente.id,
+        tipo_registro='diario',
+        observacoes='Ontem',
+    )
     r_ontem.data_hora = ontem
     session.add(r_ontem)
     await session.flush()
-    session.add(RegistroSintoma(registro_id=r_ontem.id, sintoma_id='1', intensidade=4))  # Dor
-    session.add(RegistroSintoma(registro_id=r_ontem.id, sintoma_id='4', intensidade=7))  # Fadiga
-    session.add(RegistroRegiaoDor(registro_id=r_ontem.id, regiao_id='10', intensidade=3))
+    # Dor
+    session.add(
+        RegistroSintoma(registro_id=r_ontem.id, sintoma_id='1', intensidade=4)
+    )
+    # Fadiga
+    session.add(
+        RegistroSintoma(registro_id=r_ontem.id, sintoma_id='4', intensidade=7)
+    )
+    session.add(
+        RegistroRegiaoDor(
+            registro_id=r_ontem.id, regiao_id='10', intensidade=3
+        )
+    )
 
     # Registro de Crise
     crise = RegistroCrise(
@@ -41,7 +69,7 @@ async def test_get_dashboard_statistics_sucesso(client, token, paciente, session
         tipo_registro='crise',
         intensidade_dor=9,
         contexto='Contexto',
-        duracao='1h'
+        duracao='1h',
     )
     crise.data_hora = hoje - timedelta(hours=1)
     session.add(crise)
@@ -57,12 +85,19 @@ async def test_get_dashboard_statistics_sucesso(client, token, paciente, session
     assert response.status_code == HTTPStatus.OK
     data = response.json()
 
-    assert data['total_registros'] == 2
-    assert data['total_crises'] == 1
-    assert data['dias_ativos'] == 2
-    assert data['media_intensidade_dor'] == 4.0  # (5+3)/2
-    assert data['sintoma_mais_frequente'] in ['Dor', 'Fadiga']  # Ambos tem 2
-    assert data['sequencia_dias_consecutivos'] == 2
+    total_registros_esperado = 2
+    total_crises_esperado = 1
+    dias_ativos_esperado = 2
+    media_dor_esperada = 4.0  # (5+3)/2
+    sequencia_esperada = 2
+
+    assert data['total_registros'] == total_registros_esperado
+    assert data['total_crises'] == total_crises_esperado
+    assert data['dias_ativos'] == dias_ativos_esperado
+    assert data['media_intensidade_dor'] == media_dor_esperada
+    # Ambos tem 2
+    assert data['sintoma_mais_frequente'] in {'Dor', 'Fadiga'}
+    assert data['sequencia_dias_consecutivos'] == sequencia_esperada
     # taxa_adesao depende de created_at, que no conftest deve ser func.now()
     assert data['taxa_adesao'] is not None
 
@@ -114,4 +149,5 @@ async def test_sequencia_dias_com_gaps(client, token, paciente, session):
     assert response.status_code == HTTPStatus.OK
     data = response.json()
     # Maior sequência é 2 (Mon-Tue)
-    assert data['sequencia_dias_consecutivos'] == 2
+    sequencia_esperada = 2
+    assert data['sequencia_dias_consecutivos'] == sequencia_esperada

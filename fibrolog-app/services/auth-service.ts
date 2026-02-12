@@ -27,6 +27,7 @@ export type ResultadoAuth = {
 
 async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
   try {
+    console.log(`🔐 [AuthService] Tentando login para: ${credenciais.email}`);
     const body = new URLSearchParams();
     body.append("username", credenciais.email);
     body.append("password", credenciais.senha);
@@ -38,6 +39,8 @@ async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
       },
       body: body.toString(),
     });
+
+    console.log(`📥 [AuthService] Login response status: ${response.status}`);
 
     if (!response.ok) {
       let mensagem = "Não foi possível realizar o login.";
@@ -51,14 +54,20 @@ async function login(credenciais: CredenciaisLogin): Promise<ResultadoAuth> {
         // Se não conseguir fazer parse do JSON, usar mensagem genérica
       }
 
+      console.error(`❌ [AuthService] Erro no login: ${mensagem}`);
       throw new Error(mensagem);
     }
 
     const data = (await response.json()) as AuthTokenResponse;
 
     if (!data.access_token) {
+      console.error("❌ [AuthService] Token de acesso não recebido");
       throw new Error("Token de acesso não recebido");
     }
+
+    console.log(
+      `✅ [AuthService] Login bem-sucedido, token recebido: ${data.access_token.substring(0, 20)}...`,
+    );
 
     return {
       token: data.access_token,
@@ -87,6 +96,7 @@ type PacienteCriadoResponse = {
 };
 
 async function signup(dados: DadosCadastro): Promise<ResultadoAuth> {
+  console.log(`👤 [AuthService] Criando conta para: ${dados.email}`);
   const body = {
     nome: dados.nome,
     email: dados.email,
@@ -98,8 +108,10 @@ async function signup(dados: DadosCadastro): Promise<ResultadoAuth> {
 
   try {
     const criado = await api.post<PacienteCriadoResponse>("/pacientes/", body);
+    console.log(`✅ [AuthService] Paciente criado com ID: ${criado.id}`);
 
     // Opcao simples: apos criar paciente, realizar login automatico
+    console.log(`🔐 [AuthService] Fazendo login automático após cadastro...`);
     const resultadoLogin = await login({
       email: dados.email,
       senha: dados.senha,
@@ -107,6 +119,7 @@ async function signup(dados: DadosCadastro): Promise<ResultadoAuth> {
 
     return resultadoLogin;
   } catch (erro) {
+    console.error(`❌ [AuthService] Erro no signup:`, erro);
     const mensagemBase =
       erro instanceof Error && erro.message
         ? erro.message

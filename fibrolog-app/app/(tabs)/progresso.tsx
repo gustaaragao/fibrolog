@@ -16,7 +16,8 @@ import {
 } from "@/services/statistics-service";
 import { MetricCard } from "@/components/ui/MetricCard";
 import { WeeklyPainChart } from "@/components/ui/WeeklyPainChart";
-import { InsightCard } from "@/components/ui/InsightCard";
+import { SelfCareCard } from "@/components/ui/SelfCareCard";
+import { SELF_CARE_TIPS } from "@/constants/self-care";
 import Button from "@/components/ui/Button";
 
 export default function ProgressoScreen() {
@@ -123,14 +124,10 @@ export default function ProgressoScreen() {
 
           <WeeklyPainChart data={data.grafico_dor_semanal} />
 
-          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Seus Insights</Text>
-          {data.insights.length > 0 ? (
-            data.insights.map((insight, index) => (
-              <InsightCard key={index} insight={insight} />
-            ))
-          ) : (
-            <Text style={styles.emptyText}>Continue registrando seus sintomas para receber insights personalizados.</Text>
-          )}
+          <Text style={[styles.sectionTitle, { marginTop: 20 }]}>Dicas de Autocuidado</Text>
+          {SELF_CARE_TIPS.map((tip) => (
+            <SelfCareCard key={tip.id} tip={tip} />
+          ))}
           
           <View style={styles.footerSpacer} />
         </View>

@@ -29,6 +29,11 @@ async function request<TResponse>(
   // Busca o token de autenticação
   const token = await storage.getItemAsync("fibrolog_access_token");
 
+  console.log(`🔹 [API Request] ${method} ${path}`);
+  console.log(
+    `🔑 [API Token] ${token ? `Token presente (${token.substring(0, 20)}...)` : "❌ SEM TOKEN"}`,
+  );
+
   const requestHeaders: Record<string, string> = {
     "Content-Type": "application/json",
     ...headers,
@@ -37,6 +42,8 @@ async function request<TResponse>(
   // Adiciona o token se existir
   if (token) {
     requestHeaders["Authorization"] = `Bearer ${token}`;
+  } else {
+    console.warn("⚠️ [API] Requisição sem token de autenticação!");
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -45,12 +52,23 @@ async function request<TResponse>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
+  console.log(
+    `📥 [API Response] ${method} ${path} - Status: ${response.status}`,
+  );
+
   // Trata erro 401 (Não autorizado) de forma global
   if (response.status === 401) {
+    console.error("🚫 [API] Erro 401 - Token inválido ou expirado");
     // Dispara um evento customizado que pode ser ouvido pelo AuthProvider
-    if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.dispatchEvent === "function"
+    ) {
       window.dispatchEvent(new Event("fibrolog_unauthorized"));
     }
+
+    // Lança erro específico para 401
+    throw new Error("Sessão expirada. Faça login novamente.");
   }
 
   // Para respostas sem conteúdo (204 ou 200 sem body), retornar imediatamente

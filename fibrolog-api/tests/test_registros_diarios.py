@@ -240,20 +240,24 @@ async def test_rn006_upsert_registro_mesmo_dia(client, token, paciente):
 
     # Deve ter apenas 1 registro para hoje
     registros_hoje = [
-        r for r in registros
-        if datetime.fromisoformat(r['data_registro']).date() == data_hoje.date()
+        r
+        for r in registros
+        if datetime.fromisoformat(r['data_registro']).date()
+        == data_hoje.date()
     ]
     assert len(registros_hoje) == 1
 
     # E os dados devem ser da segunda versão
     registro = registros_hoje[0]
     assert registro['id'] == primeiro_id
+    intensidade_esperada = 8
     assert len(registro['symptoms']) == 1
     assert registro['symptoms'][0]['id'] == '2'
-    assert registro['symptoms'][0]['intensity'] == 8
+    assert registro['symptoms'][0]['intensity'] == intensidade_esperada
+    intensidade_regiao = 9
     assert len(registro['painRegions']) == 1
     assert registro['painRegions'][0]['id'] == '20'
-    assert registro['painRegions'][0]['intensity'] == 9
+    assert registro['painRegions'][0]['intensity'] == intensidade_regiao
     assert registro['notes'] == 'Segunda versão (sobrescrita)'
 
 
@@ -287,13 +291,16 @@ async def test_update_registro_diario(client, token, paciente):
     assert response_put.status_code == HTTPStatus.OK
     data = response_put.json()
     assert data['id'] == registro_id
+    intensidade_nova = 9
     assert data['notes'] == 'Depois do update'
     assert data['symptoms'][0]['id'] == '3'
-    assert data['symptoms'][0]['intensity'] == 9
+    assert data['symptoms'][0]['intensity'] == intensidade_nova
 
 
 @pytest.mark.asyncio
-async def test_update_registro_diario_outro_usuario(client, other_token, token):
+async def test_update_registro_diario_outro_usuario(
+    client, other_token, token
+):
     # Criar um registro com o primeiro usuário
     response_post = await client.post(
         '/registros-diarios/pt',
@@ -354,7 +361,9 @@ async def test_delete_registro_diario(client, token, paciente):
 
 
 @pytest.mark.asyncio
-async def test_delete_registro_diario_outro_usuario(client, other_token, token):
+async def test_delete_registro_diario_outro_usuario(
+    client, other_token, token
+):
     # Criar um registro com o primeiro usuário
     response_post = await client.post(
         '/registros-diarios/pt',

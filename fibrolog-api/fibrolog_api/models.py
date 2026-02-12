@@ -41,6 +41,9 @@ class Paciente:
     medicacoes: Mapped[List['Medicacao']] = relationship(
         back_populates='paciente', cascade='all, delete-orphan', init=False
     )
+    lembretes: Mapped[List['Lembrete']] = relationship(
+        back_populates='paciente', cascade='all, delete-orphan', init=False
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         init=False, server_default=func.now()
@@ -200,3 +203,29 @@ class RegistroCrise(Registro):
     __mapper_args__ = {
         'polymorphic_identity': 'crise',
     }
+
+
+@table_registry.mapped_as_dataclass
+class Lembrete:
+    __tablename__ = 'lembretes'
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    paciente_id: Mapped[int] = mapped_column(ForeignKey('pacientes.id'))
+    titulo: Mapped[str]
+    tipo: Mapped[str]  # "geral", "medicamento", "exame"
+    hora: Mapped[int]
+    minuto: Mapped[int]
+    ativo: Mapped[bool] = mapped_column(default=True)
+    dosagem: Mapped[Optional[str]] = mapped_column(default=None)
+    intervalo: Mapped[Optional[int]] = mapped_column(default=None)
+    data_exame: Mapped[Optional[datetime]] = mapped_column(default=None)
+
+    paciente: Mapped['Paciente'] = relationship(
+        back_populates='lembretes', init=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        init=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        init=False, server_default=func.now(), onupdate=func.now()
+    )
