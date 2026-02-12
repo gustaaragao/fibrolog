@@ -22,8 +22,9 @@ export interface CreateCrisisDto {
 export interface SupportContact {
   id: number;
   nome: string;
+  email: string;
   telefone: string;
-  relacao?: string;
+  parentesco: string;
 }
 
 export const crisesService = {

@@ -24,9 +24,19 @@ from .registro_diario import (
     RegistroDiarioList,
     RegistroDiarioPublic,
 )
+from .support_network import (
+    ContatoApoioList,
+    ContatoApoioPublic,
+    ContatoApoioSchema,
+    ContatoApoioUpdate,
+)
 from .token import Token, TokenData
 
 __all__ = [
+    'ContatoApoioList',
+    'ContatoApoioPublic',
+    'ContatoApoioSchema',
+    'ContatoApoioUpdate',
     'DiaGrafico',
     'EntradaRegiaoDor',
     'EntradaSintoma',
