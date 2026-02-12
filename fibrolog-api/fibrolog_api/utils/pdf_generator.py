@@ -1,4 +1,5 @@
 from io import BytesIO
+from pathlib import Path
 
 from reportlab.graphics.charts.lineplots import LinePlot
 from reportlab.graphics.shapes import Drawing
@@ -19,6 +20,9 @@ from reportlab.platypus import (
 )
 
 from fibrolog_api.utils.report_utils import get_highlighted_body_map
+
+# Resolve assets directory path relative to this module
+ASSETS_DIR = Path(__file__).resolve().parent.parent.parent / 'assets'
 
 # Global configuration
 PRIMARY_COLOR = colors.HexColor('#D21F8F')
@@ -49,10 +53,10 @@ class ReportPDF(BaseDocTemplate):
         canvas.saveState()
 
         # Logo
-        logo_path = "assets/logo.jpeg"
+        logo_path = ASSETS_DIR / 'logo.jpeg'
         try:
-            canvas.drawImage(logo_path, 1.5 * cm, A4[1] - 1.7 * cm, width=1.2 * cm, height=1.2 * cm, preserveAspectRatio=True, mask='auto')
-        except:
+            canvas.drawImage(str(logo_path), 1.5 * cm, A4[1] - 1.7 * cm, width=1.2 * cm, height=1.2 * cm, preserveAspectRatio=True, mask='auto')
+        except Exception:
             pass  # Fallback if image not found
 
         # Header
@@ -85,8 +89,6 @@ def render_pain_chart(timeline_data):
 
     drawing = Drawing(400, 200)
 
-    # Data extraction
-    data = []
     labels = []
 
     # Take up to last 30 entries to keep it legible
@@ -219,7 +221,7 @@ def generate_report_pdf(report_data):
 
     frequent_ids = [r['id'] for r in report_data['frequentPainRegions']]
     drawing = get_highlighted_body_map(frequent_ids)
-    drawing.renderScale = 0.22
+    drawing.scale(0.22, 0.22)
 
     layout_data = [
         [

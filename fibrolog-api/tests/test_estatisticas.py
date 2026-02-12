@@ -16,7 +16,6 @@ async def test_get_dashboard_statistics_sucesso(client, token, paciente, session
     # 1. Criar dados de teste
     hoje = datetime.now()
     ontem = hoje - timedelta(days=1)
-    anteontem = hoje - timedelta(days=2)
 
     # Registro de Hoje
     r_hoje = RegistroDiario(paciente_id=paciente.id, tipo_registro='diario', observacoes='Hoje')

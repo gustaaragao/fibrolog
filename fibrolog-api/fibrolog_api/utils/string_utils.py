@@ -2,10 +2,11 @@ import re
 import unicodedata
 
 
-def slugify(text: str) -> str:
+def slugify(text: str | None) -> str:
     """
     Converts a string to a slug format: lowercase, no accents, spaces replaced by underscores.
     Example: 'Gustavo Henrique Aragão Silva' -> 'gustavo_henrique_aragao_silva'
+    Returns empty string if text is None or empty.
     """
     if not text:
         return ""

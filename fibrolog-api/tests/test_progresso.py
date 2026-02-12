@@ -8,7 +8,6 @@ from fibrolog_api.models import (
     RegistroCrise,
     RegistroDiario,
     RegistroRegiaoDor,
-    RegistroSintoma,
 )
 
 pytestmark = pytest.mark.asyncio

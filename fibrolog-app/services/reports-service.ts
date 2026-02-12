@@ -11,6 +11,10 @@ export const reportsService = {
   async getReportPdf(dataInicio: string, dataFim: string): Promise<Blob> {
     const token = await storage.getItemAsync("fibrolog_access_token");
 
+    if (!token) {
+      throw new Error("Sessão expirada. Por favor, faça login novamente.");
+    }
+
     const url = new URL(`${API_BASE_URL}/relatorios/pdf`);
     url.searchParams.append("data_inicio", dataInicio);
     url.searchParams.append("data_fim", dataFim);

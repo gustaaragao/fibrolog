@@ -48,7 +48,7 @@ async function request<TResponse>(
   // Trata erro 401 (Não autorizado) de forma global
   if (response.status === 401) {
     // Dispara um evento customizado que pode ser ouvido pelo AuthProvider
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && typeof window.dispatchEvent === "function") {
       window.dispatchEvent(new Event("fibrolog_unauthorized"));
     }
   }
