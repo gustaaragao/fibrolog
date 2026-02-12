@@ -4,11 +4,18 @@ para facilitar a importação em outros módulos.
 """
 
 from .base import FilterPage, Message
+from .estatistica import EstatisticasDashboard
 from .paciente import (
     PacienteList,
     PacientePublic,
     PacienteSchema,
     PacienteUpdate,
+)
+from .progresso import (
+    DiaGrafico,
+    EstatisticasProgresso,
+    Insight,
+    MetricaProgresso,
 )
 from .registro_diario import (
     EntradaRegiaoDor,
@@ -20,10 +27,15 @@ from .registro_diario import (
 from .token import Token, TokenData
 
 __all__ = [
+    'DiaGrafico',
     'EntradaRegiaoDor',
     'EntradaSintoma',
+    'EstatisticasDashboard',
+    'EstatisticasProgresso',
     'FilterPage',
+    'Insight',
     'Message',
+    'MetricaProgresso',
     'PacienteList',
     'PacientePublic',
     'PacienteSchema',

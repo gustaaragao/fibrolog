@@ -108,6 +108,7 @@ async def test_create_registro_nao_autenticado(client):
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
 
+
 @pytest.mark.asyncio
 async def test_create_registro_frontend_compatibility(client, token, paciente):
     timestamp = datetime.now().isoformat()
@@ -239,7 +240,7 @@ async def test_rn006_upsert_registro_mesmo_dia(client, token, paciente):
 
     # Deve ter apenas 1 registro para hoje
     registros_hoje = [
-        r for r in registros 
+        r for r in registros
         if datetime.fromisoformat(r['data_registro']).date() == data_hoje.date()
     ]
     assert len(registros_hoje) == 1

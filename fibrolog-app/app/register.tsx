@@ -1,34 +1,36 @@
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import { useAuth } from "@/contexts/auth-context";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import Toast from "react-native-toast-message";
-import Input from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import * as z from "zod";
 
-const registrationSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Email inválido"),
-  dataNascimento: z.string().length(10, "Formato DD/MM/AAAA"),
-  sexo: z.enum(["M", "F", "O"]),
-  dataDiagnostico: z.string().length(10, "Formato DD/MM/AAAA"),
-  senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-  confirmarSenha: z.string().min(6, "Confirme sua senha"),
-}).refine((data) => data.senha === data.confirmarSenha, {
-  message: "As senhas não coincidem",
-  path: ["confirmarSenha"],
-});
+const registrationSchema = z
+  .object({
+    nome: z.string().min(1, "Nome é obrigatório"),
+    email: z.string().email("Email inválido"),
+    dataNascimento: z.string().length(10, "Formato DD/MM/AAAA"),
+    sexo: z.enum(["M", "F", "O"]),
+    dataDiagnostico: z.string().length(10, "Formato DD/MM/AAAA"),
+    senha: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
+    confirmarSenha: z.string().min(6, "Confirme sua senha"),
+  })
+  .refine((data) => data.senha === data.confirmarSenha, {
+    message: "As senhas não coincidem",
+    path: ["confirmarSenha"],
+  });
 
 type RegistrationFormValues = z.infer<typeof registrationSchema>;
 
@@ -61,7 +63,8 @@ export default function RegisterScreen() {
   const formatarData = (texto: string) => {
     const numeros = texto.replace(/\D/g, "");
     if (numeros.length <= 2) return numeros;
-    if (numeros.length <= 4) return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+    if (numeros.length <= 4)
+      return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
     return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4, 8)}`;
   };
 
@@ -89,7 +92,7 @@ export default function RegisterScreen() {
       });
 
       setTimeout(() => {
-        router.replace("/home");
+        router.replace("/(tabs)/home");
       }, 1000);
     } catch (error) {
       Toast.show({
@@ -108,11 +111,14 @@ export default function RegisterScreen() {
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }} className="px-10 py-16">
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          className="px-10 py-16"
+        >
           <View className="items-center mb-10">
-            <Text 
+            <Text
               className="text-7xl text-pink-800"
-              style={{ fontFamily: 'Carattere_400Regular' }}
+              style={{ fontFamily: "Carattere_400Regular" }}
             >
               FibroLog
             </Text>
@@ -168,20 +174,32 @@ export default function RegisterScreen() {
                     key={option}
                     onPress={() => setValue("sexo", option as any)}
                     className={`flex-1 flex-row items-center justify-center p-4 rounded-xl border-2 ${
-                      sexoValue === option ? "bg-white border-pink-500" : "bg-white border-pink-200"
+                      sexoValue === option
+                        ? "bg-white border-pink-500"
+                        : "bg-white border-pink-200"
                     }`}
                   >
-                    <View className={`w-5 h-5 rounded-full border-2 border-pink-500 items-center justify-center mr-2`}>
-                      {sexoValue === option && <View className="w-2.5 h-2.5 rounded-full bg-pink-500" />}
+                    <View
+                      className={`w-5 h-5 rounded-full border-2 border-pink-500 items-center justify-center mr-2`}
+                    >
+                      {sexoValue === option && (
+                        <View className="w-2.5 h-2.5 rounded-full bg-pink-500" />
+                      )}
                     </View>
                     <Text className="text-pink-800 font-medium">
-                      {option === "M" ? "Masc" : option === "F" ? "Fem" : "Outro"}
+                      {option === "M"
+                        ? "Masc"
+                        : option === "F"
+                          ? "Fem"
+                          : "Outro"}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
               {errors.sexo && (
-                <Text className="text-red-500 text-sm mt-1">{errors.sexo.message}</Text>
+                <Text className="text-red-500 text-sm mt-1">
+                  {errors.sexo.message}
+                </Text>
               )}
             </View>
 

@@ -26,6 +26,7 @@ class Paciente:
     data_nascimento: Mapped[datetime]
     sexo: Mapped[str] = mapped_column(String(50))
     data_diagnostico: Mapped[datetime]
+    celular: Mapped[Optional[str]] = mapped_column(String(20), default=None)
 
     # Relacionamentos
     contatos: Mapped[List['ContatoApoio']] = relationship(

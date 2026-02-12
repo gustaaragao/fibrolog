@@ -108,8 +108,6 @@ export const colorAccessibilityTests = {
 
 // Function to run all accessibility tests
 export function runAccessibilityTests(): void {
-  console.log('🎨 Running WCAG 2.1 AA Accessibility Tests...\n');
-  
   Object.entries(colorAccessibilityTests).forEach(([testName, test]) => {
     const actualRatio = getContrastRatio(test.text, test.background);
     const passes = actualRatio >= 4.5;
