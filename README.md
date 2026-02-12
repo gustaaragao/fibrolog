@@ -128,7 +128,11 @@ npm run lint        # Verifica qualidade do código
 
 ## 👥 Equipe de Desenvolvimento
 
-Projeto desenvolvido por estudantes da **Universidade Federal de Sergipe** como parte do currículo de Engenharia de Software.
+Projeto desenvolvido por estudantes da **Universidade Federal de Sergipe** como parte do currículo de Engenharia de Software:
+
+- [Gustavo Aragão](https://github.com/gustaaragao)
+- [Lucas Costa](https://github.com/LuksESC)
+- [Wemerson Soares](https://github.com/serenesinister)
 
 ## 📄 Licença
 
@@ -139,7 +143,5 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 <div align="center">
 
 **FibroLog P2527** - Tecnologia a serviço do cuidado com a fibromialgia
-
-*Desenvolvido com ❤️ na Universidade Federal de Sergipe*
 
 </div>
