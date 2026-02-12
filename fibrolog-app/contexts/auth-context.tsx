@@ -81,12 +81,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       signOut();
     };
 
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && typeof window.addEventListener === "function") {
       window.addEventListener("fibrolog_unauthorized", handleUnauthorized);
     }
 
     return () => {
-      if (typeof window !== "undefined") {
+      if (typeof window !== "undefined" && typeof window.removeEventListener === "function") {
         window.removeEventListener("fibrolog_unauthorized", handleUnauthorized);
       }
     };

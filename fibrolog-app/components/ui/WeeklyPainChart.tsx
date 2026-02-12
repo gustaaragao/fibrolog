@@ -14,7 +14,7 @@ export function WeeklyPainChart({ data }: WeeklyPainChartProps) {
     labels: data.map((d) => d.dia),
     datasets: [
       {
-        data: data.map((d) => d.intensidade_dor || 0),
+        data: data.map((d) => (d.intensidade_dor !== null ? d.intensidade_dor : 0)),
       },
     ],
   };
@@ -51,7 +51,7 @@ export function WeeklyPainChart({ data }: WeeklyPainChartProps) {
         showValuesOnTopOfBars
       />
       {data.some(d => d.intensidade_dor === null) && (
-          <Text style={styles.hint}>* Dias sem registro mostrados como 0</Text>
+          <Text style={styles.hint}>* Dias sem registro são exibidos como 0 no gráfico</Text>
       )}
     </View>
   );

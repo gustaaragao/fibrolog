@@ -17,7 +17,7 @@ import {
 import { MetricCard } from "@/components/ui/MetricCard";
 import { WeeklyPainChart } from "@/components/ui/WeeklyPainChart";
 import { InsightCard } from "@/components/ui/InsightCard";
-import { Button } from "@/components/ui/Button";
+import Button from "@/components/ui/Button";
 
 export default function ProgressoScreen() {
   const [data, setData] = useState<ProgressStatistics | null>(null);

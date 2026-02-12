@@ -55,6 +55,15 @@ export default function RelatorioScreen() {
     },
   });
 
+  // Cleanup URL object when component unmounts or pdfUri changes
+  React.useEffect(() => {
+    return () => {
+      if (pdfUri && Platform.OS === "web" && pdfUri.startsWith("blob:")) {
+        URL.revokeObjectURL(pdfUri);
+      }
+    };
+  }, [pdfUri]);
+
   const handleQuickSelect = (days: number) => {
     const end = new Date();
     const start = new Date();
