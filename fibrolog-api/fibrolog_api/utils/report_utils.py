@@ -4,16 +4,19 @@ from io import BytesIO
 from svglib.svglib import svg2rlg
 
 
-def get_highlighted_body_map(frequent_region_ids: list[str], svg_path: str = 'assets/Body-Map.svg'):
+def get_highlighted_body_map(
+    frequent_region_ids: list[str], svg_path: str = 'assets/Body-Map.svg'
+):
     """
-    Reads Body-Map.svg, highlights specific regions, and returns a ReportLab drawing.
-    
+    Reads Body-Map.svg, highlights specific regions,
+    and returns a ReportLab drawing.
+
     Args:
         frequent_region_ids: List of region IDs (1-50) to highlight in red.
         svg_path: Path to the Body-Map.svg file.
     """
     # Parse the SVG as XML
-    ET.register_namespace('', "http://www.w3.org/2000/svg")
+    ET.register_namespace('', 'http://www.w3.org/2000/svg')
     tree = ET.parse(svg_path)
     root = tree.getroot()
 

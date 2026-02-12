@@ -34,6 +34,9 @@ S_SLEEP = '3'
 S_FATIGUE = '4'
 S_EMOTION = '5'
 
+# Constantes para análise de intensidade
+INTENSE_PAIN_THRESHOLD = 7
+
 EMOTIONS = {
     0: 'FELIZ',
     1: 'ANSIOSO',
@@ -46,14 +49,21 @@ EMOTIONS = {
     '/gerar',
     response_model=ReportPublic,
     summary='Gerar dados do relatório',
-    description='Retorna dados consolidados para o relatório de monitoramento no período especificado.',
+    description=(
+        'Retorna dados consolidados para o relatório de monitoramento '
+        'no período especificado.'
+    ),
 )
-async def gerar_relatorio(
+async def gerar_relatorio(  # noqa: PLR0914
     session: Session,
     paciente: CurrentPaciente,
-    data_inicio: datetime = Query(...),
-    data_fim: datetime = Query(...),
+    data_inicio: Annotated[datetime, Query(...)],
+    data_fim: Annotated[datetime, Query(...)],
 ):
+    """Gera relatório com dados consolidados do período.
+
+    Note: Multiple variables needed for comprehensive report generation.
+    """
     # 1. Buscar Registros Diários no período
     stmt_diarios = (
         select(RegistroDiario)
@@ -96,17 +106,14 @@ async def gerar_relatorio(
     timeline = []
 
     for d in diarios:
-        entry = SymptomTimelineEntry(
-            date=d.data_hora,
-            notes=d.observacoes
-        )
+        entry = SymptomTimelineEntry(date=d.data_hora, notes=d.observacoes)
 
         for s in d.sintomas:
             if s.sintoma_id == S_PAIN:
                 entry.pain = s.intensidade
                 total_pain += s.intensidade
                 peak_pain = max(peak_pain, s.intensidade)
-                if s.intensidade > 7:
+                if s.intensidade > INTENSE_PAIN_THRESHOLD:
                     intense_pain_days += 1
             elif s.sintoma_id == S_SLEEP:
                 entry.sleep = s.intensidade
@@ -121,7 +128,9 @@ async def gerar_relatorio(
                     emotion_counts[emotion_name] += 1
 
         for r in d.regioes_dor:
-            pain_region_counts[r.regiao_id] = pain_region_counts.get(r.regiao_id, 0) + 1
+            pain_region_counts[r.regiao_id] = (
+                pain_region_counts.get(r.regiao_id, 0) + 1
+            )
 
         timeline.append(entry)
 
@@ -130,15 +139,19 @@ async def gerar_relatorio(
         averagePain=round(total_pain / num_days, 1) if num_days > 0 else 0,
         peakPain=peak_pain,
         intensePainDays=intense_pain_days,
-        averageFatigue=round(total_fatigue / num_days, 1) if num_days > 0 else 0,
+        averageFatigue=round(total_fatigue / num_days, 1)
+        if num_days > 0
+        else 0,
         averageSleep=round(total_sleep / num_days, 1) if num_days > 0 else 0,
-        emotionFrequency=emotion_counts
+        emotionFrequency=emotion_counts,
     )
 
     # 4. Processar Regiões de Dor
     frequent_regions = [
         PainRegionSummary(id=rid, count=count)
-        for rid, count in sorted(pain_region_counts.items(), key=lambda x: x[1], reverse=True)
+        for rid, count in sorted(
+            pain_region_counts.items(), key=lambda x: x[1], reverse=True
+        )
     ]
 
     # 5. Processar Crises
@@ -148,19 +161,22 @@ async def gerar_relatorio(
             intensity=c.intensidade_dor,
             duration=c.duracao,
             symptoms=c.sintomas_relatados,
-            context=c.contexto
+            context=c.contexto,
         )
         for c in crises
     ]
 
     return ReportPublic(
         patientName=paciente.nome,
-        period=f"{data_inicio.strftime('%d/%m/%Y')} - {data_fim.strftime('%d/%m/%Y')}",
+        period=(
+            f'{data_inicio.strftime("%d/%m/%Y")} - '
+            f'{data_fim.strftime("%d/%m/%Y")}'
+        ),
         generationDate=datetime.now(),
         generalSummary=summary,
         frequentPainRegions=frequent_regions,
         symptomTimeline=timeline,
-        crisisHistory=crisis_history
+        crisisHistory=crisis_history,
     )
 
 
@@ -172,29 +188,36 @@ async def gerar_relatorio(
 async def gerar_relatorio_pdf(
     session: Session,
     paciente: CurrentPaciente,
-    data_inicio: datetime = Query(...),
-    data_fim: datetime = Query(...),
+    data_inicio: Annotated[datetime, Query(...)],
+    data_fim: Annotated[datetime, Query(...)],
 ):
-    report_public = await gerar_relatorio(session, paciente, data_inicio, data_fim)
+    report_public = await gerar_relatorio(
+        session, paciente, data_inicio, data_fim
+    )
 
     report_data = {
         'patientName': report_public.patientName,
         'period': report_public.period,
         'generationDate': report_public.generationDate,
         'generalSummary': report_public.generalSummary.model_dump(),
-        'frequentPainRegions': [r.model_dump() for r in report_public.frequentPainRegions],
-        'symptomTimeline': [e.model_dump() for e in report_public.symptomTimeline],
+        'frequentPainRegions': [
+            r.model_dump() for r in report_public.frequentPainRegions
+        ],
+        'symptomTimeline': [
+            e.model_dump() for e in report_public.symptomTimeline
+        ],
         'crisisHistory': [c.model_dump() for c in report_public.crisisHistory],
     }
 
     pdf_content = generate_report_pdf(report_data)
 
-    filename = f"relatorio_{slugify(paciente.nome)}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    filename = (
+        f'relatorio_{slugify(paciente.nome)}_'
+        f'{datetime.now().strftime("%Y%m%d")}.pdf'
+    )
 
     return Response(
         content=pdf_content,
         media_type='application/pdf',
-        headers={
-            'Content-Disposition': f'attachment; filename="{filename}"'
-        }
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )

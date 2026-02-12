@@ -5,6 +5,7 @@ from fibrolog_api.routers import (
     auth,
     crises,
     estatisticas,
+    lembretes,
     medicacoes,
     pacientes,
     registros_diarios,
@@ -33,3 +34,4 @@ app.include_router(registros_diarios.router)
 app.include_router(medicacoes.router)
 app.include_router(relatorios.router)
 app.include_router(estatisticas.router)
+app.include_router(lembretes.router)

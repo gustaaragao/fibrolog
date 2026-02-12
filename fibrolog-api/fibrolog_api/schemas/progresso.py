@@ -67,23 +67,57 @@ class EstatisticasProgresso(BaseModel):
                     'tendencia': 'baixa',
                 },
                 'grafico_dor_semanal': [
-                    {'dia': 'Seg', 'data': '2026-02-05', 'intensidade_dor': 6.0},
-                    {'dia': 'Ter', 'data': '2026-02-06', 'intensidade_dor': 4.5},
-                    {'dia': 'Qua', 'data': '2026-02-07', 'intensidade_dor': 7.0},
-                    {'dia': 'Qui', 'data': '2026-02-08', 'intensidade_dor': 5.5},
-                    {'dia': 'Sex', 'data': '2026-02-09', 'intensidade_dor': 3.0},
-                    {'dia': 'Sáb', 'data': '2026-02-10', 'intensidade_dor': 6.5},
-                    {'dia': 'Dom', 'data': '2026-02-11', 'intensidade_dor': None},
+                    {
+                        'dia': 'Seg',
+                        'data': '2026-02-05',
+                        'intensidade_dor': 6.0,
+                    },
+                    {
+                        'dia': 'Ter',
+                        'data': '2026-02-06',
+                        'intensidade_dor': 4.5,
+                    },
+                    {
+                        'dia': 'Qua',
+                        'data': '2026-02-07',
+                        'intensidade_dor': 7.0,
+                    },
+                    {
+                        'dia': 'Qui',
+                        'data': '2026-02-08',
+                        'intensidade_dor': 5.5,
+                    },
+                    {
+                        'dia': 'Sex',
+                        'data': '2026-02-09',
+                        'intensidade_dor': 3.0,
+                    },
+                    {
+                        'dia': 'Sáb',
+                        'data': '2026-02-10',
+                        'intensidade_dor': 6.5,
+                    },
+                    {
+                        'dia': 'Dom',
+                        'data': '2026-02-11',
+                        'intensidade_dor': None,
+                    },
                 ],
                 'insights': [
                     {
                         'tipo': 'info',
-                        'mensagem': 'Seus níveis de dor diminuíram 12% em relação à semana passada',
+                        'mensagem': (
+                            'Seus níveis de dor diminuíram 12% '
+                            'em relação à semana passada'
+                        ),
                         'icone': '📉',
                     },
                     {
                         'tipo': 'success',
-                        'mensagem': 'Você registrou 29 dias este mês! Continue assim!',
+                        'mensagem': (
+                            'Você registrou 29 dias este mês! '
+                            'Continue assim!'
+                        ),
                         'icone': '📝',
                     },
                 ],

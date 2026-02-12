@@ -35,6 +35,13 @@ SINTOMAS_MAP = {
     '5': 'Emoção',
 }
 
+# Constantes para limiares de análise
+SATURDAY_WEEKDAY = 6
+PAIN_VARIATION_THRESHOLD = 5
+MIN_RECORDS_MONTH_THRESHOLD = 20
+MAX_CRISES_MONTH_THRESHOLD = 5
+PAIN_INTENSITY_THRESHOLD = 7
+
 
 def calcular_sequencia_dias(datas: List[datetime]) -> int:
     """
@@ -43,20 +50,23 @@ def calcular_sequencia_dias(datas: List[datetime]) -> int:
     if not datas:
         return 0
 
-    # Converter para conjunto de dates para busca rápida e remover duplicatas/horas
+    # Converter para conjunto de dates para busca rápida
+    # e remover duplicatas/horas
     datas_set = {d.date() for d in datas}
     datas_ordenadas = sorted(list(datas_set), reverse=True)
 
     if not datas_ordenadas:
         return 0
 
-    # Verificar se o registro mais recente é hoje ou ontem para considerar sequência "atual"
+    # Verificar se o registro mais recente é hoje ou ontem
+    # para considerar sequência "atual"
     hoje = datetime.now().date()
     ultimo_registro = datas_ordenadas[0]
 
     if (hoje - ultimo_registro).days > 1:
         # Sequência quebrada (mais de 1 dia sem registro)
-        # Mas o requisito pede a "maior sequência", vou implementar a maior de todas
+        # Mas o requisito pede a "maior sequência",
+        # vou implementar a maior de todas
         pass
 
     # Implementando a maior sequência de todas as datas
@@ -78,14 +88,19 @@ def calcular_sequencia_dias(datas: List[datetime]) -> int:
     '/dashboard',
     response_model=EstatisticasDashboard,
     summary='Obter estatísticas do dashboard',
-    description='Retorna estatísticas agregadas para o dashboard do paciente logado.',
+    description=(
+        'Retorna estatísticas agregadas para o dashboard '
+        'do paciente logado.'
+    ),
 )
-async def get_dashboard_statistics(
+async def get_dashboard_statistics(  # noqa: PLR0914
     session: Session,
     paciente: CurrentPaciente,
 ):
     """
     Retorna estatísticas agregadas para o dashboard do paciente logado.
+
+    Note: Multiple local variables are needed for comprehensive statistics.
     """
     paciente_id = paciente.id
 
@@ -149,7 +164,8 @@ async def get_dashboard_statistics(
 
     # 7. Taxa de adesão
     # Calculada como (dias_ativos / dias_desde_cadastro) * 100
-    # Usaremos created_at como data de cadastro, com fallback para data_diagnostico
+    # Usaremos created_at como data de cadastro,
+    # com fallback para data_diagnostico
     taxa_adesao = None
     data_referencia = None
 
@@ -174,7 +190,8 @@ async def get_dashboard_statistics(
             # Se a data de cadastro for no futuro (erro de sistema/relógio),
             # assumimos 1 dia para evitar divisão por zero ou negativa
             taxa_adesao = 100.0 if dias_ativos > 0 else 0.0
-    # Se não houver data nenhuma, mas houver registros, a adesão é 100% dos dias que conhecemos
+    # Se não houver data nenhuma, mas houver registros,
+    # a adesão é 100% dos dias que conhecemos
     elif dias_ativos > 0:
         taxa_adesao = 100.0
 
@@ -193,21 +210,26 @@ async def get_dashboard_statistics(
     '/progresso',
     response_model=EstatisticasProgresso,
     summary='Obter estatísticas de progresso',
-    description='Retorna estatísticas de progresso com comparações temporais e insights.',
+    description=(
+        'Retorna estatísticas de progresso com comparações '
+        'temporais e insights.'
+    ),
 )
-async def get_progress_statistics(
+async def get_progress_statistics(  # noqa: PLR0912, PLR0915, PLR0914
     session: Session,
     paciente: CurrentPaciente,
 ):
     """
     Retorna estatísticas de progresso do paciente com comparações temporais.
-    
+
     Inclui:
     - Média de dor da última semana (vs semana anterior)
     - Dias registrados no mês (vs mês anterior)
     - Crises no mês (vs mês anterior)
     - Gráfico de dor dos últimos 7 dias
     - Insights automáticos baseados nos dados
+
+    Note: High complexity is acceptable for comprehensive progress analysis.
     """
     paciente_id = paciente.id
     hoje = datetime.now()
@@ -217,29 +239,41 @@ async def get_progress_statistics(
     inicio_semana_anterior = inicio_semana_atual - timedelta(days=7)
     fim_semana_anterior = inicio_semana_atual - timedelta(days=1)
 
-    inicio_mes_atual = hoje.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    inicio_mes_atual = hoje.replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
     if inicio_mes_atual.month == 1:
-        inicio_mes_anterior = inicio_mes_atual.replace(year=inicio_mes_atual.year - 1, month=12)
+        inicio_mes_anterior = inicio_mes_atual.replace(
+            year=inicio_mes_atual.year - 1, month=12
+        )
     else:
-        inicio_mes_anterior = inicio_mes_atual.replace(month=inicio_mes_atual.month - 1)
+        inicio_mes_anterior = inicio_mes_atual.replace(
+            month=inicio_mes_atual.month - 1
+        )
     fim_mes_anterior = inicio_mes_atual - timedelta(days=1)
 
     # 1. Média de dor da semana atual
     media_dor_semana_stmt = (
         select(func.avg(RegistroRegiaoDor.intensidade))
-        .join(RegistroDiario, RegistroRegiaoDor.registro_id == RegistroDiario.id)
+        .join(
+            RegistroDiario, RegistroRegiaoDor.registro_id == RegistroDiario.id
+        )
         .where(
             RegistroDiario.paciente_id == paciente_id,
             RegistroDiario.data_hora >= inicio_semana_atual,
         )
     )
     media_dor_semana = await session.scalar(media_dor_semana_stmt)
-    media_dor_semana = round(float(media_dor_semana), 1) if media_dor_semana else 0.0
+    media_dor_semana = (
+        round(float(media_dor_semana), 1) if media_dor_semana else 0.0
+    )
 
     # Média de dor da semana anterior
     media_dor_semana_ant_stmt = (
         select(func.avg(RegistroRegiaoDor.intensidade))
-        .join(RegistroDiario, RegistroRegiaoDor.registro_id == RegistroDiario.id)
+        .join(
+            RegistroDiario, RegistroRegiaoDor.registro_id == RegistroDiario.id
+        )
         .where(
             RegistroDiario.paciente_id == paciente_id,
             RegistroDiario.data_hora >= inicio_semana_anterior,
@@ -247,16 +281,26 @@ async def get_progress_statistics(
         )
     )
     media_dor_semana_ant = await session.scalar(media_dor_semana_ant_stmt)
-    media_dor_semana_ant = float(media_dor_semana_ant) if media_dor_semana_ant else None
+    media_dor_semana_ant = (
+        float(media_dor_semana_ant) if media_dor_semana_ant else None
+    )
 
     # Calcular variação
     variacao_dor = None
     tendencia_dor = 'neutro'
     if media_dor_semana_ant and media_dor_semana_ant > 0:
         variacao_dor = round(
-            ((media_dor_semana - media_dor_semana_ant) / media_dor_semana_ant) * 100, 1
+            ((media_dor_semana - media_dor_semana_ant) / media_dor_semana_ant)
+            * 100,
+            1,
         )
-        tendencia_dor = 'baixa' if variacao_dor < 0 else 'alta' if variacao_dor > 0 else 'neutro'
+        tendencia_dor = (
+            'baixa'
+            if variacao_dor < 0
+            else 'alta'
+            if variacao_dor > 0
+            else 'neutro'
+        )
 
     # 2. Dias registrados no mês atual
     dias_registrados_mes_stmt = select(
@@ -275,16 +319,29 @@ async def get_progress_statistics(
         RegistroDiario.data_hora >= inicio_mes_anterior,
         RegistroDiario.data_hora <= fim_mes_anterior,
     )
-    dias_registrados_mes_ant = await session.scalar(dias_registrados_mes_ant_stmt) or 0
+    dias_registrados_mes_ant = (
+        await session.scalar(dias_registrados_mes_ant_stmt) or 0
+    )
 
     # Calcular variação
     variacao_dias = None
     tendencia_dias = 'neutro'
     if dias_registrados_mes_ant > 0:
         variacao_dias = round(
-            ((dias_registrados_mes - dias_registrados_mes_ant) / dias_registrados_mes_ant) * 100, 1
+            (
+                (dias_registrados_mes - dias_registrados_mes_ant)
+                / dias_registrados_mes_ant
+            )
+            * 100,
+            1,
         )
-        tendencia_dias = 'alta' if variacao_dias > 0 else 'baixa' if variacao_dias < 0 else 'neutro'
+        tendencia_dias = (
+            'alta'
+            if variacao_dias > 0
+            else 'baixa'
+            if variacao_dias < 0
+            else 'neutro'
+        )
 
     # 3. Crises no mês atual
     crises_mes_stmt = select(func.count(RegistroCrise.id)).where(
@@ -308,7 +365,13 @@ async def get_progress_statistics(
         variacao_crises = round(
             ((crises_mes - crises_mes_ant) / crises_mes_ant) * 100, 1
         )
-        tendencia_crises = 'baixa' if variacao_crises < 0 else 'alta' if variacao_crises > 0 else 'neutro'
+        tendencia_crises = (
+            'baixa'
+            if variacao_crises < 0
+            else 'alta'
+            if variacao_crises > 0
+            else 'neutro'
+        )
 
     # 4. Gráfico de dor dos últimos 7 dias
     dias_semana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -316,13 +379,20 @@ async def get_progress_statistics(
 
     for i in range(7):
         dia_atual = inicio_semana_atual + timedelta(days=i)
-        dia_inicio = dia_atual.replace(hour=0, minute=0, second=0, microsecond=0)
-        dia_fim = dia_atual.replace(hour=23, minute=59, second=59, microsecond=999999)
+        dia_inicio = dia_atual.replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+        dia_fim = dia_atual.replace(
+            hour=23, minute=59, second=59, microsecond=999999
+        )
 
         # Buscar média de dor do dia
         media_dia_stmt = (
             select(func.avg(RegistroRegiaoDor.intensidade))
-            .join(RegistroDiario, RegistroRegiaoDor.registro_id == RegistroDiario.id)
+            .join(
+                RegistroDiario,
+                RegistroRegiaoDor.registro_id == RegistroDiario.id,
+            )
             .where(
                 RegistroDiario.paciente_id == paciente_id,
                 RegistroDiario.data_hora >= dia_inicio,
@@ -334,7 +404,11 @@ async def get_progress_statistics(
 
         grafico_dados.append(
             DiaGrafico(
-                dia=dias_semana[dia_atual.weekday() + 1 if dia_atual.weekday() < 6 else 0],
+                dia=dias_semana[
+                    dia_atual.weekday() + 1
+                    if dia_atual.weekday() < SATURDAY_WEEKDAY
+                    else 0
+                ],
                 data=dia_atual.strftime('%Y-%m-%d'),
                 intensidade_dor=intensidade,
             )
@@ -345,19 +419,26 @@ async def get_progress_statistics(
 
     # Insight sobre tendência de dor
     if variacao_dor is not None:
-        if variacao_dor < -5:
+        if variacao_dor < -PAIN_VARIATION_THRESHOLD:
             insights.append(
                 Insight(
                     tipo='success',
-                    mensagem=f'Seus níveis de dor diminuíram {abs(variacao_dor):.0f}% em relação à semana passada',
+                    mensagem=(
+                        f'Seus níveis de dor diminuíram '
+                        f'{abs(variacao_dor):.0f}% '
+                        'em relação à semana passada'
+                    ),
                     icone='📉',
                 )
             )
-        elif variacao_dor > 5:
+        elif variacao_dor > PAIN_VARIATION_THRESHOLD:
             insights.append(
                 Insight(
                     tipo='warning',
-                    mensagem=f'Seus níveis de dor aumentaram {variacao_dor:.0f}% em relação à semana passada',
+                    mensagem=(
+                        f'Seus níveis de dor aumentaram {variacao_dor:.0f}% '
+                        'em relação à semana passada'
+                    ),
                     icone='📈',
                 )
             )
@@ -365,17 +446,23 @@ async def get_progress_statistics(
             insights.append(
                 Insight(
                     tipo='info',
-                    mensagem='Seus níveis de dor estão estáveis em relação à semana passada',
+                    mensagem=(
+                        'Seus níveis de dor estão estáveis '
+                        'em relação à semana passada'
+                    ),
                     icone='➡️',
                 )
             )
 
     # Insight sobre registros
-    if dias_registrados_mes > 20:
+    if dias_registrados_mes > MIN_RECORDS_MONTH_THRESHOLD:
         insights.append(
             Insight(
                 tipo='success',
-                mensagem=f'Você registrou {dias_registrados_mes} dias este mês! Continue assim!',
+                mensagem=(
+                    f'Você registrou {dias_registrados_mes} dias este mês! '
+                    'Continue assim!'
+                ),
                 icone='📝',
             )
         )
@@ -383,7 +470,10 @@ async def get_progress_statistics(
         insights.append(
             Insight(
                 tipo='info',
-                mensagem=f'Você tem {dias_registrados_mes} registros este mês. Tente registrar diariamente!',
+                mensagem=(
+                    f'Você tem {dias_registrados_mes} registros este mês. '
+                    'Tente registrar diariamente!'
+                ),
                 icone='📝',
             )
         )
@@ -401,15 +491,21 @@ async def get_progress_statistics(
         insights.append(
             Insight(
                 tipo='success',
-                mensagem=f'Suas crises diminuíram {abs(variacao_crises):.0f}% em relação ao mês passado',
+                mensagem=(
+                    f'Suas crises diminuíram {abs(variacao_crises):.0f}% '
+                    'em relação ao mês passado'
+                ),
                 icone='✨',
             )
         )
-    elif crises_mes > 5:
+    elif crises_mes > MAX_CRISES_MONTH_THRESHOLD:
         insights.append(
             Insight(
                 tipo='warning',
-                mensagem=f'Você teve {crises_mes} crises este mês. Considere consultar seu médico',
+                mensagem=(
+                    f'Você teve {crises_mes} crises este mês. '
+                    'Considere consultar seu médico'
+                ),
                 icone='⚠️',
             )
         )

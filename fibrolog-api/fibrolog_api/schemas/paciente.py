@@ -40,11 +40,13 @@ def validate_password_strength(password: str) -> str:
 def validate_phone_number(v: str | None) -> str | None:
     if v is None:
         return None
-    # Permite (XX) 9XXXX-XXXX ou apenas números (11 dígitos para celular com 9, ou 10 para fixo/antigo)
+    # Permite (XX) 9XXXX-XXXX ou apenas números
+    # (11 dígitos para celular com 9, ou 10 para fixo/antigo)
     pattern = r'^((\(?\d{2}\)?\s?9?\d{4}-?\d{4})|(\d{10,11}))$'
     if not re.match(pattern, v):
         raise ValueError(
-            'Número de celular inválido. Formatos aceitos: (XX) 9XXXX-XXXX ou apenas números.'
+            'Número de celular inválido. Formatos aceitos: '
+            '(XX) 9XXXX-XXXX ou apenas números.'
         )
     return v
 

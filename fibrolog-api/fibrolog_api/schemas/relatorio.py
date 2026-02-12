@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class GeneralSummary(BaseModel):
     """General summary of symptoms in the period."""
+
     averagePain: float
     peakPain: int
     intensePainDays: int
@@ -16,12 +17,14 @@ class GeneralSummary(BaseModel):
 
 class PainRegionSummary(BaseModel):
     """Summary of pain region occurrences."""
+
     id: str
     count: int
 
 
 class SymptomTimelineEntry(BaseModel):
     """Chronological entry for daily symptoms."""
+
     date: datetime
     pain: Optional[int] = None
     fatigue: Optional[int] = None
@@ -32,6 +35,7 @@ class SymptomTimelineEntry(BaseModel):
 
 class CrisisReportEntry(BaseModel):
     """Chronological entry for crises."""
+
     timestamp: datetime
     intensity: int
     duration: Optional[str] = None
@@ -41,6 +45,7 @@ class CrisisReportEntry(BaseModel):
 
 class ReportPublic(BaseModel):
     """Main schema for the consolidated report."""
+
     patientName: str
     period: str
     generationDate: datetime

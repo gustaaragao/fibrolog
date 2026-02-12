@@ -32,7 +32,8 @@ async def test_get_progresso_sem_dados(client, token):
     assert data['media_dor_semana']['valor'] == 0.0
     assert data['dias_registrados_mes']['valor'] == 0
     assert data['crises_mes']['valor'] == 0
-    assert len(data['grafico_dor_semanal']) == 7
+    dias_esperados = 7
+    assert len(data['grafico_dor_semanal']) == dias_esperados
 
 
 async def test_get_progresso_com_dados(client, token, paciente, session):
@@ -105,11 +106,14 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
 
     # Verificar métricas
     assert data['media_dor_semana']['valor'] > 0
-    assert data['dias_registrados_mes']['valor'] >= 7
-    assert data['crises_mes']['valor'] == 3
+    dias_minimos = 7
+    crises_esperadas = 3
+    assert data['dias_registrados_mes']['valor'] >= dias_minimos
+    assert data['crises_mes']['valor'] == crises_esperadas
 
     # Verificar gráfico
-    assert len(data['grafico_dor_semanal']) == 7
+    dias_semana = 7
+    assert len(data['grafico_dor_semanal']) == dias_semana
     for dia in data['grafico_dor_semanal']:
         assert 'dia' in dia
         assert 'data' in dia
@@ -117,13 +121,16 @@ async def test_get_progresso_com_dados(client, token, paciente, session):
 
     # Verificar insights
     assert len(data['insights']) > 0
+    tipos_validos = {'info', 'warning', 'success', 'danger'}
     for insight in data['insights']:
         assert 'tipo' in insight
         assert 'mensagem' in insight
-        assert insight['tipo'] in ['info', 'warning', 'success', 'danger']
+        assert insight['tipo'] in tipos_validos
 
 
-async def test_get_progresso_compara_periodos(client, token, paciente, session):
+async def test_get_progresso_compara_periodos(
+    client, token, paciente, session
+):
     """Testa se o endpoint compara corretamente os períodos."""
     hoje = datetime.now()
 
@@ -182,11 +189,11 @@ async def test_get_progresso_compara_periodos(client, token, paciente, session):
     data = response.json()
 
     # Verificar que houve melhora (dor diminuiu)
-    assert data['media_dor_semana']['valor'] == 4.0
+    media_dor_esperada = 4.0
+    assert data['media_dor_semana']['valor'] == media_dor_esperada
     assert data['media_dor_semana']['variacao_percentual'] is not None
-    assert (
-        data['media_dor_semana']['variacao_percentual'] < 0
-    )  # Diminuiu (negativo)
+    # Diminuiu (negativo)
+    assert data['media_dor_semana']['variacao_percentual'] < 0
     assert data['media_dor_semana']['tendencia'] == 'baixa'
 
 
