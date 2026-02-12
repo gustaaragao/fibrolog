@@ -80,7 +80,15 @@ export default function RootLayout() {
         <Stack.Screen name="index" />
         <Stack.Screen name="login" />
         <Stack.Screen name="register" />
-        <Stack.Screen name="home" />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="symptoms" />
+        <Stack.Screen name="crisis" />
+        <Stack.Screen name="crisis-form" />
+        <Stack.Screen name="crisis-detail" />
+        <Stack.Screen name="reminder" />
+        <Stack.Screen name="history" />
+        <Stack.Screen name="support" />
+        <Stack.Screen name="relatorio" />
       </Stack>
       <Toast />
     </AuthProvider>

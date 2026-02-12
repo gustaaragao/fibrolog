@@ -62,7 +62,7 @@ async def _buscar_registro_mesmo_dia(session, paciente_id, data_registro):
     )
     result = await session.execute(stmt)
     registros_existentes = result.scalars().all()
-    
+
     # Filtrar registros do mesmo dia
     for reg in registros_existentes:
         if reg.data_hora.date() == data_registro:
@@ -117,7 +117,7 @@ async def create_registro_diario(
     db_registro = await _buscar_registro_mesmo_dia(
         session, paciente.id, data_registro
     )
-    
+
     if db_registro:
         # Atualizar registro existente (RN006: sobrescrever)
         db_registro.data_hora = registro.timestamp
@@ -169,7 +169,7 @@ async def create_registro_diario_pt(
     db_registro = await _buscar_registro_mesmo_dia(
         session, paciente.id, data_registro
     )
-    
+
     if db_registro:
         # Atualizar registro existente (RN006: sobrescrever)
         db_registro.data_hora = registro.data_hora
@@ -307,7 +307,7 @@ async def update_registro_diario(
             selectinload(RegistroDiario.regioes_dor),
         )
     )
-    
+
     if not db_registro:
         raise HTTPException(
             status_code=HTTPStatus.NOT_FOUND,
@@ -316,7 +316,7 @@ async def update_registro_diario(
 
     db_registro.data_hora = registro_data.timestamp
     db_registro.observacoes = registro_data.notes
-    
+
     await _limpar_itens_registro(session, db_registro)
     await _adicionar_itens_registro(
         session, db_registro, registro_data.symptoms, registro_data.painRegions

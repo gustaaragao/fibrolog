@@ -3,13 +3,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    ScrollView,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import BodyMap from "../components/ui/BodyMap";
@@ -188,7 +188,7 @@ export default function SymptomsScreen() {
           text1: "Sucesso!",
           text2: "Seus sintomas foram registrados.",
         });
-        router.replace("/home");
+        router.replace("/(tabs)/home");
       }
     } catch (error) {
       Alert.alert(
@@ -257,181 +257,191 @@ export default function SymptomsScreen() {
       ) : (
         <>
           {step === 1 && (
-        <ScrollView className="flex-1">
-          <View className="p-4">
-            <Text className="text-pink-800 text-lg font-bold mb-2 text-center">
-              Como você está hoje?
-            </Text>
-            <Text className="text-pink-600 text-sm mb-4 text-center">
-              Selecione os sintomas que você está sentindo:
-            </Text>
-            <FlatList
-              data={SYMPTOMS}
-              renderItem={renderSymptomItem}
-              keyExtractor={(item) => item.id}
-              numColumns={2}
-              scrollEnabled={false}
-              contentContainerStyle={{ paddingBottom: 10 }}
-            />
-            <View className="mt-4">
-              <Button title="Próximo: Local da Dor" onPress={handleNext} />
-            </View>
-          </View>
-        </ScrollView>
-      )}
-
-      {step === 2 && (
-        <ScrollView className="flex-1">
-          <View className="pb-4">
-            <View className="px-4 pt-4">
-              <Text className="text-pink-800 text-lg font-bold mb-2 text-center">
-                Onde dói?
-              </Text>
-              <Text className="text-pink-600 text-sm mb-4 text-center">
-                Toque nas áreas do corpo onde você sente dor.
-              </Text>
-            </View>
-            <View className="mb-4">
-              <BodyMap
-                selectedRegions={selectedRegions}
-                onRegionToggle={toggleRegion}
-              />
-            </View>
-
-            {selectedRegions.length > 0 && (
-              <View className="mt-4 px-4">
-                <Text className="text-pink-800 font-bold mb-3 text-base">
-                  Intensidade da dor em cada região (0-10):
+            <ScrollView className="flex-1">
+              <View className="p-4">
+                <Text className="text-pink-800 text-lg font-bold mb-2 text-center">
+                  Como você está hoje?
                 </Text>
-                {selectedRegions.map((regionId) => {
-                  const intensity = regionIntensities[regionId] || 5;
-                  return (
-                    <View
-                      key={regionId}
-                      className="bg-white p-4 rounded-xl mb-3 border border-pink-100"
-                    >
-                      <View className="flex-row items-center justify-between mb-3">
-                        <Text className="text-pink-800 font-semibold">
-                          Região {regionId}
-                        </Text>
-                        <Text className="text-pink-600 font-bold text-xl">
-                          {intensity}
-                        </Text>
-                      </View>
-                      <View className="flex-row justify-between">
-                        {[0, 2, 4, 6, 8, 10].map((val) => (
-                          <TouchableOpacity
-                            key={val}
-                            onPress={() => updateRegionIntensity(regionId, val)}
-                            className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
-                              intensity === val
-                                ? "bg-pink-500 border-pink-500"
-                                : "bg-white border-pink-200"
+                <Text className="text-pink-600 text-sm mb-4 text-center">
+                  Selecione os sintomas que você está sentindo:
+                </Text>
+                <FlatList
+                  data={SYMPTOMS}
+                  renderItem={renderSymptomItem}
+                  keyExtractor={(item) => item.id}
+                  numColumns={2}
+                  scrollEnabled={false}
+                  contentContainerStyle={{ paddingBottom: 10 }}
+                />
+                <View className="mt-4">
+                  <Button title="Próximo: Local da Dor" onPress={handleNext} />
+                </View>
+              </View>
+            </ScrollView>
+          )}
+
+          {step === 2 && (
+            <ScrollView className="flex-1">
+              <View className="pb-4">
+                <View className="px-4 pt-4">
+                  <Text className="text-pink-800 text-lg font-bold mb-2 text-center">
+                    Onde dói?
+                  </Text>
+                  <Text className="text-pink-600 text-sm mb-4 text-center">
+                    Toque nas áreas do corpo onde você sente dor.
+                  </Text>
+                </View>
+                <View className="mb-4">
+                  <BodyMap
+                    selectedRegions={selectedRegions}
+                    onRegionToggle={toggleRegion}
+                  />
+                </View>
+
+                {selectedRegions.length > 0 && (
+                  <View className="mt-4 px-4">
+                    <Text className="text-pink-800 font-bold mb-3 text-base">
+                      Intensidade da dor em cada região (0-10):
+                    </Text>
+                    {selectedRegions.map((regionId) => {
+                      const intensity = regionIntensities[regionId] || 5;
+                      return (
+                        <View
+                          key={regionId}
+                          className="bg-white p-4 rounded-xl mb-3 border border-pink-100"
+                        >
+                          <View className="flex-row items-center justify-between mb-3">
+                            <Text className="text-pink-800 font-semibold">
+                              Região {regionId}
+                            </Text>
+                            <Text className="text-pink-600 font-bold text-xl">
+                              {intensity}
+                            </Text>
+                          </View>
+                          <View className="flex-row justify-between">
+                            {[0, 2, 4, 6, 8, 10].map((val) => (
+                              <TouchableOpacity
+                                key={val}
+                                onPress={() =>
+                                  updateRegionIntensity(regionId, val)
+                                }
+                                className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
+                                  intensity === val
+                                    ? "bg-pink-500 border-pink-500"
+                                    : "bg-white border-pink-200"
+                                }`}
+                              >
+                                <Text
+                                  className={`font-bold ${
+                                    intensity === val
+                                      ? "text-white"
+                                      : "text-pink-400"
+                                  }`}
+                                >
+                                  {val}
+                                </Text>
+                              </TouchableOpacity>
+                            ))}
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
+                <View className="flex-row justify-between mt-6 mb-4 px-4">
+                  <View className="flex-1 mr-2">
+                    <Button
+                      title="Voltar"
+                      variant="outline"
+                      onPress={handleBack}
+                    />
+                  </View>
+                  <View className="flex-1 ml-2">
+                    <Button title="Próximo" onPress={handleNext} />
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+          )}
+
+          {step === 3 && (
+            <ScrollView className="flex-1 p-4">
+              <Text className="text-pink-800 text-lg font-bold mb-4">
+                Qual a intensidade de cada sintoma? (0 a 10)
+              </Text>
+
+              {selectedSymptoms.map((id) => {
+                const symptom = SYMPTOMS.find((s) => s.id === id);
+                const intensity = symptomIntensities[id] || 0;
+                return (
+                  <View
+                    key={id}
+                    className="bg-white p-4 rounded-xl mb-4 border border-pink-100"
+                  >
+                    <View className="flex-row items-center mb-3">
+                      <MaterialCommunityIcons
+                        name={symptom?.icon as any}
+                        size={24}
+                        color={Colors.pink[600]}
+                      />
+                      <Text className="ml-2 text-pink-800 font-bold text-base">
+                        {symptom?.name}
+                      </Text>
+                      <Text className="ml-auto text-pink-600 font-bold text-lg">
+                        {intensity}
+                      </Text>
+                    </View>
+
+                    <View className="flex-row justify-between">
+                      {[0, 2, 4, 6, 8, 10].map((val) => (
+                        <TouchableOpacity
+                          key={val}
+                          onPress={() => updateSymptomIntensity(id, val)}
+                          className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
+                            intensity === val
+                              ? "bg-pink-500 border-pink-500"
+                              : "bg-white border-pink-200"
+                          }`}
+                        >
+                          <Text
+                            className={`font-bold ${
+                              intensity === val ? "text-white" : "text-pink-400"
                             }`}
                           >
-                            <Text
-                              className={`font-bold ${
-                                intensity === val
-                                  ? "text-white"
-                                  : "text-pink-400"
-                              }`}
-                            >
-                              {val}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
+                            {val}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
                     </View>
-                  );
-                })}
-              </View>
-            )}
-            <View className="flex-row justify-between mt-6 mb-4 px-4">
-              <View className="flex-1 mr-2">
-                <Button title="Voltar" variant="outline" onPress={handleBack} />
-              </View>
-              <View className="flex-1 ml-2">
-                <Button title="Próximo" onPress={handleNext} />
-              </View>
-            </View>
-          </View>
-        </ScrollView>
-      )}
+                  </View>
+                );
+              })}
 
-      {step === 3 && (
-        <ScrollView className="flex-1 p-4">
-          <Text className="text-pink-800 text-lg font-bold mb-4">
-            Qual a intensidade de cada sintoma? (0 a 10)
-          </Text>
-
-          {selectedSymptoms.map((id) => {
-            const symptom = SYMPTOMS.find((s) => s.id === id);
-            const intensity = symptomIntensities[id] || 0;
-            return (
-              <View
-                key={id}
-                className="bg-white p-4 rounded-xl mb-4 border border-pink-100"
-              >
-                <View className="flex-row items-center mb-3">
-                  <MaterialCommunityIcons
-                    name={symptom?.icon as any}
-                    size={24}
-                    color={Colors.pink[600]}
-                  />
-                  <Text className="ml-2 text-pink-800 font-bold text-base">
-                    {symptom?.name}
-                  </Text>
-                  <Text className="ml-auto text-pink-600 font-bold text-lg">
-                    {intensity}
-                  </Text>
-                </View>
-
-                <View className="flex-row justify-between">
-                  {[0, 2, 4, 6, 8, 10].map((val) => (
-                    <TouchableOpacity
-                      key={val}
-                      onPress={() => updateSymptomIntensity(id, val)}
-                      className={`w-12 h-12 rounded-full items-center justify-center border-2 ${
-                        intensity === val
-                          ? "bg-pink-500 border-pink-500"
-                          : "bg-white border-pink-200"
-                      }`}
-                    >
-                      <Text
-                        className={`font-bold ${
-                          intensity === val ? "text-white" : "text-pink-400"
-                        }`}
-                      >
-                        {val}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            );
-          })}
-
-          <TextArea
-            name="notes"
-            control={control}
-            label="Observações Adicionais"
-            placeholder="Descreva como você está se sentindo..."
-          />
-
-          <View className="flex-row justify-between mt-4 mb-8">
-            <View className="flex-1 mr-2">
-              <Button title="Voltar" variant="outline" onPress={handleBack} />
-            </View>
-            <View className="flex-1 ml-2">
-              <Button
-                title="Salvar Registro"
-                loading={loading}
-                onPress={handleSubmit(onSubmit)}
+              <TextArea
+                name="notes"
+                control={control}
+                label="Observações Adicionais"
+                placeholder="Descreva como você está se sentindo..."
               />
-            </View>
-          </View>
-        </ScrollView>
-      )}
+
+              <View className="flex-row justify-between mt-4 mb-8">
+                <View className="flex-1 mr-2">
+                  <Button
+                    title="Voltar"
+                    variant="outline"
+                    onPress={handleBack}
+                  />
+                </View>
+                <View className="flex-1 ml-2">
+                  <Button
+                    title="Salvar Registro"
+                    loading={loading}
+                    onPress={handleSubmit(onSubmit)}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+          )}
         </>
       )}
     </View>

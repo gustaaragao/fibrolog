@@ -4,9 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fibrolog_api.routers import (
     auth,
     crises,
+    estatisticas,
     medicacoes,
     pacientes,
     registros_diarios,
+    relatorios,
 )
 
 app = FastAPI()
@@ -29,3 +31,5 @@ app.include_router(crises.router)
 app.include_router(pacientes.router)
 app.include_router(registros_diarios.router)
 app.include_router(medicacoes.router)
+app.include_router(relatorios.router)
+app.include_router(estatisticas.router)
